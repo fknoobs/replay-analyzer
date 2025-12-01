@@ -196,6 +196,8 @@ export class ReplayParser {
                 // Old format fallback or unknown, skipping for safety in this port
             }
         }
+
+        this.replay.duration = tickIndex / 8;
     }
 
     private parseTick(data: Buffer, tickDataStart: number) {
