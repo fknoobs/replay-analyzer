@@ -1,0 +1,811 @@
+9,0,UNIT,"Engineers",0xa,0
+9,0,UNIT,"Heavy Machine Gun Team",0xf,0
+9,0,UNIT,"Mortar Team",0x28,0
+9,0,UNIT,"Riflemen",0x30,0
+9,0,UNIT,"Sniper",0x36,0
+9,0,UNIT,"Jeep",0x3d,0
+9,0,UNIT,"M10 Tank Destroyer",0x3f,0
+9,0,UNIT,"M18 Hellcat",0x41,0
+9,0,UNIT,"M1 57mm Anti-Tank Gun",0x43,0
+9,0,UNIT,"M3 Halftrack",0x4a,0
+9,0,UNIT,"M4 Sherman",0x4b,0
+9,0,UNIT,"M4 'Crocodile' Sherman",0x4d,0
+9,0,UNIT,"M8 Armored Car",0x4f,0
+9,0,UNIT,"T17 Armored Car",0x53,0
+9,0,UNIT,"Captain",0x57,0
+9,0,UNIT,"HMG Commandos",0x58,0
+9,0,UNIT,"Mortar Commandos",0x59,0
+9,0,UNIT,"PIAT Commandos",0x5b,0
+9,0,UNIT,"Commandos",0x5c,0
+9,0,UNIT,"Lieutenant",0x72,0
+9,0,UNIT,"Sappers",0x79,0
+9,0,UNIT,"Infantry Section",0x7b,0
+9,0,UNIT,"Bren Carrier",0x85,0
+9,0,UNIT,"Cromwell Command Tank",0x8a,0
+9,0,UNIT,"Cromwell",0x8e,0
+9,0,UNIT,"Kangaroo Carrier",0x95,0
+9,0,UNIT,"Sherman Firefly",0x97,0
+9,0,UNIT,"Staghound Armoured Car",0x99,0
+9,0,UNIT,"Stuart Light Tank",0x9a,0
+9,0,UNIT,"Tetrarch",0x9b,0
+9,0,UNIT,"Grenadiers",0xa2,0
+9,0,UNIT,"MG42 Heavy Machine Gun",0xa4,0
+9,0,UNIT,"Knight's Cross Holders",0xb6,0
+9,0,UNIT,"Gr. 34 8cm Mortar Team",0xba,0
+9,0,UNIT,"Officer",0xbb,0
+9,0,UNIT,"Pioneers",0xbc,0
+9,0,UNIT,"Sniper",0xbd,0
+9,0,UNIT,"Volksgrenadiers",0xcf,0
+9,0,UNIT,"150mm Nebelwerfer Rocket Battery",0xd6,0
+9,0,UNIT,"Pak 38 50mm Anti-Tank Gun",0xd7,0
+9,0,UNIT,"Schwimmwagen Type 166",0xde,0
+9,0,UNIT,"Geschutzwagen",0xe4,0
+9,0,UNIT,"Goliath",0xe5,0
+9,0,UNIT,"Sdkfz 251 Halftrack",0xe6,0
+9,0,UNIT,"Motorcycle",0xed,0
+9,0,UNIT,"Ostwind Flakpanzer",0xf0,0
+9,0,UNIT,"Panther",0xf2,0
+9,0,UNIT,"Panzer IV",0xf3,0
+9,0,UNIT,"Sdkfz 234 Armored Car",0xf4,0
+9,0,UNIT,"Stug IV",0xfb,0
+9,0,UNIT,"Panzer Grenadiers",0x121,0
+9,0,UNIT,"Assault Grenadier Heavy Infantry",0x124,0
+9,0,UNIT,"Tank Buster Heavy Infantry",0x125,0
+9,0,UNIT,"Scout Car",0x127,0
+9,0,UNIT,"Armored Car",0x128,0
+9,0,UNIT,"Infantry Halftrack",0x12a,0
+9,0,UNIT,"Mortar Halftrack",0x12b,0
+9,0,UNIT,"Light AT Halftrack",0x12c,0
+9,0,UNIT,"Funkwagen 'Vampire' Halftrack",0x12d,0
+9,0,UNIT,"Munitions Halftrack",0x12e,0
+9,0,UNIT,"Bergetiger Repair and Recovery Vehicle",0x131,0
+9,0,UNIT,"Hotchkiss Light Tank",0x139,0
+9,0,UNIT,"Marder III Tank Hunter",0x13c,0
+9,0,UNIT,"Schwimmwagen Type 128",0x13e,0
+9,0,UNIT,"Panzer IV Infantry Support Truck",0x140,0
+9,0,UNIT,"Kettenkrad",0x141,0
+9,0,BUILDING,"Tank Depot",0x5db,0
+9,0,BUILDING,"Barbed Wire",0x5dd,0
+9,0,BUILDING,"Barbed Wire (Riflemen)",0x5df,0
+9,0,BUILDING,"Barracks",0x5e1,0
+9,0,BUILDING,"Medic Station",0x5e2,0
+9,0,BUILDING,"Tank Depot",0x5e5,0
+9,0,BUILDING,"Barbed Wire(Engineers)",0x5e7,0
+9,0,BUILDING,"Barbed Wire(Riflemen)",0x5e9,0
+9,0,BUILDING,"Barracks",0x5eb,0
+9,0,BUILDING,"Medic Station",0x5ec,0
+9,0,BUILDING,"Machine Gun Emplacement",0x5f7,0
+9,0,BUILDING,"Motor Pool",0x5f9,0
+9,0,BUILDING,"Supply Yard",0x5fa,0
+9,0,BUILDING,"Sand Bags",0x5fb,0
+9,0,BUILDING,"Sand Bags (Riflemen)",0x5fd,0
+9,0,BUILDING,"Observation Post",0x5fe,0
+9,0,BUILDING,"Observation Post",0x601,0
+9,0,BUILDING,"Motor Pool",0x603,0
+9,0,BUILDING,"Supply Yard",0x604,0
+9,0,BUILDING,"Sandbags(Engineers)",0x605,0
+9,0,BUILDING,"Triage Center",0x606,0
+9,0,BUILDING,"Sandbags(Riflemen)",0x607,0
+9,0,BUILDING,"Mines",0x608,0
+9,0,BUILDING,"Mines (Riflemen)",0x60a,0
+9,0,BUILDING,"Weapons Support Center",0x60d,0
+9,0,BUILDING,"Tank Traps(Engineers)",0x60e,0
+9,0,BUILDING,"Tank Traps(Riflemen)",0x60f,0
+9,0,BUILDING,"Triage Center",0x610,0
+9,0,BUILDING,"Mines(Engineers)",0x612,0
+9,0,BUILDING,"Mines(Riflemen)",0x614,0
+9,0,BUILDING,"M2 105mm Howitzer",0x641,0
+9,0,BUILDING,"M2 105mm Howitzer",0x64b,0
+9,0,BUILDING,"17 Pounder AT Gun",0x653,0
+9,0,BUILDING,"Barbed Wire",0x654,0
+9,0,BUILDING,"Bofors 40mm Cannon",0x657,0
+9,0,BUILDING,"Casualty Clearing Station",0x658,0
+9,0,BUILDING,"Mines",0x659,0
+9,0,BUILDING,"Detector for Radio Triangulation",0x65a,0
+9,0,BUILDING,"17 Pounder AT Gun",0x65d,0
+9,0,BUILDING,"Barbed Wire(Sappers)",0x65e,0
+9,0,BUILDING,"25 Pounder Gun Howitzer",0x65f,0
+9,0,BUILDING,"Bofors 40mm Cannon",0x661,0
+9,0,BUILDING,"Casualty Clearing Station",0x662,0
+9,0,BUILDING,"Mines(Sappers)",0x663,0
+9,0,BUILDING,"Detector for Radio Triangulation",0x664,0
+9,0,BUILDING,"Slit Trench",0x666,0
+9,0,BUILDING,"25 Pounder Howitzer Gun",0x669,0
+9,0,BUILDING,"Vickers Machine Gun Emplacement",0x66b,0
+9,0,BUILDING,"3'' Mortar Emplacement",0x66c,0
+9,0,BUILDING,"Sandbags(Sappers)",0x66e,0
+9,0,BUILDING,"Slit Trench",0x670,0
+9,0,BUILDING,"Mines",0x69d,0
+9,0,BUILDING,"Bunker",0x69e,0
+9,0,BUILDING,"Observation Post",0x69f,0
+9,0,BUILDING,"Barbed Wire",0x6a2,0
+9,0,BUILDING,"Wehrmacht Quarters",0x6a3,0
+9,0,BUILDING,"Panzer Command",0x6a5,0
+9,0,BUILDING,"Mines",0x6a7,0
+9,0,BUILDING,"Bunker",0x6a8,0
+9,0,BUILDING,"Observation Post",0x6a9,0
+9,0,BUILDING,"Barbed Wire",0x6ac,0
+9,0,BUILDING,"Wehrmacht Quarters",0x6ad,0
+9,0,BUILDING,"Panzer Command",0x6af,0
+9,0,BUILDING,"Sturm Armory",0x6b1,0
+9,0,BUILDING,"Krieg Barracks",0x6c2,0
+9,0,BUILDING,"Kampfkraft Centre",0x6c4,0
+9,0,BUILDING,"Sand Bags",0x6c5,0
+9,0,BUILDING,"Tank Traps",0x6ca,0
+9,0,BUILDING,"Krieg Barracks",0x6cc,0
+9,0,BUILDING,"Kampfkraft Centre",0x6ce,0
+9,0,BUILDING,"Sandbags",0x6cf,0
+9,0,BUILDING,"Tank Traps",0x6d4,0
+9,0,BUILDING,"88mm Flak 36 AT/AA",0x6fa,0
+9,0,BUILDING,"Flak 88mm 36 AT/AA",0x6fb,0
+9,0,BUILDING,"88mm Flak 36 AT/AA",0x705,0
+9,0,BUILDING,"Barbed Wire",0x72f,0
+9,0,BUILDING,"Barbed Wire",0x730,0
+9,0,BUILDING,"Barbed Wire (LGF)",0x73a,0
+9,0,BUILDING,"Barbed Wire (SE PGren)",0x73b,0
+9,0,BUILDING,"Kampfgruppe Kompanie",0x743,0
+9,0,BUILDING,"Logistik Kompanie",0x744,0
+9,0,BUILDING,"Panzer-Support Kommand",0x745,0
+9,0,BUILDING,"Panzer-J�ger Kommand",0x746,0
+9,0,BUILDING,"Sand Bags",0x747,0
+9,0,BUILDING,"Road Blocks",0x748,0
+9,0,BUILDING,"Teller Mines",0x74b,0
+9,0,BUILDING,"Kampfgruppe Kompanie",0x74e,0
+9,0,BUILDING,"Logistik Kompanie",0x74f,0
+9,0,BUILDING,"Panzer-Support Kommand",0x750,0
+9,0,BUILDING,"Panzer-Jager Kommand",0x751,0
+9,0,BUILDING,"Sandbags (LGF)",0x752,0
+9,0,BUILDING,"Road Blocks",0x753,0
+9,0,BUILDING,"Teller Mines",0x757,0
+9,0,BUILDING,"88mm Flak 36 AT/AA",0x769,0
+9,0,BUILDING,"Flakvierling 38 20mm AA",0x76e,0
+9,0,BUILDING,"88mm Flak 36 AT/AA",0x775,0
+9,0,BUILDING,"Flakvierling 38 20mm AA",0x77a,0
+9,0,COMMANDTREE,"Airborne Company",0x2,0
+9,0,COMMANDTREE,"Paratroopers",0x3,0
+9,0,COMMANDTREE,"Paradrop AT Gun",0x4,0
+9,0,COMMANDTREE,"Supply Drops",0x5,0
+9,0,COMMANDTREE,"Air Recon",0x6,0
+9,0,COMMANDTREE,"Strafing Run",0x7,0
+9,0,COMMANDTREE,"Bombing Run",0x8,0
+9,0,COMMANDTREE,"Armor Company",0x9,0
+9,0,COMMANDTREE,"Raid",0xa,0
+9,0,COMMANDTREE,"Calliope Rocket Launcher",0xb,0
+9,0,COMMANDTREE,"M26 Pershing Heavy Tank",0xc,0
+9,0,COMMANDTREE,"Fast Deployment",0xd,0
+9,0,COMMANDTREE,"Field Repairs",0xe,0
+9,0,COMMANDTREE,"Allied War Machine",0xf,0
+9,0,COMMANDTREE,"Infantry Company",0x11,0
+9,0,COMMANDTREE,"Rapid Response",0x12,0
+9,0,COMMANDTREE,"Rangers",0x13,0
+9,0,COMMANDTREE,"Off-Map Combat Group",0x14,0
+9,0,COMMANDTREE,"Defensive Operations",0x15,0
+9,0,COMMANDTREE,"Off-Map Artillery Support",0x16,0
+9,0,COMMANDTREE,"105mm Howitzer",0x17,0
+9,0,COMMANDTREE,"Blitzkrieg Doctrine",0xba,0
+9,0,COMMANDTREE,"Infantry Assault Team",0xbb,0
+9,0,COMMANDTREE,"Urban Assault Support",0xbc,0
+9,0,COMMANDTREE,"Armored Assault Force",0xbd,0
+9,0,COMMANDTREE,"Assault Grenadiers",0xbe,0
+9,0,COMMANDTREE,"Blitzkrieg Assault",0xbf,0
+9,0,COMMANDTREE,"Resource Blitz",0xc0,0
+9,0,COMMANDTREE,"Defensive Doctrine",0xc2,0
+9,0,COMMANDTREE,"For the Fatherland!",0xc3,0
+9,0,COMMANDTREE,"Fortify the Perimeter",0xc4,0
+9,0,COMMANDTREE,"88mm Flak 36 AT/AA",0xc5,0
+9,0,COMMANDTREE,"Advanced Warning",0xc6,0
+9,0,COMMANDTREE,"Registered Artillery",0xc7,0
+9,0,COMMANDTREE,"Rocket Artillery",0xc8,0
+9,0,COMMANDTREE,"Terror Doctrine",0x109,0
+9,0,COMMANDTREE,"Zeal",0x10a,0
+9,0,COMMANDTREE,"Propaganda War",0x10b,0
+9,0,COMMANDTREE,"King Tiger",0x10c,0
+9,0,COMMANDTREE,"Inspired Assault",0x10d,0
+9,0,COMMANDTREE,"Firestorm",0x10e,0
+9,0,COMMANDTREE,"V1 Rocket Attack",0x10f,0
+9,0,COMMANDTREE,"Luftwaffe Tactics",0x127,0
+9,0,COMMANDTREE,"Fallschirmjager Infiltration",0x128,0
+9,0,COMMANDTREE,"Butterfly Bombs",0x129,0
+9,0,COMMANDTREE,"Henschel Combat Air Patrol",0x12a,0
+9,0,COMMANDTREE,"Luftwaffe Ground Forces",0x12b,0
+9,0,COMMANDTREE,"Wirbelwind Flakpanzer",0x12c,0
+9,0,COMMANDTREE,"Flak 36 88mm Cannon",0x12d,0
+9,0,COMMANDTREE,"Scorched Earth Tactics",0x12e,0
+9,0,COMMANDTREE,"Booby Trap Building",0x12f,0
+9,0,COMMANDTREE,"Booby Trap Strategic Point",0x130,0
+9,0,COMMANDTREE,"Sector Artillery",0x131,0
+9,0,COMMANDTREE,"Roadblocks",0x132,0
+9,0,COMMANDTREE,"Scorched Earth",0x133,0
+9,0,COMMANDTREE,"Hummel Self-Propelled Artillery",0x134,0
+9,0,COMMANDTREE,"Tank Destroyer Tactics",0x135,0
+9,0,COMMANDTREE,"Teller Mines",0x136,0
+9,0,COMMANDTREE,"Hetzer Tank",0x137,0
+9,0,COMMANDTREE,"Double Infantry AT Efforts",0x138,0
+9,0,COMMANDTREE,"Tank Awareness",0x139,0
+9,0,COMMANDTREE,"APCR Rounds",0x13a,0
+9,0,COMMANDTREE,"Jagdpanther Tank Destroyer",0x13b,0
+9,0,COMMANDTREE,"Royal Artillery Support",0x13c,0
+9,0,COMMANDTREE,"Forward Observation Officers",0x13d,0
+9,0,COMMANDTREE,"Creeping Barrage",0x13e,0
+9,0,COMMANDTREE,"Priest 105mm SPG",0x13f,0
+9,0,COMMANDTREE,"Supercharge Artillery Rounds",0x140,0
+9,0,COMMANDTREE,"Overwatch Artillery",0x141,0
+9,0,COMMANDTREE,"Counter Battery",0x142,0
+9,0,COMMANDTREE,"Royal Commandos Support",0x143,0
+9,0,COMMANDTREE,"Glider-borne Commandos",0x144,0
+9,0,COMMANDTREE,"Tetrarch Tank",0x145,0
+9,0,COMMANDTREE,"Glider Headquarters",0x146,0
+9,0,COMMANDTREE,"Radio Triangulation Detectors",0x147,0
+9,0,COMMANDTREE,"Ultra Decryption",0x148,0
+9,0,COMMANDTREE,"Decoy Artillery",0x149,0
+9,0,COMMANDTREE,"Royal Engineers Support",0x14a,0
+9,0,COMMANDTREE,"Improved Emplacements",0x14b,0
+9,0,COMMANDTREE,"Hull Down",0x14c,0
+9,0,COMMANDTREE,"Improved Command Vehicles",0x14d,0
+9,0,COMMANDTREE,"Churchill Infantry Tank",0x14e,0
+9,0,COMMANDTREE,"Churchill AVRE",0x14f,0
+9,0,COMMANDTREE,"Churchill Crocodile",0x150,0
+9,0,UPGRADE,"Level 1 Production",0x18,0
+9,0,UPGRADE,"Level 2 Production",0x19,0
+9,0,UPGRADE,"M1A1C 76mm Gun",0x1b,0
+9,0,UPGRADE,"Demolitions",0x1f,0
+9,0,UPGRADE,"Mk2 Grenades",0x20,0
+9,0,UPGRADE,"Defensive Smoke Screen",0x23,0
+9,0,UPGRADE,"Sticky Bombs",0x24,0
+9,0,UPGRADE,"Aid Station (Bunker)",0x27,0
+9,0,UPGRADE,"M2HB .50 cal Machine Gun (M18)",0x2b,0
+9,0,UPGRADE,"M2HB .50 cal Machine Gun (M8)",0x2e,0
+9,0,UPGRADE,"M2HB .50 cal Machine Gun (M4)",0x2f,0
+9,0,UPGRADE,"M2HB .50 cal Machine Gun",0x30,0
+9,0,UPGRADE,"M2 Flamethrower",0x31,0
+9,0,UPGRADE,"Armor Skirts",0x33,0
+9,0,UPGRADE,"M18 57mm Recoilless Rifle",0x34,0
+9,0,UPGRADE,"Quad .50 cal Maxson Mount",0x36,0
+9,0,UPGRADE,"Thompson SMG",0x37,0
+9,0,UPGRADE,"Bulldozer",0x3b,0
+9,0,UPGRADE,"Crab Mine Flail",0x3d,0
+9,0,UPGRADE,"Minesweeper",0x45,0
+9,0,UPGRADE,"M1918 Browning Automatic Rifle (BAR)",0x55,0
+9,0,UPGRADE,"Secured Resourcing",0x5a,0
+9,0,UPGRADE,"Speed Governers",0x5f,0
+9,0,UPGRADE,"Speed Governors",0x60,0
+9,0,UPGRADE,"Convert to MMG Carrier",0x66,0
+9,0,UPGRADE,"Convert to MMG Carrier (BC)",0x67,0
+9,0,UPGRADE,"Mine Plow",0x69,0
+9,0,UPGRADE,"Mine Plow (Churchill)",0x6a,0
+9,0,UPGRADE,"Bren Light Machine Gun",0x6e,0
+9,0,UPGRADE,"Bren Light Machine Gun",0x6f,0
+9,0,UPGRADE,"Disposal and Detection Section (Sappers)",0x70,0
+9,0,UPGRADE,"Expert Engineers",0x71,0
+9,0,UPGRADE,"PIAT",0x72,0
+9,0,UPGRADE,"PIAT",0x73,0
+9,0,UPGRADE,"Recon Element",0x74,0
+9,0,UPGRADE,"Rifle Grenades",0x75,0
+9,0,UPGRADE,"Tank Crew Commander",0x76,0
+9,0,UPGRADE,"Tank Crew Commander (Firefly)",0x77,0
+9,0,UPGRADE,"Littlejohn Adapter (Tetrarch)",0x78,0
+9,0,UPGRADE,"MG42 Heavy Machine Gun (Bunker)",0x83,0
+9,0,UPGRADE,"MG42 Heavy Machine Gun (Bunker)",0x84,0
+9,0,UPGRADE,"Repair Station (Bunker)",0x85,0
+9,0,UPGRADE,"Flammenwerfer 42",0x8c,0
+9,0,UPGRADE,"Flamenwerfer 42 (Pioneers)",0x8d,0
+9,0,UPGRADE,"Flammenwerfers",0x8e,0
+9,0,UPGRADE,"Flammenwerfers (Halftrack)",0x8f,0
+9,0,UPGRADE,"Walking Stuka",0x90,0
+9,0,UPGRADE,"Puma 50mm Gun",0x91,0
+9,0,UPGRADE,"Puma 50mm Gun",0x92,0
+9,0,UPGRADE,"MG42 Light Machine Gun",0x94,0
+9,0,UPGRADE,"MG42 Light Machine Gun",0x95,0
+9,0,UPGRADE,"Frankfurt 42 Mine Detector",0x97,0
+9,0,UPGRADE,"Frankfurt 42 Mine Detector",0x98,0
+9,0,UPGRADE,"MP44 Sturmgewehr (Assault Rifles)",0x99,0
+9,0,UPGRADE,"RPzB 54 Panzerschreck",0x9e,0
+9,0,UPGRADE,"RPzB 54 Panzerschreck",0x9f,0
+9,0,UPGRADE,"MP40 Sub-Machine Gun",0xa6,0
+9,0,UPGRADE,"MP40 Sub-Machine Gun",0xa7,0
+9,0,UPGRADE,"Skirmish Phase",0xaa,0
+9,0,UPGRADE,"Escalate to Skirmish Phase",0xab,0
+9,0,UPGRADE,"Escalate to Assault Phase",0xac,0
+9,0,UPGRADE,"Escalate to Battle Phase",0xad,0
+9,0,UPGRADE,"Veteran Infantry",0xae,0
+9,0,UPGRADE,"Crack Infantry",0xaf,0
+9,0,UPGRADE,"Elite Infantry",0xb0,0
+9,0,UPGRADE,"Veteran Support Units",0xb1,0
+9,0,UPGRADE,"Crack Support Units",0xb2,0
+9,0,UPGRADE,"Elite Support Units",0xb3,0
+9,0,UPGRADE,"Veteran Tanks",0xb4,0
+9,0,UPGRADE,"Crack Tanks",0xb5,0
+9,0,UPGRADE,"Elite Tanks",0xb6,0
+9,0,UPGRADE,"Veteran Vechicles",0xb7,0
+9,0,UPGRADE,"Crack Vehicles",0xb8,0
+9,0,UPGRADE,"Elite Vehicles",0xb9,0
+9,0,UPGRADE,"Activate Panther Battlegroup",0xca,0
+9,0,UPGRADE,"Activate Panther Battlegroup",0xcb,0
+9,0,UPGRADE,"Support Kommand Upgrade",0xd2,0
+9,0,UPGRADE,"Support Kommand Upgrade",0xd3,0
+9,0,UPGRADE,"J�ger Kommand Upgrade",0xd4,0
+9,0,UPGRADE,"Panzer Jager Upgrade",0xd5,0
+9,0,UPGRADE,"Logistik Upgrade (SC)",0xd6,0
+9,0,UPGRADE,"FG42 Assault Rifle",0xd7,0
+9,0,UPGRADE,"Spotting Scope",0xd8,0
+9,0,UPGRADE,"Long-barreled 37mm Cannon",0xd9,0
+9,0,UPGRADE,"Walking Stuka",0xda,0
+9,0,UPGRADE,"Armor Skirts",0xdc,0
+9,0,UPGRADE,"Armor Skirts (P4 IST)",0xdd,0
+9,0,UPGRADE,"MG42 gunner (P4 IST)",0xde,0
+9,0,UPGRADE,"RPzB 54 Panzerschreck",0xe1,0
+9,0,UPGRADE,"Panzershreck",0xe2,0
+9,0,UPGRADE,"Gewehr 43 Package",0xe3,0
+9,0,UPGRADE,"Gewehr 43 Package",0xe4,0
+9,0,UPGRADE,"MP44 Sturmgewehr (Assault Rifles)",0xe5,0
+9,0,UPGRADE,"Kampgruppe Kompanie Upgrade",0xf0,0
+9,0,UPGRADE,"Kampfgruppe Kompanie Upgrade",0xf1,0
+9,0,UPGRADE,"Defensive Bonus 3 (squad)",0xf3,0
+9,0,UPGRADE,"Advanced Repair",0xf4,0
+9,0,UPGRADE,"Anti Tank Grenades",0xf5,0
+9,0,UPGRADE,"Field Craft",0xf6,0
+9,0,UPGRADE,"Incendiary Grenades",0xf7,0
+9,0,UPGRADE,"Group Zeal",0xf8,0
+9,0,UPGRADE,"Defensive Operations",0xf9,0
+9,0,UPGRADE,"Increase Squad Sizes",0xfa,0
+9,0,UPGRADE,"Increase Squad Sizes",0xfb,0
+9,0,UPGRADE,"Veteran Sergeant",0xfc,0
+9,0,UPGRADE,"Defensive Bonus 1 (Infantry)",0xfd,0
+9,0,UPGRADE,"Defensive Bonus 2 (Infantry)",0xfe,0
+9,0,UPGRADE,"Defensive Bonus 3 (Infantry)",0xff,0
+9,0,UPGRADE,"Offensive Bonus 1 (Infantry)",0x100,0
+9,0,UPGRADE,"Offensive Bonus 2 (Infantry)",0x101,0
+9,0,UPGRADE,"Offensive Bonus 3 (Infantry)",0x102,0
+9,0,UPGRADE,"Defensive Bonus 1 (Vehicle)",0x103,0
+9,0,UPGRADE,"Defensive Bonus 2 (Vehicle)",0x104,0
+9,0,UPGRADE,"Defensive Bonus 3 (Vehicle)",0x105,0
+9,0,UPGRADE,"Offensive Bonus 1 (Vehicle)",0x106,0
+9,0,UPGRADE,"Offensive Bonus 2 (Vehicle)",0x107,0
+9,0,UPGRADE,"Offensive Bonus 3 (Vehicle)",0x108,0
+9,0,UPGRADE,"Upgrade to Barracks",0x110,0
+9,0,UPGRADE,"Upgrade to Barracks (FHQ)",0x111,0
+9,0,UPGRADE,"Reinforce Point (FHQ)",0x112,0
+9,0,SPECIALABILITY,"Field Repairs",0x1,0
+9,0,SPECIALABILITY,"Air Reconnaissance",0x5,1
+9,0,SPECIALABILITY,"Bombing Run",0x7,1
+9,0,SPECIALABILITY,"Strafing Run",0x8,1
+9,0,SPECIALABILITY,"Howitzer Shoot",0x16,1
+9,0,SPECIALABILITY,"Airdrop M1 57mm Anti-Tank Gun",0x17,1
+9,0,SPECIALABILITY,"Paratroopers",0x18,1
+9,0,SPECIALABILITY,"Supply Drops",0x1e,1
+9,0,SPECIALABILITY,"Call in Rangers",0x23,1
+9,0,SPECIALABILITY,"Allied War Machine",0x34,0
+9,0,SPECIALABILITY,"280mm Rocket Barrage",0x36,1
+9,0,SPECIALABILITY,"Inspired Assault",0x3c,0
+9,0,SPECIALABILITY,"Manpower Blitz",0x40,0
+9,0,SPECIALABILITY,"Registered Artillery",0x45,0
+9,0,SPECIALABILITY,"Air-Dropped SD-2 Butterfly Bombs",0x46,1
+9,0,SPECIALABILITY,"Call in King Tiger",0x4a,1
+9,0,SPECIALABILITY,"Call in Infantry Assault Team (Stormtroopers)",0x4c,1
+9,0,SPECIALABILITY,"Call in Urban Assault Support (StuH 42)",0x4d,1
+9,0,SPECIALABILITY,"Call in Armored Assault Force (Tiger)",0x4e,1
+9,0,SPECIALABILITY,"Firestorm",0x54,1
+9,0,SPECIALABILITY,"Blitzkrieg",0x5a,0
+9,0,SPECIALABILITY,"Call for M4 Sherman Calliope Reinforcement",0x62,1
+9,0,SPECIALABILITY,"Call in Churchill AVRE",0x7b,1
+9,0,SPECIALABILITY,"Call in Churchill Crocodile",0x7c,1
+9,0,SPECIALABILITY,"Call in Churchill Tank",0x7e,1
+9,0,SPECIALABILITY,"Decoy Artillery Barrage",0x81,1
+9,0,SPECIALABILITY,"25 Pounder Artillery Barrage",0x82,1
+9,0,SPECIALABILITY,"105mm Priest Self-Propelled Gun",0x94,1
+9,0,SPECIALABILITY,"For the Fatherland",0xc8,0
+9,0,SPECIALABILITY,"Call in Glider HQ",0xc9,1
+9,0,SPECIALABILITY,"Glider HQ",0xca,1
+9,0,SPECIALABILITY,"Call in Glider with Tetrarch",0xcb,1
+9,0,SPECIALABILITY,"Glider with Tetrarch",0xcc,1
+9,0,SPECIALABILITY,"Call in Glider with Commandos",0xcd,1
+9,0,SPECIALABILITY,"Glider",0xce,1
+9,0,SPECIALABILITY,"Henschel 'Panzerknacker' Support",0x110,1
+9,0,SPECIALABILITY,"Henschel 'Panzer Knacker' support",0x112,1
+9,0,SPECIALABILITY,"Call in Hummel 150mm Self-Propelled Howitzer",0x114,1
+9,0,SPECIALABILITY,"Fallschirmjager Infiltration",0x116,1
+9,0,SPECIALABILITY,"Call in Luftwaffe Ground Forces",0x117,1
+9,0,SPECIALABILITY,"Fallschirmj�ger Infantry",0x118,1
+9,0,SPECIALABILITY,"Luftwaffe Ground Forces",0x119,1
+9,0,SPECIALABILITY,"Call in Hetzer",0x11c,1
+9,0,SPECIALABILITY,"Call in Jagdpanther",0x11d,1
+9,0,SPECIALABILITY,"Call in Panther Battlegroup",0x11e,1
+9,0,SPECIALABILITY,"Jagdpanther Tank Destroyer",0x11f,1
+9,0,SPECIALABILITY,"Panther Battle Group",0x120,1
+9,0,SPECIALABILITY,"Call in Wirblewind",0x124,1
+9,0,SPECIALABILITY,"Wirblewind",0x126,1
+9,0,SPECIALABILITY,"Call for M26 Pershing Reinforcement",0x12f,1
+9,0,SPECIALABILITY,"Call for Pershing Reinforcement",0x131,1
+9,0,SPECIALABILITY,"Call in Off-Map Combat Group",0x135,1
+9,0,SPECIALABILITY,"Off-Map Combat Group",0x137,1
+9,0,SPECIALABILITY,"Propaganda War",0x148,1
+9,0,SPECIALABILITY,"Propaganda War",0x14a,1
+9,0,SPECIALABILITY,"Sector Artillery",0x14d,1
+9,0,SPECIALABILITY,"Sector Artillery",0x14f,1
+9,0,SPECIALABILITY,"V1 Rocket",0x1d3,1
+9,0,SPECIALABILITY,"V1 Rocket Attack",0x1d4,1
+9,0,UNITCOMMAND,"Armor Piercing Shells (M1 57mm)",0x2,0
+9,0,UNITCOMMAND,"Armor Piercing Burst (HMG)",0x3,0
+9,0,UNITCOMMAND,"Calliope Barrage",0xa,1
+9,0,UNITCOMMAND,"Fire-Up!",0xb,0
+9,0,UNITCOMMAND,"Lower/Raise the Bulldozer",0xe,0
+9,0,UNITCOMMAND,"105mm Howitzer Barrage",0xf,1
+9,0,UNITCOMMAND,"Smoke Barrage",0x11,1
+9,0,UNITCOMMAND,"Suppression Fire (BAR)",0x25,0
+9,0,UNITCOMMAND,"60mm Mortar Bombardment",0x26,1
+9,0,UNITCOMMAND,"Throw Grenade",0x28,1
+9,0,UNITCOMMAND,"Throw Satchel Charge",0x2b,1
+9,0,UNITCOMMAND,"Throw Sticky Bomb",0x2d,0
+9,0,UNITCOMMAND,"PIAT Ambush",0x32,0
+9,0,UNITCOMMAND,"Observed Fire (Officer)",0x35,1
+9,0,UNITCOMMAND,"Assault",0x37,0
+9,0,UNITCOMMAND,"(De)Camouflage (Pak)",0x38,0
+9,0,UNITCOMMAND,"Fire Panzerfaust",0x39,0
+9,0,UNITCOMMAND,"Fire Panzerfaust (KCH)",0x3a,0
+9,0,UNITCOMMAND,"Assault",0x3f,0
+9,0,UNITCOMMAND,"Smoke Barrage",0x41,1
+9,0,UNITCOMMAND,"Nebelwerfer Barrage",0x42,1
+9,0,UNITCOMMAND,"Rapid Fire Shells",0x49,0
+9,0,UNITCOMMAND,"Walking Stuka Rocket Barrage",0x4f,1
+9,0,UNITCOMMAND,"81mm Mortar Bombardment",0x50,1
+9,0,UNITCOMMAND,"Throw Grenade",0x55,1
+9,0,UNITCOMMAND,"Throw Bundled Grenade",0x57,1
+9,0,UNITCOMMAND,"Booby Trap (PGren)",0x5b,1
+9,0,UNITCOMMAND,"Button Enemy Vehicle (Bren)",0x5c,0
+9,0,UNITCOMMAND,"Armor Piercing Burst (Bren)",0x5d,0
+9,0,UNITCOMMAND,"Bren Carrier Self Repair",0x5e,0
+9,0,UNITCOMMAND,"Button Enemy Vehicle",0x61,0
+9,0,UNITCOMMAND,"Toggle Ambush Lock-Down",0x66,1
+9,0,UNITCOMMAND,"(De)Camouflage (Stormtroopers)",0x67,0
+9,0,UNITCOMMAND,"(De)Camouflage (Kettenkrad)",0x68,0
+9,0,UNITCOMMAND,"(De)Camouflage (Sniper)",0x6a,0
+9,0,UNITCOMMAND,"(De)Camouflage (Sniper)",0x6b,0
+9,0,UNITCOMMAND,"25 Pounder Barrage",0x70,1
+9,0,UNITCOMMAND,"25 Pounder Super Charge",0x72,1
+9,0,UNITCOMMAND,"Armor Piercing Rounds",0x74,0
+9,0,UNITCOMMAND,"Tank Shock",0x7f,0
+9,0,UNITCOMMAND,"Fire Petard Mortar Round",0x83,1
+9,0,UNITCOMMAND,"Fire Canister Round",0x84,0
+9,0,UNITCOMMAND,"Flank Speed",0x86,0
+9,0,UNITCOMMAND,"25 Pounder Barrage",0x87,1
+9,0,UNITCOMMAND,"Toggle Hull Down",0x8a,0
+9,0,UNITCOMMAND,"Heroic Charge",0x8d,0
+9,0,UNITCOMMAND,"Medical Supplies",0x8f,0
+9,0,UNITCOMMAND,"105mm Range Boost",0x93,0
+9,0,UNITCOMMAND,"Deploy Marksman",0x95,0
+9,0,UNITCOMMAND,"Rifle Smoke Grenade",0x9d,1
+9,0,UNITCOMMAND,"Concealing Smoke",0x9f,0
+9,0,UNITCOMMAND,"3'' Mortar Bombardment",0xa0,1
+9,0,UNITCOMMAND,"3'' Mortar Bombardment",0xa1,1
+9,0,UNITCOMMAND,"3'' Mortar Super Charge",0xa2,1
+9,0,UNITCOMMAND,"Throw Grenade",0xa3,1
+9,0,UNITCOMMAND,"Set Up (Armor Command Truck)",0xa5,1
+9,0,UNITCOMMAND,"Set Up (Headquarters Command Truck)",0xa6,1
+9,0,UNITCOMMAND,"Set Up (Field Support Truck)",0xa7,1
+9,0,UNITCOMMAND,"Counter Battery",0xaf,1
+9,0,UNITCOMMAND,"Counter Battery",0xb0,1
+9,0,UNITCOMMAND,"Counter Battery (Priest)",0xb1,1
+9,0,UNITCOMMAND,"Cancel Counter Battery",0xb2,0
+9,0,UNITCOMMAND,"Cancel Counter Battery",0xb3,0
+9,0,UNITCOMMAND,"Creeping Barrage",0xb4,1
+9,0,UNITCOMMAND,"Creeping Barrage",0xb5,1
+9,0,UNITCOMMAND,"Creeping Smoke Barrage",0xb6,1
+9,0,UNITCOMMAND,"Barbed Wire Cutters",0xb7,0
+9,0,UNITCOMMAND,"Barbed Wire Cutters",0xb8,0
+9,0,UNITCOMMAND,"Fire Smoke Shell (M4)",0xb9,0
+9,0,UNITCOMMAND,"Scorched Earth on a point (PGren)",0xba,1
+9,0,UNITCOMMAND,"Scorched Earth",0xbb,0
+9,0,UNITCOMMAND,"Scorched Earth",0xbc,0
+9,0,UNITCOMMAND,"Scorched Earth",0xbd,0
+9,0,UNITCOMMAND,"Face Weapon (17 Pounder)",0xc0,1
+9,0,UNITCOMMAND,"Face Weapon",0xc1,0
+9,0,UNITCOMMAND,"Fire Smoke Shell(Tetrarch)",0xc2,1
+9,0,UNITCOMMAND,"Fire Smoke Shell",0xc3,1
+9,0,UNITCOMMAND,"Maintain Command Range (LT)",0xc4,0
+9,0,UNITCOMMAND,"Maintain Command Range (CPT)",0xc5,0
+9,0,UNITCOMMAND,"Maintain Command Range (CCT)",0xc6,0
+9,0,UNITCOMMAND,"Maintain Support Range (MH)",0xc7,0
+9,0,UNITCOMMAND,"Maintain Support Range",0xc8,0
+9,0,UNITCOMMAND,"Detonate the Goliath",0xcf,0
+9,0,UNITCOMMAND,"Armored Car Mine Drop (M8 mine)",0xd0,1
+9,0,UNITCOMMAND,"M8 Armored Car Mine Drop",0xd1,1
+9,0,UNITCOMMAND,"Field Medical Kit",0xf3,0
+9,0,UNITCOMMAND,"Field Medical Kit",0xf4,0
+9,0,UNITCOMMAND,"Use Medical Kit",0xf5,0
+9,0,UNITCOMMAND,"Toggle Disable Free-Fire (Mortar)",0xf7,0
+9,0,UNITCOMMAND,"Munitions Halftrack Mine Drop",0xf8,1
+9,0,UNITCOMMAND,"Munitions Halftrack Mine Drop",0xf9,1
+9,0,UNITCOMMAND,"Overwatch Barrage",0xfe,1
+9,0,UNITCOMMAND,"Cancel Overwatch",0xff,0
+9,0,UNITCOMMAND,"3'' Overwatch Barrage",0x100,1
+9,0,UNITCOMMAND,"Overwatch Barrage",0x101,1
+9,0,UNITCOMMAND,"Cancel Overwatch",0x102,0
+9,0,UNITCOMMAND,"Overwatch Barrage (Priest)",0x103,1
+9,0,UNITCOMMAND,"Cancel Overwatch (Priest)",0x104,0
+9,0,UNITCOMMAND,"Secure Sector (SC)",0x107,1
+9,0,UNITCOMMAND,"Get Mobile (SC)",0x108,0
+9,0,UNITCOMMAND,"Secure Sector",0x109,1
+9,0,UNITCOMMAND,"Throw Anti-Building Incendiary Device",0x10a,1
+9,0,UNITCOMMAND,"Throw Anti Tank Grenade",0x10b,1
+9,0,UNITCOMMAND,"Fire Panzerfaust (Fallschrimjager)",0x10c,0
+9,0,UNITCOMMAND,"Throw Anti Tank Grenade",0x10d,1
+9,0,UNITCOMMAND,"Focused Firing (AT HT)",0x10e,0
+9,0,UNITCOMMAND,"Focused Firing",0x110,0
+9,0,UNITCOMMAND,"Hummel 150mm Howitzer Barrage",0x111,1
+9,0,UNITCOMMAND,"Hummel 150mm Howitzer Barrage (RF)",0x112,1
+9,0,UNITCOMMAND,"Hummel 150mm Howitzer Barrage",0x113,1
+9,0,UNITCOMMAND,"Incendiary Mortar Round (MHT)",0x115,1
+9,0,UNITCOMMAND,"Incendiary Mortar Round",0x117,1
+9,0,UNITCOMMAND,"Booby Trap (Kettenkrad)",0x11b,1
+9,0,UNITCOMMAND,"Booby Traps (Kettenkrad)",0x11d,0
+9,0,UNITCOMMAND,"Sprint (PGren)",0x11f,0
+9,0,UNITCOMMAND,"81mm Mortar Bombardment (MHT)",0x121,1
+9,0,UNITCOMMAND,"Throw Incediary Grenade",0x122,1
+9,0,UNITCOMMAND,"Suppresive Volley Fire",0x123,0
+9,0,UNITCOMMAND,"Throw Incendiary Grenade",0x124,1
+9,0,UNITCOMMAND,"Goliath Drop (FVH)",0x128,1
+9,0,UNITCOMMAND,"Toggle Rapid Fire Artillery (Hummel)",0x129,0
+9,0,UNITCOMMAND,"Toggle Site Main Gun (Marder III)",0x12a,0
+9,0,UNITCOMMAND,"Toggle Rapid Fire (P4 IST)",0x12b,0
+9,0,UNITCOMMAND,"Toggle Site Main Gun",0x12c,0
+9,0,UNITCOMMAND,"Overdrive (AC)",0x12d,0
+9,0,UNITCOMMAND,"Tread Braker (AT HT)",0x12e,0
+9,0,UNITCOMMAND,"Overdrive",0x12f,0
+9,0,UNITCOMMAND,"Recover Wreck",0x132,0
+9,0,UNITCOMMAND,"Repair vehicle/structure",0x138,0
+9,0,UNITCOMMAND,"Repair",0x13a,0
+9,0,UNITCOMMAND,"Rudimentary Repair vehicle/structure",0x13b,0
+9,0,UNITCOMMAND,"Over Repair",0x13c,0
+9,0,UNITCOMMAND,"Advanced Repair vehicle/structure",0x13d,0
+9,0,UNITCOMMAND,"Advanced Repair",0x13f,0
+9,0,UNITCOMMAND,"Battlefield Repair",0x142,0
+9,0,UNITCOMMAND,"Withdraw to Captain's Position",0x147,0
+9,0,UNITCOMMAND,"Force Retreat (Officer)",0x149,0
+9,0,UNITCOMMAND,"Force Retreat (Officer)",0x14b,0
+9,0,UNITCOMMAND,"Salvage Wrecks",0x14c,0
+9,0,UNITCOMMAND,"Schwimmwagen Mine Drop",0x14d,1
+9,0,UNITCOMMAND,"Toggle Mineclearing (M4 Flail)",0x14f,0
+9,0,UNITCOMMAND,"Toggle Mineclearing (M4)",0x151,0
+9,0,UNITCOMMAND,"Supervision (Officer)",0x1af,0
+9,0,UNITCOMMAND,"Supervision (Officer)",0x1b1,0
+9,0,UNITCOMMAND,"Toggle Divert Supplies (FVH)",0x1bc,0
+9,0,UNITCOMMAND,"Divert Supplies",0x1be,0
+9,0,UNITCOMMAND,"Victor Target",0x1d9,1
+9,0,UNITCOMMAND,"Victor Target",0x1da,1
+9,0,UNITCOMMAND,"Place Demolitions",0x1fc,0
+9,0,UNITCOMMAND,"Detonate Demolitions",0x1fd,0
+9,0,UNITCOMMAND,"Hold Fire",0x1fe,0
+9,0,UNITCOMMAND,"Fire at Will",0x1ff,0
+9,0,UNITCOMMAND,"Become Mobile",0xb00,0
+9,1,UNIT,"Engineers",0x63,0
+9,1,UNIT,"Heavy Machine Gun Team",0x64,0
+9,1,UNIT,"Mortar Team",0x65,0
+9,1,UNIT,"Rangers",0x66,0
+9,1,UNIT,"Riflemen",0x67,0
+9,1,UNIT,"Riflemen",0x68,0
+9,1,UNIT,"Sniper",0x69,0
+9,1,UNIT,"Jeep",0x6a,0
+9,1,UNIT,"M1 57mm Anti-Tank Gun",0x6b,0
+9,1,UNIT,"M8 Armored Car",0x6c,0
+9,1,UNIT,"M26 Pershing",0x6d,0
+9,1,UNIT,"M10 Tank Destroyer",0x6e,0
+9,1,UNIT,"M4 Sherman",0x6f,0
+9,1,UNIT,"MG42 Heavy Machine Gun",0x16a,0
+9,1,UNIT,"Gr. 34 8cm Mortar Team",0x16b,0
+9,1,UNIT,"Grenadiers",0x16c,0
+9,1,UNIT,"Pioneers",0x16d,0
+9,1,UNIT,"Sniper",0x16e,0
+9,1,UNIT,"Volksgrenadiers",0x16f,0
+9,1,UNIT,"Volksgrenadiers",0x170,0
+9,1,UNIT,"Motorcycle",0x173,0
+9,1,UNIT,"Panther",0x174,0
+9,1,UNIT,"Panzer IV",0x175,0
+9,1,UNIT,"sdkfz 234 Armored Car",0x176,0
+9,1,UNIT,"Stug IV",0x177,0
+9,1,UNIT,"Tiger",0x179,0
+9,1,UNIT,"Goliath",0x19a,0
+9,1,BUILDING,"Barbed Wire",0x658,0
+9,1,BUILDING,"Triage Center",0x667,0
+9,1,BUILDING,"Machine Gun Emplacement",0x684,0
+9,1,BUILDING,"Sand Bags",0x693,0
+9,1,BUILDING,"Bunker",0x7bc,0
+9,1,BUILDING,"Barbed Wire",0x7c4,0
+9,1,BUILDING,"Sand Bags",0x7f4,0
+9,1,UPGRADE,"Unlock Allied Sniper",0x1a,0
+9,1,UPGRADE,"Unlock Allied Rangers",0x1b,0
+9,1,UPGRADE,"Unlock Allied HMG Team",0x1c,0
+9,1,UPGRADE,"Unlock Allied Mortar Team",0x1d,0
+9,1,UPGRADE,"Unlock M8 Armored Car (Greyhound)",0x1e,0
+9,1,UPGRADE,"Unlock M1 57mm AT Gun",0x1f,0
+9,1,UPGRADE,"Unlock M10 Tank Destroyer",0x20,0
+9,1,UPGRADE,"Unlock M4 Sherman",0x21,0
+9,1,UPGRADE,"Unlock M26 Pershing",0x22,0
+9,1,UPGRADE,"M1AC 76mm Gun",0x27,0
+9,1,UPGRADE,"Mk2 Grenades",0x2d,0
+9,1,UPGRADE,"Defensive Smoke Screen",0x31,0
+9,1,UPGRADE,"Sticky Bombs",0x33,0
+9,1,UPGRADE,"Aid Station (Bunker)",0x36,0
+9,1,UPGRADE,"M2 Flamethrower",0x41,0
+9,1,UPGRADE,"Thompson SMG",0x4c,0
+9,1,UPGRADE,"Crab Mine Flail",0x53,0
+9,1,UPGRADE,"M1918 Browning Automatic Rifle (BAR)",0x73,0
+9,1,UPGRADE,"MG42 Heavy Machine Gun (Bunker)",0xa4,0
+9,1,UPGRADE,"Repair Station (Bunker)",0xa7,0
+9,1,UPGRADE,"Flammenwerfer 42",0xaf,0
+9,1,UPGRADE,"Puma 50mm Gun",0xb5,0
+9,1,UPGRADE,"MG42 Light Machine Gun",0xbd,0
+9,1,UPGRADE,"RPzB 54 Panzerschreck",0xcc,0
+9,1,UPGRADE,"MP40 Sub-Machine Gun",0xd4,0
+9,1,UPGRADE,"Unlock Axis Sniper",0x13c,0
+9,1,UPGRADE,"Unlock Axis Grenadiers",0x13d,0
+9,1,UPGRADE,"Unlock Axis MG42 Heavy Machine Gun Squad",0x13e,0
+9,1,UPGRADE,"Unlock Axis Gr. 34 8cm Mortar Team",0x13f,0
+9,1,UPGRADE,"Unlock Axis Sdkfz 234 Armored Car (Puma)",0x140,0
+9,1,UPGRADE,"Unlock Axis Stug IV",0x141,0
+9,1,UPGRADE,"Unlock Axis Panzer IV",0x142,0
+9,1,UPGRADE,"Unlock Axis Panther",0x143,0
+9,1,UPGRADE,"Unlock Axis Tiger",0x144,0
+9,1,UPGRADE,"Population Cap Upgrade 1",0x5d4,0
+9,1,UPGRADE,"Population Cap Upgrade 2",0x5d5,0
+9,1,UPGRADE,"Population Cap Upgrade 3",0x5d6,0
+9,1,UPGRADE,"Population Cap Upgrade 4",0x5d7,0
+9,1,UPGRADE,"Population Cap Upgrade 5",0x5d8,0
+9,1,UPGRADE,"Population Cap Upgrade 6",0x5d9,0
+9,1,UNITCOMMAND,"Armor Piercing Shells",0x1,0
+9,1,UNITCOMMAND,"Armor Piercing Burst (HMG)",0x7,0
+9,1,UNITCOMMAND,"Fire-Up!",0x11,0
+9,1,UNITCOMMAND,"Smoke Barrage",0x21,1
+9,1,UNITCOMMAND,"Suppression Fire (BAR)",0x39,0
+9,1,UNITCOMMAND,"60mm Mortar Bombardment",0x3a,1
+9,1,UNITCOMMAND,"Throw Grenade",0x45,1
+9,1,UNITCOMMAND,"Throw Sticky Bomb",0x57,0
+9,1,UNITCOMMAND,"Fire Panzerfaust",0x71,0
+9,1,UNITCOMMAND,"Smoke Barrage",0x7a,1
+9,1,UNITCOMMAND,"81mm Bombardment",0x88,1
+9,1,UNITCOMMAND,"Throw Grenade",0x8f,1
+9,1,UNITCOMMAND,"(De)Camouflage (Sniper)",0xb9,0
+9,1,UNITCOMMAND,"(De)Camouflage (Sniper)",0xba,0
+9,1,UNITCOMMAND,"Salvage Wrecks",0x14c,0
+9,1,UNITCOMMAND,"Barbed Wire Cutters",0x15c,0
+9,1,UNITCOMMAND,"Fire Smoke Shell",0x162,0
+9,1,UNITCOMMAND,"Detonate the Goliath",0x17f,0
+9,1,UNITCOMMAND,"M8 Armored Car Mine Drop",0x182,1
+9,1,UNITCOMMAND,"Use Medical Kit",0x1b2,0
+9,1,UNITCOMMAND,"Use Medical Kit",0x1b3,0
+9,1,UNITCOMMAND,"Use Medical Kit",0x1b4,0
+9,1,UNITCOMMAND,"Use Medical Kit",0x1b5,0
+9,1,UNITCOMMAND,"Use Medical Kit",0x1b6,0
+9,1,UNITCOMMAND,"Enable/Disable Free-Fire",0x1bc,0
+9,1,UNITCOMMAND,"Repair",0x212,0
+9,1,UNITCOMMAND,"Salvage Wrecks",0x226,0
+9,1,UNITCOMMAND,"Toggle Mineclearing (M4)",0x229,0
+9,2,COMMANDTREE,"Churchill",0x145,0
+9,2,COMMANDTREE,"Group Field Repairs",0x146,0
+9,2,COMMANDTREE,"Flame Thrower Upgrade",0x147,0
+9,2,COMMANDTREE,"Heroic Assault",0x148,0
+9,2,COMMANDTREE,"Hull Down",0x149,0
+9,2,COMMANDTREE,"Flank Speed",0x14a,0
+9,2,COMMANDTREE,"Tread Breaker",0x14b,0
+9,2,COMMANDTREE,"Hotchkiss",0x528,0
+9,2,COMMANDTREE,"Mine Laying Upgrade",0x529,0
+9,2,COMMANDTREE,"Long Barreled Cannon",0x52a,0
+9,2,COMMANDTREE,"Camouflage Paint",0x52b,0
+9,2,COMMANDTREE,"Mark Target",0x52c,0
+9,2,COMMANDTREE,"Rocket Barrage Upgrade",0x52d,0
+9,2,COMMANDTREE,"37mm Stun Shot Upgrade",0x52e,0
+9,2,COMMANDTREE,"Ambush Lock-Down",0x537,0
+9,2,COMMANDTREE,"Armor Piercing Shells",0x538,0
+9,2,COMMANDTREE,"Hawkins Mine Upgrade",0x539,0
+9,2,COMMANDTREE,"HVAP Ammunition Upgrade",0x53a,0
+9,2,COMMANDTREE,"Mark Target",0x53b,0
+9,2,COMMANDTREE,"Observational Status",0x53c,0
+9,2,COMMANDTREE,"M18 Hellcat",0x53d,0
+9,2,COMMANDTREE,"Panther",0x53e,0
+9,2,COMMANDTREE,"Armor Sch�rzen Upgrade",0x53f,0
+9,2,COMMANDTREE,"Blitzkrieg",0x540,0
+9,2,COMMANDTREE,"Defensive Smoke Upgrade",0x541,0
+9,2,COMMANDTREE,"Precision Artillery",0x542,0
+9,2,COMMANDTREE,"Site Main Gun",0x543,0
+9,2,COMMANDTREE,"White Phosphorus Ability",0x544,0
+9,2,COMMANDTREE,"Panzer IV",0x546,0
+9,2,COMMANDTREE,"Armor Piercing Shells",0x547,0
+9,2,COMMANDTREE,"Armor Skirt Upgrade",0x548,0
+9,2,COMMANDTREE,"Overdrive",0x549,0
+9,2,COMMANDTREE,"Rapid Fire",0x54a,0
+9,2,COMMANDTREE,"Self Repair",0x54b,0
+9,2,COMMANDTREE,"Triple Shot",0x54c,0
+9,2,COMMANDTREE,"76mm Gun Upgrade",0x5a0,0
+9,2,COMMANDTREE,"Armor Piercing Shells",0x5a1,0
+9,2,COMMANDTREE,"Crab Flail",0x5a2,0
+9,2,COMMANDTREE,"Smoke Canister",0x5a3,0
+9,2,COMMANDTREE,"50 Cal Machine Gun Upgrade",0x5a4,0
+9,2,COMMANDTREE,"Flank Speed",0x5a5,0
+9,2,COMMANDTREE,"M4 Sherman",0x5a6,0
+9,2,UNITCOMMAND,"Armor Piercing Shells",0x4,0
+9,2,UNITCOMMAND,"Armor Piercing Shells",0x5,0
+9,2,UNITCOMMAND,"Armor Piercing Shells",0x6,0
+9,2,UNITCOMMAND,"Blitzkrieg",0xa1,0
+9,2,UNITCOMMAND,"Toggle Ambush Lock-Down",0xb6,1
+9,2,UNITCOMMAND,"Fire Smoke Shell",0x164,0
+9,2,UNITCOMMAND,"Fire Smoke Shell",0x165,0
+9,2,UNITCOMMAND,"Observational Status",0x196,0
+9,2,UNITCOMMAND,"Observational Status",0x197,0
+9,2,UNITCOMMAND,"Toggle Site Main Gun",0x1f3,0
+9,2,UNITCOMMAND,"Toggle Rapid Fire",0x1f5,0
+9,2,UNITCOMMAND,"Flank Speed",0x1f8,0
+9,2,UNITCOMMAND,"Flank Speed",0x1f9,0
+9,2,UNITCOMMAND,"Overdrive",0x1fa,0
+9,2,UNITCOMMAND,"Flank Speed",0x1fb,0
+9,2,UNITCOMMAND,"Hotchkiss Mine Drop",0x292,1
+9,2,UNITCOMMAND,"Rocket Barrage",0x296,1
+9,2,UNITCOMMAND,"Heroic Assault",0x29a,0
+9,2,UNITCOMMAND,"Toggle Direct-Fire",0x29d,0
+9,2,UNITCOMMAND,"Drop Hawkins Mine",0x2a0,1
+9,2,UNITCOMMAND,"Camouflage Paint",0x2a1,0
+9,2,UNITCOMMAND,"Toggle Hull Down",0x2a3,0
+9,2,UNITCOMMAND,"Mark Target",0x2a5,0
+9,2,UNITCOMMAND,"Precision Artillery",0x2a6,0
+9,2,UNITCOMMAND,"Toggle Mineclearing (M4)",0x2ab,0
+9,2,UNITCOMMAND,"Defensive Infantry",0x2de,1
+9,2,UNITCOMMAND,"Defensive Infantry",0x2e1,1
+9,3,UNIT,"Aggressor Commando",0x71,0
+9,3,UNIT,"Saboteur Engineer",0x73,0
+9,3,UNIT,"Field Medic",0x76,0
+9,3,UNIT,"Inspirational Officer",0x78,0
+9,3,UNIT,"Storm Heavy Weapons Specialist",0x7a,0
+9,3,UNIT,"Marksman Sniper",0x7e,0
+9,3,UNIT,"Illuminator Recon",0x80,0
+9,3,UNIT,"Storm Heavy Weapons Specialist",0x17b,0
+9,3,UNIT,"Field Medic",0x17f,0
+9,3,UNIT,"Inspirational Officer",0x181,0
+9,3,UNIT,"Saboteur Pioneer",0x183,0
+9,3,UNIT,"Marksman Sniper",0x185,0
+9,3,UNIT,"Aggressor Commando",0x187,0
+9,3,UNIT,"Illuminator Recon",0x18b,0
+9,3,UPGRADE,"Grenade Rank 1",0x564,0
+9,3,UPGRADE,"Grenade Rank 1",0x565,0
+9,3,UPGRADE,"Grenade Rank 2",0x566,0
+9,3,UPGRADE,"Grenade Rank 2",0x567,0
+9,3,UPGRADE,"Grenade Rank 3",0x568,0
+9,3,UPGRADE,"Grenade Rank 3",0x569,0
+9,3,UPGRADE,"Armor Rank 1",0x56b,0
+9,3,UPGRADE,"Armor Rank 10",0x56c,0
+9,3,UPGRADE,"Armor Rank 2",0x56d,0
+9,3,UPGRADE,"Armor Rank 3",0x56e,0
+9,3,UPGRADE,"Armor Rank 4",0x56f,0
+9,3,UPGRADE,"Armor Rank 5",0x570,0
+9,3,UPGRADE,"Armor Rank 6",0x571,0
+9,3,UPGRADE,"Armor Rank 7",0x572,0
+9,3,UPGRADE,"Armor Rank 8",0x573,0
+9,3,UPGRADE,"Armor Rank 9",0x574,0
+9,3,UPGRADE,"Weapon Rank 1",0x575,0
+9,3,UPGRADE,"Weapon Rank 10",0x576,0
+9,3,UPGRADE,"Weapon Rank 2",0x577,0
+9,3,UPGRADE,"Weapon Rank 3",0x578,0
+9,3,UPGRADE,"Weapon Rank 4",0x579,0
+9,3,UPGRADE,"Weapon Rank 5",0x57a,0
+9,3,UPGRADE,"Weapon Rank 6",0x57b,0
+9,3,UPGRADE,"Weapon Rank 7",0x57c,0
+9,3,UPGRADE,"Weapon Rank 8",0x57d,0
+9,3,UPGRADE,"Weapon Rank 9",0x57e,0
+9,3,UNITCOMMAND,"Vital Shot",0xc,1
+9,3,UNITCOMMAND,"Throw Grenade",0x49,1
+9,3,UNITCOMMAND,"Throw Grenade",0x4a,1
+9,3,UNITCOMMAND,"Throw Satchel Charge",0x50,1
+9,3,UNITCOMMAND,"Vital Shot",0x6a,1
+9,3,UNITCOMMAND,"Throw Grenade",0x9c,1
+9,3,UNITCOMMAND,"(De)Camouflage",0xbb,1
+9,3,UNITCOMMAND,"(De)Camouflage",0xbd,1
+9,3,UNITCOMMAND,"Grit Ability",0xf2,0
+9,3,UNITCOMMAND,"Concealing Smoke",0xfd,0
+9,3,UNITCOMMAND,"Fire-Up!",0x101,0
+9,3,UNITCOMMAND,"Scorch",0x102,1
+9,3,UNITCOMMAND,"Scorch",0x103,1
+9,3,UNITCOMMAND,"Sprint",0x106,0
+9,3,UNITCOMMAND,"Sprint",0x107,0
+9,3,UNITCOMMAND,"Self Repair",0x204,0
+9,3,UNITCOMMAND,"Healing Burst",0x2d4,1
+9,3,UNITCOMMAND,"Drop a Flare",0x2d5,1
+9,3,UNITCOMMAND,"Inspired Command",0x2d6,0
+9,3,UNITCOMMAND,"Heroic Charge",0x2d7,0
+9,3,UNITCOMMAND,"(De)Camouflage",0x2d8,1
