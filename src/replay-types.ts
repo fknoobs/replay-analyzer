@@ -3,6 +3,9 @@ export interface Player {
     faction: string;
     id?: number;
     doctrine?: number;
+    doctrineName?: string;
+    dataInfo1?: number;
+    dataInfo2?: number;
 }
 
 export interface Message {

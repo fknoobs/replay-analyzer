@@ -1,5 +1,5 @@
 import { ReplayStream } from "./replay-stream";
-import { ReplayData, createEmptyReplay, Action } from "./replay-types";
+import { ReplayData, createEmptyReplay, Action, getDoctrineName } from "./replay-types";
 
 /**
  * Parses the entire replay file.
@@ -15,11 +15,15 @@ export const parseReplay = (input: ArrayBuffer | Uint8Array): ReplayData => {
         parseDataInternal(stream, replay);
         findPlayerIDs(replay);
 
-        // replay.players.forEach((player) => {
-        //     player.doctrine =
-        //         player.actions.find((action) => action.commandID === 98)
-        //             ?.objectID || undefined;
-        // });
+        replay.players.forEach((player) => {
+            player.doctrine =
+                replay.actions.find((action) => action.commandID === 98 && action.playerID === player.id)
+                    ?.objectID || undefined;
+
+            if (player.doctrine !== undefined) {
+                player.doctrineName = getDoctrineName(player.doctrine);
+            }
+        });
     } catch (e) {
         console.error("Error parsing replay:", e);
     }
@@ -169,11 +173,10 @@ const processDataChunk = (
         replay.matchType = stream.readLengthPrefixedASCIIStr();
     } else if (type.startsWith("DATAINFO") && version === 6) {
         const playerName = stream.readLengthPrefixedUnicodeStr();
-        const id = stream.readUInt16();
-        console.log(id)
-        stream.skip(6);
+        const u1 = stream.readUInt32();
+        const u2 = stream.readUInt32();
         const faction = stream.readLengthPrefixedASCIIStr();
-        addPlayer(replay, playerName, faction, id);
+        addPlayer(replay, playerName, faction, 0, 0, u1, u2);
     }
 };
 
@@ -183,12 +186,16 @@ const addPlayer = (
     faction: string,
     id: number = 0,
     doctrine: number = 0,
+    dataInfo1: number = 0,
+    dataInfo2: number = 0,
 ) => {
     replay.players.push({
         name,
         faction,
         id,
-        doctrine
+        doctrine,
+        dataInfo1,
+        dataInfo2
     });
     replay.playerCount = replay.players.length;
 };
@@ -452,7 +459,7 @@ const parseMessage = (
 };
 
 const findPlayerIDs = (replay: ReplayData) => {
-    // 1. Try to assign IDs from chat messages (most reliable)
+    // Strategy 1: Use Chat Messages (Most Reliable)
     for (const player of replay.players) {
         for (const message of replay.messages) {
             if (message.sender === player.name) {
@@ -462,15 +469,43 @@ const findPlayerIDs = (replay: ReplayData) => {
         }
     }
 
-    // 2. Fallback: If ID is still small (likely a slot ID), map to 1000-based ID
-    // This handles cases with no chat messages.
-    for (const player of replay.players) {
-        if (player.id !== undefined && player.id < 1000) {
-            player.id = 1000 + player.id;
+    // Strategy 2: Check DATAINFO fields
+    // Only use if values are unique and look like valid IDs (small integers or 1000-range)
+    const d1Values = replay.players.map(p => p.dataInfo1);
+    const uniqueD1 = new Set(d1Values);
+    
+    if (uniqueD1.size === replay.players.length) {
+        // Check if values are reasonable (e.g. < 10000) to avoid using garbage data
+        const allReasonable = d1Values.every(v => v !== undefined && v < 10000);
+        if (allReasonable) {
+            replay.players.forEach(p => {
+                if (!p.id || p.id === 0) {
+                    if (p.dataInfo1 !== undefined) {
+                        p.id = p.dataInfo1 < 1000 ? p.dataInfo1 + 1000 : p.dataInfo1;
+                    }
+                }
+            });
         }
     }
 
-    // 3. Update player names in actions now that we have correct IDs
+    // Strategy 3: Fallback - Ensure everyone has an ID
+    // If any player still has no ID (0 or undefined), assign one.
+    const takenIds = new Set(replay.players.map(p => p.id).filter(id => id && id !== 0));
+    
+    replay.players.forEach((player) => {
+        if (!player.id || player.id === 0) {
+            // Find the first available ID starting from 1000
+            let candidateId = 1000;
+            while (takenIds.has(candidateId)) {
+                candidateId++;
+            }
+            
+            player.id = candidateId;
+            takenIds.add(candidateId);
+        }
+    });
+
+    // Update player names in actions now that we have correct IDs
     updateActionPlayerNames(replay);
 };
 
