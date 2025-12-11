@@ -3,12 +3,15 @@ export interface Player {
     faction: string;
     id?: number;
     doctrine?: number;
+
+    actions: Action[];
+    messages: Message[];
 }
 
 export interface Message {
     tick: number;
     sender: string;
-    senderID: number;
+    playerID: number;
     content: string;
     recipient: number;
 }
@@ -24,7 +27,7 @@ export interface Action {
     timestamp: string;
     commandID: number;
     objectID: number;
-    position?: { x: number, y: number, z: number };
+    position?: { x: number; y: number; z: number };
 }
 
 export interface ReplayData {
@@ -46,7 +49,7 @@ export interface ReplayData {
     replayName: string;
     duration: number;
     durationReadable: string;
-    
+
     players: Player[];
     messages: Message[];
     actions: Action[];
@@ -56,25 +59,44 @@ export interface ReplayData {
 
 export const createEmptyReplay = (): ReplayData => ({
     version: 0,
-    gameType: '',
-    gameDate: '',
-    modName: '',
-    mapName: '',
-    mapFileName: '',
-    mapDescription: '',
+    gameType: "",
+    gameDate: "",
+    modName: "",
+    mapName: "",
+    mapFileName: "",
+    mapDescription: "",
     mapWidth: 0,
     mapHeight: 0,
     playerCount: 0,
-    matchType: '',
+    matchType: "",
     highResources: false,
     randomStart: false,
     vpCount: 0,
     vpGame: false,
-    replayName: '',
+    replayName: "",
     duration: 0,
-    durationReadable: '',
+    durationReadable: "",
     players: [],
     messages: [],
     actions: [],
-    headerParsed: false
+    headerParsed: false,
 });
+
+export const DOCTRINES: { [key: number]: string } = {
+    2: "Airborne",
+    9: "Armor",
+    17: "Infantry",
+    186: "Blitzkrieg",
+    194: "Defensive",
+    265: "Terror",
+    295: "Luftwaffe",
+    302: "Scorched Earth",
+    309: "Tank Destroyer",
+    316: "Royal Artillery",
+    323: "Royal Commandos",
+    330: "Royal Engineers",
+};
+
+export const getDoctrineName = (doctrineID: number): string => {
+    return DOCTRINES[doctrineID];
+};

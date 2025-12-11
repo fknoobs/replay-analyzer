@@ -1,5 +1,5 @@
-import { ReplayStream } from './replay-stream';
-import { ReplayData, createEmptyReplay, Action } from './replay-types';
+import { ReplayStream } from "./replay-stream";
+import { ReplayData, createEmptyReplay, Action } from "./replay-types";
 
 /**
  * Parses the entire replay file.
@@ -13,9 +13,22 @@ export const parseReplay = (input: ArrayBuffer | Uint8Array): ReplayData => {
     try {
         parseHeaderInternal(stream, replay);
         parseDataInternal(stream, replay);
+
+        replay.players.forEach((player) => {
+            player.actions = replay.actions.filter(
+                (action) => action.playerID === player.id,
+            );
+            player.messages = replay.messages.filter(
+                (message) => message.playerID === player.id,
+            );
+            player.doctrine =
+                player.actions.find((action) => action.commandID === 98)
+                    ?.objectID || undefined;
+        });
     } catch (e) {
         console.error("Error parsing replay:", e);
     }
+
     return replay;
 };
 
@@ -51,10 +64,10 @@ const parseHeaderInternal = (stream: ReplayStream, replay: ReplayData) => {
     stream.readUInt16(); // Skip null terminator
 
     stream.seek(76); // Fixed offset from C# code
-    
+
     parseChunky(stream, replay);
     parseChunky(stream, replay);
-    
+
     assignPlayerIDs(replay);
 
     replay.headerParsed = true;
@@ -76,18 +89,18 @@ const parseChunky = (stream: ReplayStream, replay: ReplayData): boolean => {
         stream.seek(pos);
         return false;
     }
-    
+
     stream.skip(4);
     const version = stream.readUInt32();
     if (version !== 3) return false;
-    
+
     stream.skip(4);
     const length = stream.readUInt32();
-    
+
     stream.skip(length - 28);
-    
+
     while (parseChunk(stream, replay));
-    
+
     return true;
 };
 
@@ -95,7 +108,7 @@ const parseChunk = (stream: ReplayStream, replay: ReplayData): boolean => {
     if (stream.position + 8 > stream.length) return false;
 
     const chunkType = stream.readASCIIStr(8);
-    
+
     if (!(chunkType.startsWith("FOLD") || chunkType.startsWith("DATA"))) {
         stream.skip(-8);
         return false;
@@ -104,7 +117,7 @@ const parseChunk = (stream: ReplayStream, replay: ReplayData): boolean => {
     const chunkVersion = stream.readUInt32();
     const chunkLength = stream.readUInt32();
     const chunkNameLength = stream.readUInt32();
-    
+
     stream.skip(8);
 
     let chunkName = "";
@@ -126,34 +139,38 @@ const parseChunk = (stream: ReplayStream, replay: ReplayData): boolean => {
     return true;
 };
 
-const processDataChunk = (stream: ReplayStream, replay: ReplayData, type: string, version: number) => {
+const processDataChunk = (
+    stream: ReplayStream,
+    replay: ReplayData,
+    type: string,
+    version: number,
+) => {
     if (type.startsWith("DATASDSC") && version === 0x7d4) {
-            stream.skip(4);
-            const len = stream.readUInt32();
-            stream.skip(12 + 2 * len);
-            
-            replay.modName = stream.readLengthPrefixedASCIIStr();
-            replay.mapFileName = stream.readLengthPrefixedASCIIStr();
-            stream.skip(20);
-            replay.mapName = stream.readLengthPrefixedUnicodeStr();
-            replay.mapDescription = stream.readLengthPrefixedUnicodeStr();
-            stream.skip(4);
-            replay.mapWidth = stream.readUInt32();
-            replay.mapHeight = stream.readUInt32();
-    }
-    else if (type.startsWith("DATABASE") && version === 0xb) {
-        stream.skip(8);
-        stream.skip(8);
-        replay.randomStart = (stream.readUInt32() === 0);
         stream.skip(4);
-        replay.highResources = (stream.readUInt32() === 1);
+        const len = stream.readUInt32();
+        stream.skip(12 + 2 * len);
+
+        replay.modName = stream.readLengthPrefixedASCIIStr();
+        replay.mapFileName = stream.readLengthPrefixedASCIIStr();
+        stream.skip(20);
+        replay.mapName = stream.readLengthPrefixedUnicodeStr();
+        replay.mapDescription = stream.readLengthPrefixedUnicodeStr();
+        stream.skip(4);
+        replay.mapWidth = stream.readUInt32();
+        replay.mapHeight = stream.readUInt32();
+    } else if (type.startsWith("DATABASE") && version === 0xb) {
+        stream.skip(8);
+        stream.skip(8);
+        replay.randomStart = stream.readUInt32() === 0;
+        stream.skip(4);
+        replay.highResources = stream.readUInt32() === 1;
         stream.skip(4);
         const vpVal = stream.readUInt32();
         replay.vpCount = 250 * (1 << vpVal);
         stream.skip(5);
         replay.replayName = stream.readLengthPrefixedUnicodeStr();
         stream.skip(8);
-        replay.vpGame = (stream.readUInt32() === 0x603872a3);
+        replay.vpGame = stream.readUInt32() === 0x603872a3;
         stream.skip(23);
         stream.readLengthPrefixedASCIIStr(); // gameminorversion
         stream.skip(4);
@@ -165,8 +182,7 @@ const processDataChunk = (stream: ReplayStream, replay: ReplayData, type: string
         }
         stream.readLengthPrefixedASCIIStr(); // matchname
         replay.matchType = stream.readLengthPrefixedASCIIStr();
-    }
-    else if (type.startsWith("DATAINFO") && version === 6) {
+    } else if (type.startsWith("DATAINFO") && version === 6) {
         const playerName = stream.readLengthPrefixedUnicodeStr();
         const id = stream.readUInt16();
         stream.skip(6);
@@ -175,39 +191,57 @@ const processDataChunk = (stream: ReplayStream, replay: ReplayData, type: string
     }
 };
 
-const addPlayer = (replay: ReplayData, name: string, faction: string, id: number = 0, doctrine: number = 0) => {
-    replay.players.push({ name, faction, id, doctrine });
+const addPlayer = (
+    replay: ReplayData,
+    name: string,
+    faction: string,
+    id: number = 0,
+    doctrine: number = 0,
+) => {
+    replay.players.push({
+        name,
+        faction,
+        id,
+        doctrine,
+        actions: [],
+        messages: [],
+    });
     replay.playerCount = replay.players.length;
 };
 
 const parseDataInternal = (stream: ReplayStream, replay: ReplayData) => {
     let tickIndex = 0;
     let tickCount = 0;
-    
+
     while (stream.position < stream.length) {
         if (stream.position + 4 > stream.length) break;
-        
+
         const marker = stream.readUInt32();
 
         if (marker === 0) {
             // Tick Data
             const tickLength = stream.readUInt32();
             if (tickLength === 0 || tickLength > 10000000) continue; // Safety
-            
+
             const tickDataStart = stream.position;
             const tickData = stream.readBytes(tickLength);
             parseTick(tickData, tickDataStart, tickCount, replay);
-            
+
             tickCount++;
 
             if (tickData.length >= 4) {
                 // We need to read from the Uint8Array directly here since tickData is a subarray
                 // DataView is needed for Little Endian reading
-                const view = new DataView(tickData.buffer, tickData.byteOffset, tickData.byteLength);
+                const view = new DataView(
+                    tickData.buffer,
+                    tickData.byteOffset,
+                    tickData.byteLength,
+                );
                 const newTickIndex = view.getUint32(0, true);
-                
-                if (newTickIndex < 4000000000) { // Ignore suspicious high values
-                        tickIndex = newTickIndex;
+
+                if (newTickIndex < 4000000000) {
+                    // Ignore suspicious high values
+                    tickIndex = newTickIndex;
                 }
             }
         } else if (marker === 1) {
@@ -224,29 +258,34 @@ const parseDataInternal = (stream: ReplayStream, replay: ReplayData) => {
     } else {
         replay.duration = tickIndex / 8;
     }
-    
+
     const totalSeconds = Math.floor(replay.duration);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-    replay.durationReadable = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    replay.durationReadable = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 };
 
-const parseTick = (data: Uint8Array, tickDataStart: number, currentTickCount: number, replay: ReplayData) => {
+const parseTick = (
+    data: Uint8Array,
+    tickDataStart: number,
+    currentTickCount: number,
+    replay: ReplayData,
+) => {
     if (data.length < 16) return;
 
     const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
     let tickId = view.getUint32(0, true);
     if (tickId >= 4000000000) {
-            tickId = currentTickCount;
+        tickId = currentTickCount;
     }
     // Bytes 4-11 are timestamp
     const bundleCount = view.getUint32(12, true);
-    
+
     let offset = 16;
     for (let i = 0; i < bundleCount; i++) {
         if (offset + 12 > data.length) break;
-        
+
         // Skip bundle header (12 bytes)
         offset += 12;
 
@@ -254,14 +293,21 @@ const parseTick = (data: Uint8Array, tickDataStart: number, currentTickCount: nu
 
         const actionBlockSize = view.getUint32(offset, true);
         offset += 4;
-        
+
         if (actionBlockSize > 0 && actionBlockSize < 65536) {
             offset += 1; // Skip duplicate byte
-            
+
             const actionEnd = offset + actionBlockSize;
             if (actionEnd > data.length) break;
 
-            parseActionsInBlock(tickId, data, offset, actionEnd, tickDataStart, replay);
+            parseActionsInBlock(
+                tickId,
+                data,
+                offset,
+                actionEnd,
+                tickDataStart,
+                replay,
+            );
             offset = actionEnd;
         } else {
             offset += 1; // Skip zero byte
@@ -269,7 +315,14 @@ const parseTick = (data: Uint8Array, tickDataStart: number, currentTickCount: nu
     }
 };
 
-const parseActionsInBlock = (tick: number, data: Uint8Array, startIndex: number, endIndex: number, tickDataStart: number, replay: ReplayData) => {
+const parseActionsInBlock = (
+    tick: number,
+    data: Uint8Array,
+    startIndex: number,
+    endIndex: number,
+    tickDataStart: number,
+    replay: ReplayData,
+) => {
     let i = startIndex;
     const maxActions = 10000;
     let actionCount = 0;
@@ -277,7 +330,7 @@ const parseActionsInBlock = (tick: number, data: Uint8Array, startIndex: number,
 
     while (i + 2 <= endIndex && actionCount < maxActions) {
         const actionLength = view.getUint16(i, true);
-        
+
         if (actionLength <= 0 || actionLength > 1000) break;
 
         // Capture up to 30 bytes for output matching, even if it overlaps next action
@@ -292,7 +345,12 @@ const parseActionsInBlock = (tick: number, data: Uint8Array, startIndex: number,
     }
 };
 
-const addAction = (replay: ReplayData, tick: number, data: Uint8Array, absoluteOffset: number) => {
+const addAction = (
+    replay: ReplayData,
+    tick: number,
+    data: Uint8Array,
+    absoluteOffset: number,
+) => {
     let playerID = 0;
     let commandID = 0;
     let objectID = 0;
@@ -311,8 +369,8 @@ const addAction = (replay: ReplayData, tick: number, data: Uint8Array, absoluteO
         objectID = view.getUint32(14, true);
     }
 
-    let position: { x: number, y: number, z: number } | undefined;
-    
+    let position: { x: number; y: number; z: number } | undefined;
+
     // Try to find coordinates (3 consecutive floats)
     if (data.length >= 12) {
         for (let i = 0; i <= data.length - 12; i++) {
@@ -324,42 +382,63 @@ const addAction = (replay: ReplayData, tick: number, data: Uint8Array, absoluteO
                 if (isNaN(n) || !isFinite(n)) return false;
                 const abs = Math.abs(n);
                 if (abs > 2048) return false;
-                if (abs > 0 && abs < 0.01) return false; 
+                if (abs > 0 && abs < 0.01) return false;
                 return true;
             };
 
             if (isValid(x) && isValid(y) && isValid(z)) {
-                if (Math.abs(x) > 0.01 || Math.abs(y) > 0.01 || Math.abs(z) > 0.01) {
-                        position = { x, y, z };
-                        break;
+                if (
+                    Math.abs(x) > 0.01 ||
+                    Math.abs(y) > 0.01 ||
+                    Math.abs(z) > 0.01
+                ) {
+                    position = { x, y, z };
+                    break;
                 }
             }
         }
     }
 
     // Convert to hex string manually since Buffer is not available
-    const rawHex = Array.from(data).map(b => b.toString(16).padStart(2, '0')).join('');
-    
+    const rawHex = Array.from(data)
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
     // 8 ticks per second
     const totalSeconds = Math.floor(tick / 8);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-    const timestamp = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    const timestamp = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 
-    const player = replay.players.find(p => p.id === playerID);
+    const player = replay.players.find((p) => p.id === playerID);
     const playerName = player ? player.name : "";
 
-    replay.actions.push({ tick, data, rawHex, playerID, playerName, timestamp, absoluteOffset, commandID, objectID, position });
+    replay.actions.push({
+        tick,
+        data,
+        rawHex,
+        playerID,
+        playerName,
+        timestamp,
+        absoluteOffset,
+        commandID,
+        objectID,
+        position,
+    });
 };
 
-const parseMessage = (stream: ReplayStream, replay: ReplayData, tick: number) => {
+const parseMessage = (
+    stream: ReplayStream,
+    replay: ReplayData,
+    tick: number,
+) => {
     const pos = stream.position;
     const length = stream.readUInt32();
 
     if (stream.readUInt32() > 0) {
         stream.skip(4);
-        
+
         const L = stream.readUInt32();
         let playerName = "";
         let playerID = 0;
@@ -377,7 +456,13 @@ const parseMessage = (stream: ReplayStream, replay: ReplayData, tick: number) =>
         const recipient = stream.readUInt32();
         const message = stream.readLengthPrefixedUnicodeStr();
 
-        replay.messages.push({ tick, sender: playerName, senderID: playerID, content: message, recipient });
+        replay.messages.push({
+            tick,
+            sender: playerName,
+            playerID: playerID,
+            content: message,
+            recipient,
+        });
     }
     stream.seek(pos + length + 4);
 };

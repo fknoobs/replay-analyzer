@@ -7,7 +7,7 @@ export interface Player {
 export interface Message {
     tick: number;
     sender: string;
-    senderID: number;
+    playerID: number;
     content: string;
     recipient: number;
 }
