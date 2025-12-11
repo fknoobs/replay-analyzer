@@ -1,5 +1,10 @@
 import { ReplayStream } from "./replay-stream";
-import { ReplayData, createEmptyReplay, Action, getDoctrineName } from "./replay-types";
+import {
+    ReplayData,
+    createEmptyReplay,
+    Action,
+    getDoctrineName,
+} from "./replay-types";
 
 /**
  * Parses the entire replay file.
@@ -17,8 +22,11 @@ export const parseReplay = (input: ArrayBuffer | Uint8Array): ReplayData => {
 
         replay.players.forEach((player) => {
             player.doctrine =
-                replay.actions.find((action) => action.commandID === 98 && action.playerID === player.id)
-                    ?.objectID || undefined;
+                replay.actions.find(
+                    (action) =>
+                        action.commandID === 98 &&
+                        action.playerID === player.id,
+                )?.objectID || undefined;
 
             if (player.doctrine !== undefined) {
                 player.doctrineName = getDoctrineName(player.doctrine);
@@ -176,7 +184,7 @@ const processDataChunk = (
         const u1 = stream.readUInt32();
         const u2 = stream.readUInt32();
         const faction = stream.readLengthPrefixedASCIIStr();
-        addPlayer(replay, playerName, faction, 0, 0, u1, u2);
+        addPlayer(replay, playerName, faction);
     }
 };
 
@@ -186,16 +194,12 @@ const addPlayer = (
     faction: string,
     id: number = 0,
     doctrine: number = 0,
-    dataInfo1: number = 0,
-    dataInfo2: number = 0,
 ) => {
     replay.players.push({
         name,
         faction,
         id,
         doctrine,
-        dataInfo1,
-        dataInfo2
     });
     replay.playerCount = replay.players.length;
 };
@@ -471,17 +475,22 @@ const findPlayerIDs = (replay: ReplayData) => {
 
     // Strategy 2: Check DATAINFO fields
     // Only use if values are unique and look like valid IDs (small integers or 1000-range)
-    const d1Values = replay.players.map(p => p.dataInfo1);
+    const d1Values = replay.players.map((p) => p.dataInfo1);
     const uniqueD1 = new Set(d1Values);
-    
+
     if (uniqueD1.size === replay.players.length) {
         // Check if values are reasonable (e.g. < 10000) to avoid using garbage data
-        const allReasonable = d1Values.every(v => v !== undefined && v < 10000);
+        const allReasonable = d1Values.every(
+            (v) => v !== undefined && v < 10000,
+        );
         if (allReasonable) {
-            replay.players.forEach(p => {
+            replay.players.forEach((p) => {
                 if (!p.id || p.id === 0) {
                     if (p.dataInfo1 !== undefined) {
-                        p.id = p.dataInfo1 < 1000 ? p.dataInfo1 + 1000 : p.dataInfo1;
+                        p.id =
+                            p.dataInfo1 < 1000
+                                ? p.dataInfo1 + 1000
+                                : p.dataInfo1;
                     }
                 }
             });
@@ -490,8 +499,10 @@ const findPlayerIDs = (replay: ReplayData) => {
 
     // Strategy 3: Fallback - Ensure everyone has an ID
     // If any player still has no ID (0 or undefined), assign one.
-    const takenIds = new Set(replay.players.map(p => p.id).filter(id => id && id !== 0));
-    
+    const takenIds = new Set(
+        replay.players.map((p) => p.id).filter((id) => id && id !== 0),
+    );
+
     replay.players.forEach((player) => {
         if (!player.id || player.id === 0) {
             // Find the first available ID starting from 1000
@@ -499,7 +510,7 @@ const findPlayerIDs = (replay: ReplayData) => {
             while (takenIds.has(candidateId)) {
                 candidateId++;
             }
-            
+
             player.id = candidateId;
             takenIds.add(candidateId);
         }
