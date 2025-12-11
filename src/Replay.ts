@@ -21,6 +21,8 @@ export interface Action {
     playerID: number;
     playerName: string;
     timestamp: string;
+    commandID: number;
+    objectID: number;
 }
 
 export class Replay {
@@ -62,10 +64,20 @@ export class Replay {
 
     public addAction(tick: number, data: Buffer, absoluteOffset: number) {
         let playerID = 0;
+        let commandID = 0;
+        let objectID = 0;
 
         // Player ID is consistently at offset 4 (UInt16) for most commands
         if (data.length >= 6) {
             playerID = data.readUInt16LE(4);
+        }
+
+        if (data.length >= 3) {
+            commandID = data.readUInt8(2);
+        }
+
+        if (data.length >= 18) {
+            objectID = data.readUInt32LE(14);
         }
 
         const rawHex = data.toString('hex');
@@ -80,6 +92,6 @@ export class Replay {
         const player = this.players.find(p => p.id === playerID);
         const playerName = player ? player.name : "";
 
-        this.actions.push({ tick, data, rawHex, playerID, playerName, timestamp, absoluteOffset });
+        this.actions.push({ tick, data, rawHex, playerID, playerName, timestamp, absoluteOffset, commandID, objectID });
     }
 }

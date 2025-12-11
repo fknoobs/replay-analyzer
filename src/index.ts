@@ -37,6 +37,20 @@ const main = () => {
 
     console.log(`Total Actions: ${replay.actions.length}`);
     console.log(`Total Messages: ${replay.messages.length}`);
+
+    const formattedActions = replay.actions.slice(0, 50).map(a => {
+        const hex = a.rawHex.toUpperCase().match(/.{1,2}/g)?.join(' ') || '';
+        return {
+            tick: a.tick,
+            rawHex: hex,
+            playerID: a.playerID,
+            playerName: a.playerName,
+            timestamp: a.timestamp,
+            commandID: a.commandID,
+            objectID: a.objectID
+        };
+    });
+    console.log(`Actions: ${JSON.stringify(formattedActions, null, 4)}`);
 };
 
 main();
