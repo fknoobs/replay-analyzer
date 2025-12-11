@@ -4,8 +4,6 @@ export interface Player {
     id?: number;
     doctrine?: number;
     doctrineName?: string;
-    dataInfo1?: number;
-    dataInfo2?: number;
 }
 export interface Message {
     tick: number;

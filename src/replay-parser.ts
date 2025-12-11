@@ -473,30 +473,6 @@ const findPlayerIDs = (replay: ReplayData) => {
         }
     }
 
-    // Strategy 2: Check DATAINFO fields
-    // Only use if values are unique and look like valid IDs (small integers or 1000-range)
-    const d1Values = replay.players.map((p) => p.dataInfo1);
-    const uniqueD1 = new Set(d1Values);
-
-    if (uniqueD1.size === replay.players.length) {
-        // Check if values are reasonable (e.g. < 10000) to avoid using garbage data
-        const allReasonable = d1Values.every(
-            (v) => v !== undefined && v < 10000,
-        );
-        if (allReasonable) {
-            replay.players.forEach((p) => {
-                if (!p.id || p.id === 0) {
-                    if (p.dataInfo1 !== undefined) {
-                        p.id =
-                            p.dataInfo1 < 1000
-                                ? p.dataInfo1 + 1000
-                                : p.dataInfo1;
-                    }
-                }
-            });
-        }
-    }
-
     // Strategy 3: Fallback - Ensure everyone has an ID
     // If any player still has no ID (0 or undefined), assign one.
     const takenIds = new Set(
