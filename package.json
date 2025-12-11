@@ -1,19 +1,19 @@
 {
-  "name": "@fknoobs/replay-parser",
-  "version": "1.1.0",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "tsc",
-    "prepare": "npm run build",
-    "dev": "vite",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "devDependencies": {
-    "typescript": "^5.9.3",
-    "vite": "^7.2.7"
-  }
+    "name": "@fknoobs/replay-parser",
+    "version": "1.2.0",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "prepare": "npm run build",
+        "dev": "vite",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "devDependencies": {
+        "typescript": "^5.9.3",
+        "vite": "^7.2.7"
+    }
 }
