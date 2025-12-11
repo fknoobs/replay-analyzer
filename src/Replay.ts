@@ -41,6 +41,7 @@ export class Replay {
     public vpGame: boolean = false;
     public replayName: string = '';
     public duration: number = 0;
+    public durationReadable: string = '';
     
     public players: Player[] = [];
     public messages: Message[] = [];

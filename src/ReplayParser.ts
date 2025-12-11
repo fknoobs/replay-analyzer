@@ -172,6 +172,7 @@ export class ReplayParser {
 
     private parseData() {
         let tickIndex = 0;
+        let tickCount = 0;
         
         while (this.stream.position < this.stream.length) {
             if (this.stream.position + 4 > this.stream.length) break;
@@ -185,9 +186,15 @@ export class ReplayParser {
                 
                 const tickDataStart = this.stream.position;
                 const tickData = this.stream.readBytes(tickLength);
-                this.parseTick(tickData, tickDataStart);
+                this.parseTick(tickData, tickDataStart, tickCount);
+                
+                tickCount++;
+
                 if (tickData.length >= 4) {
-                    tickIndex = tickData.readUInt32LE(0);
+                    const newTickIndex = tickData.readUInt32LE(0);
+                    if (newTickIndex < 4000000000) { // Ignore suspicious high values
+                         tickIndex = newTickIndex;
+                    }
                 }
             } else if (marker === 1) {
                 // Message
@@ -197,13 +204,27 @@ export class ReplayParser {
             }
         }
 
-        this.replay.duration = tickIndex / 8;
+        // If tickIndex is 0 (or invalid), fallback to tickCount
+        if (tickIndex === 0 && tickCount > 0) {
+            this.replay.duration = tickCount / 8;
+        } else {
+            this.replay.duration = tickIndex / 8;
+        }
+        
+        const totalSeconds = Math.floor(this.replay.duration);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        this.replay.durationReadable = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
-    private parseTick(data: Buffer, tickDataStart: number) {
+    private parseTick(data: Buffer, tickDataStart: number, currentTickCount: number) {
         if (data.length < 16) return;
 
-        const tickId = data.readUInt32LE(0);
+        let tickId = data.readUInt32LE(0);
+        if (tickId >= 4000000000) {
+             tickId = currentTickCount;
+        }
         // Bytes 4-11 are timestamp
         const bundleCount = data.readUInt32LE(12);
         

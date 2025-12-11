@@ -24,6 +24,7 @@ const main = () => {
     console.log(`Version: ${replay.version}`);
     console.log(`Game Type: ${replay.gameType}`);
     console.log(`Game Date: ${replay.gameDate}`);
+    console.log(`Game duration: ${replay.duration}`);
     console.log(`Mod: ${replay.modName}`);
     console.log(`Map: ${replay.mapName}`);
     console.log(`Map File: ${replay.mapFileName}`);
