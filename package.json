@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
+    "prepare": "npm run build",
     "dev": "vite",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
