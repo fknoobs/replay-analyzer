@@ -1,4 +1,4 @@
-import { ReplayData } from './replay-types';
+import { ReplayData } from "./replay-types";
 /**
  * Parses the entire replay file.
  * @param input The replay file content as ArrayBuffer or Uint8Array.

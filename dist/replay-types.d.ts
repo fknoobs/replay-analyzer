@@ -3,6 +3,8 @@ export interface Player {
     faction: string;
     id?: number;
     doctrine?: number;
+    actions: Action[];
+    messages: Message[];
 }
 export interface Message {
     tick: number;
@@ -52,3 +54,7 @@ export interface ReplayData {
     headerParsed: boolean;
 }
 export declare const createEmptyReplay: () => ReplayData;
+export declare const DOCTRINES: {
+    [key: number]: string;
+};
+export declare const getDoctrineName: (doctrineID: number) => string;
