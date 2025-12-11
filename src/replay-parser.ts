@@ -13,18 +13,13 @@ export const parseReplay = (input: ArrayBuffer | Uint8Array): ReplayData => {
     try {
         parseHeaderInternal(stream, replay);
         parseDataInternal(stream, replay);
+        findPlayerIDs(replay);
 
-        replay.players.forEach((player) => {
-            player.actions = replay.actions.filter(
-                (action) => action.playerID === player.id,
-            );
-            player.messages = replay.messages.filter(
-                (message) => message.playerID === player.id,
-            );
-            player.doctrine =
-                player.actions.find((action) => action.commandID === 98)
-                    ?.objectID || undefined;
-        });
+        // replay.players.forEach((player) => {
+        //     player.doctrine =
+        //         player.actions.find((action) => action.commandID === 98)
+        //             ?.objectID || undefined;
+        // });
     } catch (e) {
         console.error("Error parsing replay:", e);
     }
@@ -68,17 +63,7 @@ const parseHeaderInternal = (stream: ReplayStream, replay: ReplayData) => {
     parseChunky(stream, replay);
     parseChunky(stream, replay);
 
-    assignPlayerIDs(replay);
-
     replay.headerParsed = true;
-};
-
-const assignPlayerIDs = (replay: ReplayData) => {
-    const playerCount = replay.players.length;
-    for (let i = 0; i < playerCount; i++) {
-        // Assuming reverse order: First parsed is highest ID
-        replay.players[i].id = 1000 + (playerCount - 1 - i);
-    }
 };
 
 const parseChunky = (stream: ReplayStream, replay: ReplayData): boolean => {
@@ -185,6 +170,7 @@ const processDataChunk = (
     } else if (type.startsWith("DATAINFO") && version === 6) {
         const playerName = stream.readLengthPrefixedUnicodeStr();
         const id = stream.readUInt16();
+        console.log(id)
         stream.skip(6);
         const faction = stream.readLengthPrefixedASCIIStr();
         addPlayer(replay, playerName, faction, id);
@@ -202,9 +188,7 @@ const addPlayer = (
         name,
         faction,
         id,
-        doctrine,
-        actions: [],
-        messages: [],
+        doctrine
     });
     replay.playerCount = replay.players.length;
 };
@@ -465,4 +449,42 @@ const parseMessage = (
         });
     }
     stream.seek(pos + length + 4);
+};
+
+const findPlayerIDs = (replay: ReplayData) => {
+    // 1. Try to assign IDs from chat messages (most reliable)
+    for (const player of replay.players) {
+        for (const message of replay.messages) {
+            if (message.sender === player.name) {
+                player.id = message.playerID;
+                break;
+            }
+        }
+    }
+
+    // 2. Fallback: If ID is still small (likely a slot ID), map to 1000-based ID
+    // This handles cases with no chat messages.
+    for (const player of replay.players) {
+        if (player.id !== undefined && player.id < 1000) {
+            player.id = 1000 + player.id;
+        }
+    }
+
+    // 3. Update player names in actions now that we have correct IDs
+    updateActionPlayerNames(replay);
+};
+
+const updateActionPlayerNames = (replay: ReplayData) => {
+    const playerMap = new Map<number, string>();
+    for (const p of replay.players) {
+        if (p.id !== undefined) {
+            playerMap.set(p.id, p.name);
+        }
+    }
+
+    for (const action of replay.actions) {
+        if (playerMap.has(action.playerID)) {
+            action.playerName = playerMap.get(action.playerID)!;
+        }
+    }
 };
