@@ -23,6 +23,7 @@ export interface Action {
     timestamp: string;
     commandID: number;
     objectID: number;
+    position?: { x: number, y: number, z: number };
 }
 
 export class Replay {
@@ -80,6 +81,32 @@ export class Replay {
             objectID = data.readUInt32LE(14);
         }
 
+        let position: { x: number, y: number, z: number } | undefined;
+        
+        // Try to find coordinates (3 consecutive floats)
+        if (data.length >= 12) {
+            for (let i = 0; i <= data.length - 12; i++) {
+                const x = data.readFloatLE(i);
+                const y = data.readFloatLE(i + 4);
+                const z = data.readFloatLE(i + 8);
+
+                const isValid = (n: number) => {
+                    if (isNaN(n) || !isFinite(n)) return false;
+                    const abs = Math.abs(n);
+                    if (abs > 2048) return false;
+                    if (abs > 0 && abs < 0.01) return false; 
+                    return true;
+                };
+
+                if (isValid(x) && isValid(y) && isValid(z)) {
+                    if (Math.abs(x) > 0.01 || Math.abs(y) > 0.01 || Math.abs(z) > 0.01) {
+                         position = { x, y, z };
+                         break;
+                    }
+                }
+            }
+        }
+
         const rawHex = data.toString('hex');
         
         // 8 ticks per second
@@ -92,6 +119,6 @@ export class Replay {
         const player = this.players.find(p => p.id === playerID);
         const playerName = player ? player.name : "";
 
-        this.actions.push({ tick, data, rawHex, playerID, playerName, timestamp, absoluteOffset, commandID, objectID });
+        this.actions.push({ tick, data, rawHex, playerID, playerName, timestamp, absoluteOffset, commandID, objectID, position });
     }
 }

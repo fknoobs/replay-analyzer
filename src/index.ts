@@ -47,7 +47,8 @@ const main = () => {
             playerName: a.playerName,
             timestamp: a.timestamp,
             commandID: a.commandID,
-            objectID: a.objectID
+            objectID: a.objectID,
+            position: a.position
         };
     });
     console.log(`Actions: ${JSON.stringify(formattedActions, null, 4)}`);
