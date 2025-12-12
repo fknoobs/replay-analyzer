@@ -6,18 +6,23 @@ import {
     getDoctrineName,
 } from "./replay-types";
 
+export interface ParseOptions {
+    includeHexData?: boolean;
+}
+
 /**
  * Parses the entire replay file.
  * @param input The replay file content as ArrayBuffer or Uint8Array.
+ * @param options Optional configuration for parsing.
  * @returns The parsed ReplayData object.
  */
-export const parseReplay = (input: ArrayBuffer | Uint8Array): ReplayData => {
+export const parseReplay = (input: ArrayBuffer | Uint8Array, options?: ParseOptions): ReplayData => {
     const stream = new ReplayStream(input);
     const replay = createEmptyReplay();
 
     try {
         parseHeaderInternal(stream, replay);
-        parseDataInternal(stream, replay);
+        parseDataInternal(stream, replay, options);
         findPlayerIDs(replay);
 
         replay.players.forEach((player) => {
@@ -184,7 +189,7 @@ const processDataChunk = (
         const u1 = stream.readUInt32();
         const u2 = stream.readUInt32();
         const faction = stream.readLengthPrefixedASCIIStr();
-        addPlayer(replay, playerName, faction);
+        addPlayer(replay, playerName, faction, 0, 0, u1, u2);
     }
 };
 
@@ -194,17 +199,21 @@ const addPlayer = (
     faction: string,
     id: number = 0,
     doctrine: number = 0,
+    dataInfo1: number = 0,
+    dataInfo2: number = 0,
 ) => {
     replay.players.push({
         name,
         faction,
         id,
         doctrine,
+        dataInfo1,
+        dataInfo2
     });
     replay.playerCount = replay.players.length;
 };
 
-const parseDataInternal = (stream: ReplayStream, replay: ReplayData) => {
+const parseDataInternal = (stream: ReplayStream, replay: ReplayData, options?: ParseOptions) => {
     let tickIndex = 0;
     let tickCount = 0;
 
@@ -220,7 +229,7 @@ const parseDataInternal = (stream: ReplayStream, replay: ReplayData) => {
 
             const tickDataStart = stream.position;
             const tickData = stream.readBytes(tickLength);
-            parseTick(tickData, tickDataStart, tickCount, replay);
+            parseTick(tickData, tickDataStart, tickCount, replay, options);
 
             tickCount++;
 
@@ -266,6 +275,7 @@ const parseTick = (
     tickDataStart: number,
     currentTickCount: number,
     replay: ReplayData,
+    options?: ParseOptions,
 ) => {
     if (data.length < 16) return;
 
@@ -302,6 +312,7 @@ const parseTick = (
                 actionEnd,
                 tickDataStart,
                 replay,
+                options,
             );
             offset = actionEnd;
         } else {
@@ -317,6 +328,7 @@ const parseActionsInBlock = (
     endIndex: number,
     tickDataStart: number,
     replay: ReplayData,
+    options?: ParseOptions,
 ) => {
     let i = startIndex;
     const maxActions = 10000;
@@ -333,7 +345,7 @@ const parseActionsInBlock = (
         const safeCaptureLength = Math.min(captureLength, data.length - i);
 
         const actionData = data.subarray(i, i + safeCaptureLength);
-        addAction(replay, tick, actionData, tickDataStart + i);
+        addAction(replay, tick, actionData, tickDataStart + i, options);
         actionCount++;
 
         i += actionLength;
@@ -345,6 +357,7 @@ const addAction = (
     tick: number,
     data: Uint8Array,
     absoluteOffset: number,
+    options?: ParseOptions,
 ) => {
     let playerID = 0;
     let commandID = 0;
@@ -394,11 +407,6 @@ const addAction = (
         }
     }
 
-    // Convert to hex string manually since Buffer is not available
-    const rawHex = Array.from(data)
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-
     // 8 ticks per second
     const totalSeconds = Math.floor(tick / 8);
     const hours = Math.floor(totalSeconds / 3600);
@@ -409,10 +417,8 @@ const addAction = (
     const player = replay.players.find((p) => p.id === playerID);
     const playerName = player ? player.name : "";
 
-    replay.actions.push({
+    const action: Action = {
         tick,
-        data,
-        rawHex,
         playerID,
         playerName,
         timestamp,
@@ -420,7 +426,18 @@ const addAction = (
         commandID,
         objectID,
         position,
-    });
+    };
+
+    if (options?.includeHexData) {
+        // Convert to hex string manually since Buffer is not available
+        const rawHex = Array.from(data)
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+        action.data = data;
+        action.rawHex = rawHex;
+    }
+
+    replay.actions.push(action);
 };
 
 const parseMessage = (
@@ -451,12 +468,20 @@ const parseMessage = (
         const recipient = stream.readUInt32();
         const message = stream.readLengthPrefixedUnicodeStr();
 
+        // 8 ticks per second
+        const totalSeconds = Math.floor(tick / 8);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        const timestamp = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
         replay.messages.push({
             tick,
             sender: playerName,
             playerID: playerID,
             content: message,
             recipient,
+            timestamp,
         });
     }
     stream.seek(pos + length + 4);
@@ -469,6 +494,47 @@ const findPlayerIDs = (replay: ReplayData) => {
             if (message.sender === player.name) {
                 player.id = message.playerID;
                 break;
+            }
+        }
+    }
+
+    // Strategy 2: Use DATAINFO unique values (u1, u2)
+    // If we have players without IDs, try to match them based on unique dataInfo values
+    // This assumes that players with different names will have different dataInfo values
+    // We can check if any actions have a playerID that is NOT in our current known list
+    // and see if we can correlate it.
+    // However, a simpler heuristic is often used:
+    // The DATAINFO block often contains the player ID in u1 or u2, but it's inconsistent.
+    // Let's try to see if u1 matches any playerID seen in actions.
+
+    const actionPlayerIDs = new Set(replay.actions.map((a) => a.playerID));
+    const knownPlayerIDs = new Set(
+        replay.players.map((p) => p.id).filter((id) => id !== 0),
+    );
+
+    // Find IDs that appear in actions but are not yet assigned to a player
+    const unassignedActionIDs = [...actionPlayerIDs].filter(
+        (id) => !knownPlayerIDs.has(id) && id !== 0,
+    );
+
+    if (unassignedActionIDs.length > 0) {
+        // If we have unassigned IDs, let's try to assign them to players who don't have IDs yet
+        const playersWithoutIDs = replay.players.filter(
+            (p) => !p.id || p.id === 0,
+        );
+
+        // If the number of unassigned IDs matches the number of players without IDs,
+        // we can try to assign them. But we need an order.
+        // The order in DATAINFO usually matches the internal slot order.
+        // The IDs in actions usually are 1000, 1001, etc. or 0, 1, 2...
+        // Let's just assign them in order if counts match.
+        if (
+            unassignedActionIDs.length === playersWithoutIDs.length &&
+            unassignedActionIDs.length > 0
+        ) {
+            unassignedActionIDs.sort((a, b) => a - b);
+            for (let i = 0; i < playersWithoutIDs.length; i++) {
+                playersWithoutIDs[i].id = unassignedActionIDs[i];
             }
         }
     }

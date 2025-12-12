@@ -4,6 +4,8 @@ export interface Player {
     id?: number;
     doctrine?: number;
     doctrineName?: string;
+    dataInfo1?: number;
+    dataInfo2?: number;
 }
 
 export interface Message {
@@ -12,14 +14,15 @@ export interface Message {
     playerID: number;
     content: string;
     recipient: number;
+    timestamp: string;
 }
 
 export interface Action {
     tick: number;
     // We use Uint8Array instead of Buffer for web compatibility
-    data: Uint8Array;
+    data?: Uint8Array;
     absoluteOffset: number;
-    rawHex: string;
+    rawHex?: string;
     playerID: number;
     playerName: string;
     timestamp: string;
