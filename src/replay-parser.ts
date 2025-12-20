@@ -5,6 +5,7 @@ import {
     Action,
     getDoctrineName,
 } from "./replay-types";
+import { parseDate } from "chrono-node";
 
 export interface ParseOptions {
     includeHexData?: boolean;
@@ -16,7 +17,10 @@ export interface ParseOptions {
  * @param options Optional configuration for parsing.
  * @returns The parsed ReplayData object.
  */
-export const parseReplay = (input: ArrayBuffer | Uint8Array, options?: ParseOptions): ReplayData => {
+export const parseReplay = (
+    input: ArrayBuffer | Uint8Array,
+    options?: ParseOptions,
+): ReplayData => {
     const stream = new ReplayStream(input);
     const replay = createEmptyReplay();
 
@@ -72,7 +76,9 @@ const parseHeaderInternal = (stream: ReplayStream, replay: ReplayData) => {
         length++;
     }
     stream.seek(startPos);
-    replay.gameDate = stream.readUnicodeStr(length);
+    replay.gameDate =
+        parseDate(stream.readUnicodeStr(length))?.toISOString() ||
+        stream.readUnicodeStr(length);
     stream.readUInt16(); // Skip null terminator
 
     stream.seek(76); // Fixed offset from C# code
@@ -208,12 +214,16 @@ const addPlayer = (
         id,
         doctrine,
         dataInfo1,
-        dataInfo2
+        dataInfo2,
     });
     replay.playerCount = replay.players.length;
 };
 
-const parseDataInternal = (stream: ReplayStream, replay: ReplayData, options?: ParseOptions) => {
+const parseDataInternal = (
+    stream: ReplayStream,
+    replay: ReplayData,
+    options?: ParseOptions,
+) => {
     let tickIndex = 0;
     let tickCount = 0;
 
