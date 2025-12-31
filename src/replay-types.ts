@@ -6,7 +6,6 @@ export interface Player {
     doctrineName?: string;
     dataInfo1?: number;
     dataInfo2?: number;
-    actions?: Action[];
 }
 
 export interface Message {
