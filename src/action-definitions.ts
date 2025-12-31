@@ -268,11 +268,13 @@ export const DEFINITIONS = {
     UNIT_COMMAND: {
         0x2: {
             name: "Armor Piercing Shells (M1 57mm)",
-            description: "Ordered to fire armor piercing shells from M1 57mm Anti-Tank Gun",
+            description:
+                "Ordered to fire armor piercing shells from M1 57mm Anti-Tank Gun",
         },
         0x3: {
             name: "High Explosive Shells (M1 57mm)",
-            description: "Ordered to fire high explosive shells from M1 57mm Anti-Tank Gun",
+            description:
+                "Ordered to fire high explosive shells from M1 57mm Anti-Tank Gun",
         },
         0xa: {
             name: "Calliope Barrage",
@@ -471,16 +473,16 @@ export const DEFINITIONS = {
             description: "Ordered to use Concealing Smoke",
         },
         0xa0: {
-            name: "3\" Mortar Bombardment",
-            description: "Ordered to fire 3\" Mortar Bombardment",
+            name: '3" Mortar Bombardment',
+            description: 'Ordered to fire 3" Mortar Bombardment',
         },
         0xa1: {
-            name: "3\" Mortar Bombardment",
-            description: "Ordered to fire 3\" Mortar Bombardment",
+            name: '3" Mortar Bombardment',
+            description: 'Ordered to fire 3" Mortar Bombardment',
         },
         0xa2: {
-            name: "3\" Mortar Super Charge",
-            description: "Ordered to fire 3\" Mortar Super Charge",
+            name: '3" Mortar Super Charge',
+            description: 'Ordered to fire 3" Mortar Super Charge',
         },
         0xa3: {
             name: "Throw Grenade",
@@ -882,104 +884,272 @@ export const DEFINITIONS = {
     BUILDING: {
         0x5db: { name: "Tank Depot", description: "Built Tank Depot" },
         0x5dd: { name: "Barbed Wire", description: "Built Barbed Wire" },
-        0x5df: { name: "Barbed Wire (Riflemen)", description: "Built Barbed Wire (Riflemen)" },
+        0x5df: {
+            name: "Barbed Wire (Riflemen)",
+            description: "Built Barbed Wire (Riflemen)",
+        },
         0x5e1: { name: "Barracks", description: "Built Barracks" },
         0x5e2: { name: "Medic Station", description: "Built Medic Station" },
         0x5e5: { name: "Tank Depot", description: "Built Tank Depot" },
-        0x5e9: { name: "Barbed Wire(Riflemen)", description: "Built Barbed Wire(Riflemen)" },
+        0x5e9: {
+            name: "Barbed Wire(Riflemen)",
+            description: "Built Barbed Wire(Riflemen)",
+        },
         0x5eb: { name: "Barracks", description: "Built Barracks" },
         0x5ec: { name: "Medic Station", description: "Built Medic Station" },
-        0x5f7: { name: "Machine Gun Emplacement", description: "Built Machine Gun Emplacement" },
+        0x5f7: {
+            name: "Machine Gun Emplacement",
+            description: "Built Machine Gun Emplacement",
+        },
         0x5f9: { name: "Motor Pool", description: "Built Motor Pool" },
         0x5fa: { name: "Supply Yard", description: "Built Supply Yard" },
         0x5fb: { name: "Sand Bags", description: "Built Sand Bags" },
-        0x5fd: { name: "Sand Bags (Riflemen)", description: "Built Sand Bags (Riflemen)" },
-        0x5fe: { name: "Observation Post", description: "Built Observation Post" },
-        0x601: { name: "Machine Gun Emplacement", description: "Built Machine Gun Emplacement" },
+        0x5fd: {
+            name: "Sand Bags (Riflemen)",
+            description: "Built Sand Bags (Riflemen)",
+        },
+        0x5fe: {
+            name: "Observation Post",
+            description: "Built Observation Post",
+        },
+        0x601: {
+            name: "Machine Gun Emplacement",
+            description: "Built Machine Gun Emplacement",
+        },
         0x603: { name: "Motor Pool", description: "Built Motor Pool" },
         0x604: { name: "Supply Yard", description: "Built Supply Yard" },
-        0x605: { name: "Sandbags(Engineers)", description: "Built Sandbags(Engineers)" },
-        0x5e7: { name: "Barbed Wire(Engineers)", description: "Built Barbed Wire(Engineers)" },
-        0x60e: { name: "Tank Traps(Engineers)", description: "Built Tank Traps(Engineers)" },
+        0x605: {
+            name: "Sandbags(Engineers)",
+            description: "Built Sandbags(Engineers)",
+        },
+        0x5e7: {
+            name: "Barbed Wire(Engineers)",
+            description: "Built Barbed Wire(Engineers)",
+        },
+        0x60e: {
+            name: "Tank Traps(Engineers)",
+            description: "Built Tank Traps(Engineers)",
+        },
         0x606: { name: "Triage Center", description: "Built Triage Center" },
-        0x607: { name: "Sandbags(Riflemen)", description: "Built Sandbags(Riflemen)" },
-        0x608: { name: "Observation Post", description: "Built Observation Post" },
-        0x60a: { name: "Mines (Riflemen)", description: "Built Mines (Riflemen)" },
-        0x60d: { name: "Weapons Support Center", description: "Built Weapons Support Center" },
-        0x60f: { name: "Tank Traps(Riflemen)", description: "Built Tank Traps(Riflemen)" },
+        0x607: {
+            name: "Sandbags(Riflemen)",
+            description: "Built Sandbags(Riflemen)",
+        },
+        0x608: {
+            name: "Observation Post",
+            description: "Built Observation Post",
+        },
+        0x60a: {
+            name: "Mines (Riflemen)",
+            description: "Built Mines (Riflemen)",
+        },
+        0x60d: {
+            name: "Weapons Support Center",
+            description: "Built Weapons Support Center",
+        },
+        0x60f: {
+            name: "Tank Traps(Riflemen)",
+            description: "Built Tank Traps(Riflemen)",
+        },
         0x610: { name: "Triage Center", description: "Built Triage Center" },
-        0x612: { name: "Mines(Engineers)", description: "Built Mines(Engineers)" },
-        0x614: { name: "Mines(Riflemen)", description: "Built Mines(Riflemen)" },
-        0x641: { name: "M2 105mm Howitzer", description: "Built M2 105mm Howitzer" },
-        0x64b: { name: "M2 105mm Howitzer", description: "Built M2 105mm Howitzer" },
-        0x653: { name: "17 Pounder AT Gun", description: "Built 17 Pounder AT Gun" },
+        0x612: {
+            name: "Mines(Engineers)",
+            description: "Built Mines(Engineers)",
+        },
+        0x614: {
+            name: "Mines(Riflemen)",
+            description: "Built Mines(Riflemen)",
+        },
+        0x641: {
+            name: "M2 105mm Howitzer",
+            description: "Built M2 105mm Howitzer",
+        },
+        0x64b: {
+            name: "M2 105mm Howitzer",
+            description: "Built M2 105mm Howitzer",
+        },
+        0x653: {
+            name: "17 Pounder AT Gun",
+            description: "Built 17 Pounder AT Gun",
+        },
         0x654: { name: "Barbed Wire", description: "Built Barbed Wire" },
-        0x657: { name: "Bofors 40mm Cannon", description: "Built Bofors 40mm Cannon" },
-        0x658: { name: "Casualty Clearing Station", description: "Built Casualty Clearing Station" },
+        0x657: {
+            name: "Bofors 40mm Cannon",
+            description: "Built Bofors 40mm Cannon",
+        },
+        0x658: {
+            name: "Casualty Clearing Station",
+            description: "Built Casualty Clearing Station",
+        },
         0x659: { name: "Mines", description: "Built Mines" },
-        0x65a: { name: "Detector for Radio Triangulation", description: "Built Detector for Radio Triangulation" },
-        0x65d: { name: "17 Pounder AT Gun", description: "Built 17 Pounder AT Gun" },
-        0x65e: { name: "Barbed Wire(Sappers)", description: "Built Barbed Wire(Sappers)" },
-        0x65f: { name: "25 Pounder Gun Howitzer", description: "Built 25 Pounder Gun Howitzer" },
-        0x661: { name: "Bofors 40mm Cannon", description: "Built Bofors 40mm Cannon" },
-        0x662: { name: "Casualty Clearing Station", description: "Built Casualty Clearing Station" },
+        0x65a: {
+            name: "Detector for Radio Triangulation",
+            description: "Built Detector for Radio Triangulation",
+        },
+        0x65d: {
+            name: "17 Pounder AT Gun",
+            description: "Built 17 Pounder AT Gun",
+        },
+        0x65e: {
+            name: "Barbed Wire(Sappers)",
+            description: "Built Barbed Wire(Sappers)",
+        },
+        0x65f: {
+            name: "25 Pounder Gun Howitzer",
+            description: "Built 25 Pounder Gun Howitzer",
+        },
+        0x661: {
+            name: "Bofors 40mm Cannon",
+            description: "Built Bofors 40mm Cannon",
+        },
+        0x662: {
+            name: "Casualty Clearing Station",
+            description: "Built Casualty Clearing Station",
+        },
         0x663: { name: "Mines(Sappers)", description: "Built Mines(Sappers)" },
-        0x664: { name: "Detector for Radio Triangulation", description: "Built Detector for Radio Triangulation" },
+        0x664: {
+            name: "Detector for Radio Triangulation",
+            description: "Built Detector for Radio Triangulation",
+        },
         0x666: { name: "Slit Trench", description: "Built Slit Trench" },
-        0x669: { name: "25 Pounder Howitzer Gun", description: "Built 25 Pounder Howitzer Gun" },
-        0x66b: { name: "Vickers Machine Gun Emplacement", description: "Built Vickers Machine Gun Emplacement" },
-        0x66c: { name: "3'' Mortar Emplacement", description: "Built 3'' Mortar Emplacement" },
-        0x66e: { name: "Sandbags(Sappers)", description: "Built Sandbags(Sappers)" },
+        0x669: {
+            name: "25 Pounder Howitzer Gun",
+            description: "Built 25 Pounder Howitzer Gun",
+        },
+        0x66b: {
+            name: "Vickers Machine Gun Emplacement",
+            description: "Built Vickers Machine Gun Emplacement",
+        },
+        0x66c: {
+            name: "3'' Mortar Emplacement",
+            description: "Built 3'' Mortar Emplacement",
+        },
+        0x66e: {
+            name: "Sandbags(Sappers)",
+            description: "Built Sandbags(Sappers)",
+        },
         0x670: { name: "Slit Trench", description: "Built Slit Trench" },
         0x69d: { name: "Mines", description: "Built Mines" },
         0x69e: { name: "Bunker", description: "Built Bunker" },
-        0x69f: { name: "Observation Post", description: "Built Observation Post" },
+        0x69f: {
+            name: "Observation Post",
+            description: "Built Observation Post",
+        },
         0x6a2: { name: "Barbed Wire", description: "Built Barbed Wire" },
-        0x6a3: { name: "Wehrmacht Quarters", description: "Built Wehrmacht Quarters" },
+        0x6a3: {
+            name: "Wehrmacht Quarters",
+            description: "Built Wehrmacht Quarters",
+        },
         0x6a5: { name: "Panzer Command", description: "Built Panzer Command" },
         0x6a7: { name: "Mines", description: "Built Mines" },
         0x6a8: { name: "Bunker", description: "Built Bunker" },
-        0x6a9: { name: "Observation Post", description: "Built Observation Post" },
+        0x6a9: {
+            name: "Observation Post",
+            description: "Built Observation Post",
+        },
         0x6ac: { name: "Barbed Wire", description: "Built Barbed Wire" },
-        0x6ad: { name: "Wehrmacht Quarters", description: "Built Wehrmacht Quarters" },
+        0x6ad: {
+            name: "Wehrmacht Quarters",
+            description: "Built Wehrmacht Quarters",
+        },
         0x6af: { name: "Panzer Command", description: "Built Panzer Command" },
         0x6b1: { name: "Sturm Armory", description: "Built Sturm Armory" },
         0x6c2: { name: "Krieg Barracks", description: "Built Krieg Barracks" },
-        0x6c4: { name: "Kampfkraft Centre", description: "Built Kampfkraft Centre" },
+        0x6c4: {
+            name: "Kampfkraft Centre",
+            description: "Built Kampfkraft Centre",
+        },
         0x6c5: { name: "Sand Bags", description: "Built Sand Bags" },
         0x6ca: { name: "Tank Traps", description: "Built Tank Traps" },
         0x6cc: { name: "Krieg Barracks", description: "Built Krieg Barracks" },
-        0x6ce: { name: "Kampfkraft Centre", description: "Built Kampfkraft Centre" },
+        0x6ce: {
+            name: "Kampfkraft Centre",
+            description: "Built Kampfkraft Centre",
+        },
         0x6cf: { name: "Sandbags", description: "Built Sandbags" },
         0x6d4: { name: "Tank Traps", description: "Built Tank Traps" },
-        0x6fa: { name: "88mm Flak 36 AT/AA", description: "Built 88mm Flak 36 AT/AA" },
-        0x6fb: { name: "Flak 88mm 36 AT/AA", description: "Built Flak 88mm 36 AT/AA" },
-        0x705: { name: "88mm Flak 36 AT/AA", description: "Built 88mm Flak 36 AT/AA" },
+        0x6fa: {
+            name: "88mm Flak 36 AT/AA",
+            description: "Built 88mm Flak 36 AT/AA",
+        },
+        0x6fb: {
+            name: "Flak 88mm 36 AT/AA",
+            description: "Built Flak 88mm 36 AT/AA",
+        },
+        0x705: {
+            name: "88mm Flak 36 AT/AA",
+            description: "Built 88mm Flak 36 AT/AA",
+        },
         0x72f: { name: "Barbed Wire", description: "Built Barbed Wire" },
         0x730: { name: "Barbed Wire", description: "Built Barbed Wire" },
-        0x73a: { name: "Barbed Wire (LGF)", description: "Built Barbed Wire (LGF)" },
-        0x73b: { name: "Barbed Wire (SE PGren)", description: "Built Barbed Wire (SE PGren)" },
-        0x743: { name: "Kampfgruppe Kompanie", description: "Built Kampfgruppe Kompanie" },
-        0x744: { name: "Logistik Kompanie", description: "Built Logistik Kompanie" },
-        0x745: { name: "Panzer-Support Kommand", description: "Built Panzer-Support Kommand" },
-        0x746: { name: "Panzer-J´┐¢ger Kommand", description: "Built Panzer-J´┐¢ger Kommand" },
+        0x73a: {
+            name: "Barbed Wire (LGF)",
+            description: "Built Barbed Wire (LGF)",
+        },
+        0x73b: {
+            name: "Barbed Wire (SE PGren)",
+            description: "Built Barbed Wire (SE PGren)",
+        },
+        0x743: {
+            name: "Kampfgruppe Kompanie",
+            description: "Built Kampfgruppe Kompanie",
+        },
+        0x744: {
+            name: "Logistik Kompanie",
+            description: "Built Logistik Kompanie",
+        },
+        0x745: {
+            name: "Panzer-Support Kommand",
+            description: "Built Panzer-Support Kommand",
+        },
+        0x746: {
+            name: "Panzer-J´┐¢ger Kommand",
+            description: "Built Panzer-J´┐¢ger Kommand",
+        },
         0x747: { name: "Sand Bags", description: "Built Sand Bags" },
         0x748: { name: "Road Blocks", description: "Built Road Blocks" },
         0x74b: { name: "Teller Mines", description: "Built Teller Mines" },
-        0x74e: { name: "Kampfgruppe Kompanie", description: "Built Kampfgruppe Kompanie" },
-        0x74f: { name: "Logistik Kompanie", description: "Built Logistik Kompanie" },
-        0x750: { name: "Panzer-Support Kommand", description: "Built Panzer-Support Kommand" },
-        0x751: { name: "Panzer-Jager Kommand", description: "Built Panzer-Jager Kommand" },
+        0x74e: {
+            name: "Kampfgruppe Kompanie",
+            description: "Built Kampfgruppe Kompanie",
+        },
+        0x74f: {
+            name: "Logistik Kompanie",
+            description: "Built Logistik Kompanie",
+        },
+        0x750: {
+            name: "Panzer-Support Kommand",
+            description: "Built Panzer-Support Kommand",
+        },
+        0x751: {
+            name: "Panzer-Jager Kommand",
+            description: "Built Panzer-Jager Kommand",
+        },
         0x752: { name: "Sandbags (LGF)", description: "Built Sandbags (LGF)" },
         0x753: { name: "Road Blocks", description: "Built Road Blocks" },
         0x757: { name: "Teller Mines", description: "Built Teller Mines" },
-        0x769: { name: "88mm Flak 36 AT/AA", description: "Built 88mm Flak 36 AT/AA" },
-        0x76e: { name: "Flakvierling 38 20mm AA", description: "Built Flakvierling 38 20mm AA" },
-        0x775: { name: "88mm Flak 36 AT/AA", description: "Built 88mm Flak 36 AT/AA" },
-        0x77a: { name: "Flakvierling 38 20mm AA", description: "Built Flakvierling 38 20mm AA" },
+        0x769: {
+            name: "88mm Flak 36 AT/AA",
+            description: "Built 88mm Flak 36 AT/AA",
+        },
+        0x76e: {
+            name: "Flakvierling 38 20mm AA",
+            description: "Built Flakvierling 38 20mm AA",
+        },
+        0x775: {
+            name: "88mm Flak 36 AT/AA",
+            description: "Built 88mm Flak 36 AT/AA",
+        },
+        0x77a: {
+            name: "Flakvierling 38 20mm AA",
+            description: "Built Flakvierling 38 20mm AA",
+        },
     },
     DOCTRINAL: {
-        0x2: { name: "Airborne Company", description: "Chose Airborne Company" },
+        0x2: {
+            name: "Airborne Company",
+            description: "Chose Airborne Company",
+        },
         0x3: { name: "Paratroopers", description: "Chose Paratroopers" },
         0x4: { name: "Paradrop AT Gun", description: "Chose Paradrop AT Gun" },
         0x5: { name: "Supply Drops", description: "Chose Supply Drops" },
@@ -988,279 +1158,891 @@ export const DEFINITIONS = {
         0x8: { name: "Bombing Run", description: "Chose Bombing Run" },
         0x9: { name: "Armor Company", description: "Chose Armor Company" },
         0xa: { name: "Raid", description: "Chose Raid" },
-        0xb: { name: "Calliope Rocket Launcher", description: "Chose Calliope Rocket Launcher" },
-        0xc: { name: "M26 Pershing Heavy Tank", description: "Chose M26 Pershing Heavy Tank" },
+        0xb: {
+            name: "Calliope Rocket Launcher",
+            description: "Chose Calliope Rocket Launcher",
+        },
+        0xc: {
+            name: "M26 Pershing Heavy Tank",
+            description: "Chose M26 Pershing Heavy Tank",
+        },
         0xd: { name: "Fast Deployment", description: "Chose Fast Deployment" },
         0xe: { name: "Field Repairs", description: "Chose Field Repairs" },
-        0xf: { name: "Allied War Machine", description: "Chose Allied War Machine" },
-        0x11: { name: "Infantry Company", description: "Chose Infantry Company" },
+        0xf: {
+            name: "Allied War Machine",
+            description: "Chose Allied War Machine",
+        },
+        0x11: {
+            name: "Infantry Company",
+            description: "Chose Infantry Company",
+        },
         0x12: { name: "Rapid Response", description: "Chose Rapid Response" },
         0x13: { name: "Rangers", description: "Chose Rangers" },
-        0x14: { name: "Off-Map Combat Group", description: "Chose Off-Map Combat Group" },
-        0x15: { name: "Defensive Operations", description: "Chose Defensive Operations" },
-        0x16: { name: "Off-Map Artillery Support", description: "Chose Off-Map Artillery Support" },
+        0x14: {
+            name: "Off-Map Combat Group",
+            description: "Chose Off-Map Combat Group",
+        },
+        0x15: {
+            name: "Defensive Operations",
+            description: "Chose Defensive Operations",
+        },
+        0x16: {
+            name: "Off-Map Artillery Support",
+            description: "Chose Off-Map Artillery Support",
+        },
         0x17: { name: "105mm Howitzer", description: "Chose 105mm Howitzer" },
-        0xba: { name: "Blitzkrieg Doctrine", description: "Chose Blitzkrieg Doctrine" },
-        0xbb: { name: "Infantry Assault Team", description: "Chose Infantry Assault Team" },
-        0xbc: { name: "Urban Assault Support", description: "Chose Urban Assault Support" },
-        0xbd: { name: "Armored Assault Force", description: "Chose Armored Assault Force" },
-        0xbe: { name: "Assault Grenadiers", description: "Chose Assault Grenadiers" },
-        0xbf: { name: "Blitzkrieg Assault", description: "Chose Blitzkrieg Assault" },
+        0xba: {
+            name: "Blitzkrieg Doctrine",
+            description: "Chose Blitzkrieg Doctrine",
+        },
+        0xbb: {
+            name: "Infantry Assault Team",
+            description: "Chose Infantry Assault Team",
+        },
+        0xbc: {
+            name: "Urban Assault Support",
+            description: "Chose Urban Assault Support",
+        },
+        0xbd: {
+            name: "Armored Assault Force",
+            description: "Chose Armored Assault Force",
+        },
+        0xbe: {
+            name: "Assault Grenadiers",
+            description: "Chose Assault Grenadiers",
+        },
+        0xbf: {
+            name: "Blitzkrieg Assault",
+            description: "Chose Blitzkrieg Assault",
+        },
         0xc0: { name: "Resource Blitz", description: "Chose Resource Blitz" },
-        0xc2: { name: "Defensive Doctrine", description: "Chose Defensive Doctrine" },
-        0xc3: { name: "For the Fatherland!", description: "Chose For the Fatherland!" },
-        0xc4: { name: "Fortify the Perimeter", description: "Chose Fortify the Perimeter" },
-        0xc5: { name: "88mm Flak 36 AT/AA", description: "Chose 88mm Flak 36 AT/AA" },
-        0xc6: { name: "Advanced Warning", description: "Chose Advanced Warning" },
-        0xc7: { name: "Registered Artillery", description: "Chose Registered Artillery" },
-        0xc8: { name: "Rocket Artillery", description: "Chose Rocket Artillery" },
-        0x109: { name: "Terror Doctrine", description: "Chose Terror Doctrine" },
+        0xc2: {
+            name: "Defensive Doctrine",
+            description: "Chose Defensive Doctrine",
+        },
+        0xc3: {
+            name: "For the Fatherland!",
+            description: "Chose For the Fatherland!",
+        },
+        0xc4: {
+            name: "Fortify the Perimeter",
+            description: "Chose Fortify the Perimeter",
+        },
+        0xc5: {
+            name: "88mm Flak 36 AT/AA",
+            description: "Chose 88mm Flak 36 AT/AA",
+        },
+        0xc6: {
+            name: "Advanced Warning",
+            description: "Chose Advanced Warning",
+        },
+        0xc7: {
+            name: "Registered Artillery",
+            description: "Chose Registered Artillery",
+        },
+        0xc8: {
+            name: "Rocket Artillery",
+            description: "Chose Rocket Artillery",
+        },
+        0x109: {
+            name: "Terror Doctrine",
+            description: "Chose Terror Doctrine",
+        },
         0x10a: { name: "Zeal", description: "Chose Zeal" },
         0x10b: { name: "Propaganda War", description: "Chose Propaganda War" },
         0x10c: { name: "King Tiger", description: "Chose King Tiger" },
-        0x10d: { name: "Inspired Assault", description: "Chose Inspired Assault" },
+        0x10d: {
+            name: "Inspired Assault",
+            description: "Chose Inspired Assault",
+        },
         0x10e: { name: "Firestorm", description: "Chose Firestorm" },
-        0x10f: { name: "V1 Rocket Attack", description: "Chose V1 Rocket Attack" },
-        0x127: { name: "Luftwaffe Tactics", description: "Chose Luftwaffe Tactics" },
-        0x128: { name: "Fallschirmjager Infiltration", description: "Chose Fallschirmjager Infiltration" },
-        0x129: { name: "Butterfly Bombs", description: "Chose Butterfly Bombs" },
-        0x12a: { name: "Henschel Combat Air Patrol", description: "Chose Henschel Combat Air Patrol" },
-        0x12b: { name: "Luftwaffe Ground Forces", description: "Chose Luftwaffe Ground Forces" },
-        0x12c: { name: "Wirbelwind Flakpanzer", description: "Chose Wirbelwind Flakpanzer" },
-        0x12d: { name: "Flak 36 88mm Cannon", description: "Chose Flak 36 88mm Cannon" },
-        0x12e: { name: "Scorched Earth Tactics", description: "Chose Scorched Earth Tactics" },
-        0x12f: { name: "Booby Trap Building", description: "Chose Booby Trap Building" },
-        0x130: { name: "Booby Trap Strategic Point", description: "Chose Booby Trap Strategic Point" },
-        0x131: { name: "Sector Artillery", description: "Chose Sector Artillery" },
+        0x10f: {
+            name: "V1 Rocket Attack",
+            description: "Chose V1 Rocket Attack",
+        },
+        0x127: {
+            name: "Luftwaffe Tactics",
+            description: "Chose Luftwaffe Tactics",
+        },
+        0x128: {
+            name: "Fallschirmjager Infiltration",
+            description: "Chose Fallschirmjager Infiltration",
+        },
+        0x129: {
+            name: "Butterfly Bombs",
+            description: "Chose Butterfly Bombs",
+        },
+        0x12a: {
+            name: "Henschel Combat Air Patrol",
+            description: "Chose Henschel Combat Air Patrol",
+        },
+        0x12b: {
+            name: "Luftwaffe Ground Forces",
+            description: "Chose Luftwaffe Ground Forces",
+        },
+        0x12c: {
+            name: "Wirbelwind Flakpanzer",
+            description: "Chose Wirbelwind Flakpanzer",
+        },
+        0x12d: {
+            name: "Flak 36 88mm Cannon",
+            description: "Chose Flak 36 88mm Cannon",
+        },
+        0x12e: {
+            name: "Scorched Earth Tactics",
+            description: "Chose Scorched Earth Tactics",
+        },
+        0x12f: {
+            name: "Booby Trap Building",
+            description: "Chose Booby Trap Building",
+        },
+        0x130: {
+            name: "Booby Trap Strategic Point",
+            description: "Chose Booby Trap Strategic Point",
+        },
+        0x131: {
+            name: "Sector Artillery",
+            description: "Chose Sector Artillery",
+        },
         0x132: { name: "Roadblocks", description: "Chose Roadblocks" },
         0x133: { name: "Scorched Earth", description: "Chose Scorched Earth" },
-        0x134: { name: "Hummel Self-Propelled Artillery", description: "Chose Hummel Self-Propelled Artillery" },
-        0x135: { name: "Tank Destroyer Tactics", description: "Chose Tank Destroyer Tactics" },
+        0x134: {
+            name: "Hummel Self-Propelled Artillery",
+            description: "Chose Hummel Self-Propelled Artillery",
+        },
+        0x135: {
+            name: "Tank Destroyer Tactics",
+            description: "Chose Tank Destroyer Tactics",
+        },
         0x136: { name: "Teller Mines", description: "Chose Teller Mines" },
         0x137: { name: "Hetzer Tank", description: "Chose Hetzer Tank" },
-        0x138: { name: "Double Infantry AT Efforts", description: "Chose Double Infantry AT Efforts" },
+        0x138: {
+            name: "Double Infantry AT Efforts",
+            description: "Chose Double Infantry AT Efforts",
+        },
         0x139: { name: "Tank Awareness", description: "Chose Tank Awareness" },
         0x13a: { name: "APCR Rounds", description: "Chose APCR Rounds" },
-        0x13b: { name: "Jagdpanther Tank Destroyer", description: "Chose Jagdpanther Tank Destroyer" },
-        0x13c: { name: "Royal Artillery Support", description: "Chose Royal Artillery Support" },
-        0x13d: { name: "Forward Observation Officers", description: "Chose Forward Observation Officers" },
-        0x13e: { name: "Creeping Barrage", description: "Chose Creeping Barrage" },
-        0x13f: { name: "Priest 105mm SPG", description: "Chose Priest 105mm SPG" },
-        0x140: { name: "Supercharge Artillery Rounds", description: "Chose Supercharge Artillery Rounds" },
-        0x141: { name: "Overwatch Artillery", description: "Chose Overwatch Artillery" },
-        0x142: { name: "Counter Battery", description: "Chose Counter Battery" },
-        0x143: { name: "Royal Commandos Support", description: "Chose Royal Commandos Support" },
-        0x144: { name: "Glider-borne Commandos", description: "Chose Glider-borne Commandos" },
+        0x13b: {
+            name: "Jagdpanther Tank Destroyer",
+            description: "Chose Jagdpanther Tank Destroyer",
+        },
+        0x13c: {
+            name: "Royal Artillery Support",
+            description: "Chose Royal Artillery Support",
+        },
+        0x13d: {
+            name: "Forward Observation Officers",
+            description: "Chose Forward Observation Officers",
+        },
+        0x13e: {
+            name: "Creeping Barrage",
+            description: "Chose Creeping Barrage",
+        },
+        0x13f: {
+            name: "Priest 105mm SPG",
+            description: "Chose Priest 105mm SPG",
+        },
+        0x140: {
+            name: "Supercharge Artillery Rounds",
+            description: "Chose Supercharge Artillery Rounds",
+        },
+        0x141: {
+            name: "Overwatch Artillery",
+            description: "Chose Overwatch Artillery",
+        },
+        0x142: {
+            name: "Counter Battery",
+            description: "Chose Counter Battery",
+        },
+        0x143: {
+            name: "Royal Commandos Support",
+            description: "Chose Royal Commandos Support",
+        },
+        0x144: {
+            name: "Glider-borne Commandos",
+            description: "Chose Glider-borne Commandos",
+        },
         0x145: { name: "Tetrarch Tank", description: "Chose Tetrarch Tank" },
-        0x146: { name: "Glider Headquarters", description: "Chose Glider Headquarters" },
-        0x147: { name: "Radio Triangulation Detectors", description: "Chose Radio Triangulation Detectors" },
-        0x148: { name: "Ultra Decryption", description: "Chose Ultra Decryption" },
-        0x149: { name: "Decoy Artillery", description: "Chose Decoy Artillery" },
-        0x14a: { name: "Royal Engineers Support", description: "Chose Royal Engineers Support" },
-        0x14b: { name: "Improved Emplacements", description: "Chose Improved Emplacements" },
+        0x146: {
+            name: "Glider Headquarters",
+            description: "Chose Glider Headquarters",
+        },
+        0x147: {
+            name: "Radio Triangulation Detectors",
+            description: "Chose Radio Triangulation Detectors",
+        },
+        0x148: {
+            name: "Ultra Decryption",
+            description: "Chose Ultra Decryption",
+        },
+        0x149: {
+            name: "Decoy Artillery",
+            description: "Chose Decoy Artillery",
+        },
+        0x14a: {
+            name: "Royal Engineers Support",
+            description: "Chose Royal Engineers Support",
+        },
+        0x14b: {
+            name: "Improved Emplacements",
+            description: "Chose Improved Emplacements",
+        },
         0x14c: { name: "Hull Down", description: "Chose Hull Down" },
-        0x14d: { name: "Improved Command Vehicles", description: "Chose Improved Command Vehicles" },
-        0x14e: { name: "Churchill Infantry Tank", description: "Chose Churchill Infantry Tank" },
+        0x14d: {
+            name: "Improved Command Vehicles",
+            description: "Chose Improved Command Vehicles",
+        },
+        0x14e: {
+            name: "Churchill Infantry Tank",
+            description: "Chose Churchill Infantry Tank",
+        },
         0x14f: { name: "Churchill AVRE", description: "Chose Churchill AVRE" },
-        0x150: { name: "Churchill Crocodile", description: "Chose Churchill Crocodile" },
+        0x150: {
+            name: "Churchill Crocodile",
+            description: "Chose Churchill Crocodile",
+        },
     },
     UPGRADE: {
-        0x18: { name: "Level 1 Production", description: "Upgraded to Level 1 Production" },
-        0x19: { name: "Level 2 Production", description: "Upgraded to Level 2 Production" },
-        0x1b: { name: "M1A1C 76mm Gun", description: "Upgraded to M1A1C 76mm Gun" },
+        0x18: {
+            name: "Level 1 Production",
+            description: "Upgraded to Level 1 Production",
+        },
+        0x19: {
+            name: "Level 2 Production",
+            description: "Upgraded to Level 2 Production",
+        },
+        0x1b: {
+            name: "M1A1C 76mm Gun",
+            description: "Upgraded to M1A1C 76mm Gun",
+        },
         0x1f: { name: "Demolitions", description: "Upgraded to Demolitions" },
         0x20: { name: "Mk2 Grenades", description: "Upgraded to Mk2 Grenades" },
-        0x23: { name: "Defensive Smoke Screen", description: "Upgraded to Defensive Smoke Screen" },
+        0x23: {
+            name: "Defensive Smoke Screen",
+            description: "Upgraded to Defensive Smoke Screen",
+        },
         0x24: { name: "Sticky Bombs", description: "Upgraded to Sticky Bombs" },
-        0x27: { name: "Aid Station (Bunker)", description: "Upgraded to Aid Station (Bunker)" },
-        0x2b: { name: "M2HB .50 cal Machine Gun (M18)", description: "Upgraded to M2HB .50 cal Machine Gun (M18)" },
-        0x2e: { name: "M2HB .50 cal Machine Gun (M8)", description: "Upgraded to M2HB .50 cal Machine Gun (M8)" },
-        0x2f: { name: "M2HB .50 cal Machine Gun (M4)", description: "Upgraded to M2HB .50 cal Machine Gun (M4)" },
-        0x30: { name: "M2HB .50 cal Machine Gun", description: "Upgraded to M2HB .50 cal Machine Gun" },
-        0x31: { name: "M2 Flamethrower", description: "Upgraded to M2 Flamethrower" },
+        0x27: {
+            name: "Aid Station (Bunker)",
+            description: "Upgraded to Aid Station (Bunker)",
+        },
+        0x2b: {
+            name: "M2HB .50 cal Machine Gun (M18)",
+            description: "Upgraded to M2HB .50 cal Machine Gun (M18)",
+        },
+        0x2e: {
+            name: "M2HB .50 cal Machine Gun (M8)",
+            description: "Upgraded to M2HB .50 cal Machine Gun (M8)",
+        },
+        0x2f: {
+            name: "M2HB .50 cal Machine Gun (M4)",
+            description: "Upgraded to M2HB .50 cal Machine Gun (M4)",
+        },
+        0x30: {
+            name: "M2HB .50 cal Machine Gun",
+            description: "Upgraded to M2HB .50 cal Machine Gun",
+        },
+        0x31: {
+            name: "M2 Flamethrower",
+            description: "Upgraded to M2 Flamethrower",
+        },
         0x33: { name: "Armor Skirts", description: "Upgraded to Armor Skirts" },
-        0x34: { name: "M18 57mm Recoilless Rifle", description: "Upgraded to M18 57mm Recoilless Rifle" },
-        0x36: { name: "Quad .50 cal Maxson Mount", description: "Upgraded to Quad .50 cal Maxson Mount" },
+        0x34: {
+            name: "M18 57mm Recoilless Rifle",
+            description: "Upgraded to M18 57mm Recoilless Rifle",
+        },
+        0x36: {
+            name: "Quad .50 cal Maxson Mount",
+            description: "Upgraded to Quad .50 cal Maxson Mount",
+        },
         0x37: { name: "Thompson SMG", description: "Upgraded to Thompson SMG" },
         0x3b: { name: "Bulldozer", description: "Upgraded to Bulldozer" },
-        0x3d: { name: "Crab Mine Flail", description: "Upgraded to Crab Mine Flail" },
+        0x3d: {
+            name: "Crab Mine Flail",
+            description: "Upgraded to Crab Mine Flail",
+        },
         0x45: { name: "Minesweeper", description: "Upgraded to Minesweeper" },
-        0x55: { name: "M1918 Browning Automatic Rifle (BAR)", description: "Upgraded to M1918 Browning Automatic Rifle (BAR)" },
-        0x5a: { name: "Secured Resourcing", description: "Upgraded to Secured Resourcing" },
-        0x5f: { name: "Speed Governers", description: "Upgraded to Speed Governers" },
-        0x60: { name: "Speed Governors", description: "Upgraded to Speed Governors" },
-        0x66: { name: "Convert to MMG Carrier", description: "Upgraded to Convert to MMG Carrier" },
-        0x67: { name: "Convert to MMG Carrier (BC)", description: "Upgraded to Convert to MMG Carrier (BC)" },
+        0x55: {
+            name: "M1918 Browning Automatic Rifle (BAR)",
+            description: "Upgraded to M1918 Browning Automatic Rifle (BAR)",
+        },
+        0x5a: {
+            name: "Secured Resourcing",
+            description: "Upgraded to Secured Resourcing",
+        },
+        0x5f: {
+            name: "Speed Governers",
+            description: "Upgraded to Speed Governers",
+        },
+        0x60: {
+            name: "Speed Governors",
+            description: "Upgraded to Speed Governors",
+        },
+        0x66: {
+            name: "Convert to MMG Carrier",
+            description: "Upgraded to Convert to MMG Carrier",
+        },
+        0x67: {
+            name: "Convert to MMG Carrier (BC)",
+            description: "Upgraded to Convert to MMG Carrier (BC)",
+        },
         0x69: { name: "Mine Plow", description: "Upgraded to Mine Plow" },
-        0x6a: { name: "Mine Plow (Churchill)", description: "Upgraded to Mine Plow (Churchill)" },
-        0x6e: { name: "Bren Light Machine Gun", description: "Upgraded to Bren Light Machine Gun" },
-        0x6f: { name: "Bren Light Machine Gun", description: "Upgraded to Bren Light Machine Gun" },
-        0x70: { name: "Disposal and Detection Section (Sappers)", description: "Upgraded to Disposal and Detection Section (Sappers)" },
-        0x71: { name: "Expert Engineers", description: "Upgraded to Expert Engineers" },
+        0x6a: {
+            name: "Mine Plow (Churchill)",
+            description: "Upgraded to Mine Plow (Churchill)",
+        },
+        0x6e: {
+            name: "Bren Light Machine Gun",
+            description: "Upgraded to Bren Light Machine Gun",
+        },
+        0x6f: {
+            name: "Bren Light Machine Gun",
+            description: "Upgraded to Bren Light Machine Gun",
+        },
+        0x70: {
+            name: "Disposal and Detection Section (Sappers)",
+            description: "Upgraded to Disposal and Detection Section (Sappers)",
+        },
+        0x71: {
+            name: "Expert Engineers",
+            description: "Upgraded to Expert Engineers",
+        },
         0x72: { name: "PIAT", description: "Upgraded to PIAT" },
         0x73: { name: "PIAT", description: "Upgraded to PIAT" },
-        0x74: { name: "Recon Element", description: "Upgraded to Recon Element" },
-        0x75: { name: "Rifle Grenades", description: "Upgraded to Rifle Grenades" },
-        0x76: { name: "Tank Crew Commander", description: "Upgraded to Tank Crew Commander" },
-        0x77: { name: "Tank Crew Commander (Firefly)", description: "Upgraded to Tank Crew Commander (Firefly)" },
-        0x78: { name: "Littlejohn Adapter (Tetrarch)", description: "Upgraded to Littlejohn Adapter (Tetrarch)" },
-        0x83: { name: "MG42 Heavy Machine Gun (Bunker)", description: "Upgraded to MG42 Heavy Machine Gun (Bunker)" },
-        0x84: { name: "MG42 Heavy Machine Gun (Bunker)", description: "Upgraded to MG42 Heavy Machine Gun (Bunker)" },
-        0x85: { name: "Repair Station (Bunker)", description: "Upgraded to Repair Station (Bunker)" },
-        0x8c: { name: "Flammenwerfer 42", description: "Upgraded to Flammenwerfer 42" },
-        0x8d: { name: "Flamenwerfer 42 (Pioneers)", description: "Upgraded to Flamenwerfer 42 (Pioneers)" },
-        0x8e: { name: "Flammenwerfers", description: "Upgraded to Flammenwerfers" },
-        0x8f: { name: "Flammenwerfers (Halftrack)", description: "Upgraded to Flammenwerfers (Halftrack)" },
-        0x90: { name: "Walking Stuka", description: "Upgraded to Walking Stuka" },
-        0x91: { name: "Puma 50mm Gun", description: "Upgraded to Puma 50mm Gun" },
-        0x92: { name: "Puma 50mm Gun", description: "Upgraded to Puma 50mm Gun" },
-        0x94: { name: "MG42 Light Machine Gun", description: "Upgraded to MG42 Light Machine Gun" },
-        0x95: { name: "MG42 Light Machine Gun", description: "Upgraded to MG42 Light Machine Gun" },
-        0x97: { name: "Frankfurt 42 Mine Detector", description: "Upgraded to Frankfurt 42 Mine Detector" },
-        0x98: { name: "Frankfurt 42 Mine Detector", description: "Upgraded to Frankfurt 42 Mine Detector" },
-        0x99: { name: "MP44 Sturmgewehr (Assault Rifles)", description: "Upgraded to MP44 Sturmgewehr (Assault Rifles)" },
-        0x9e: { name: "RPzB 54 Panzerschreck", description: "Upgraded to RPzB 54 Panzerschreck" },
-        0x9f: { name: "RPzB 54 Panzerschreck", description: "Upgraded to RPzB 54 Panzerschreck" },
-        0xa6: { name: "MP40 Sub-Machine Gun", description: "Upgraded to MP40 Sub-Machine Gun" },
-        0xa7: { name: "MP40 Sub-Machine Gun", description: "Upgraded to MP40 Sub-Machine Gun" },
-        0xaa: { name: "Skirmish Phase", description: "Upgraded to Skirmish Phase" },
-        0xab: { name: "Escalate to Skirmish Phase", description: "Upgraded to Escalate to Skirmish Phase" },
-        0xac: { name: "Escalate to Assault Phase", description: "Upgraded to Escalate to Assault Phase" },
-        0xad: { name: "Escalate to Battle Phase", description: "Upgraded to Escalate to Battle Phase" },
-        0xae: { name: "Veteran Infantry", description: "Upgraded to Veteran Infantry" },
-        0xaf: { name: "Crack Infantry", description: "Upgraded to Crack Infantry" },
-        0xb0: { name: "Elite Infantry", description: "Upgraded to Elite Infantry" },
-        0xb1: { name: "Veteran Support Units", description: "Upgraded to Veteran Support Units" },
-        0xb2: { name: "Crack Support Units", description: "Upgraded to Crack Support Units" },
-        0xb3: { name: "Elite Support Units", description: "Upgraded to Elite Support Units" },
-        0xb4: { name: "Veteran Tanks", description: "Upgraded to Veteran Tanks" },
+        0x74: {
+            name: "Recon Element",
+            description: "Upgraded to Recon Element",
+        },
+        0x75: {
+            name: "Rifle Grenades",
+            description: "Upgraded to Rifle Grenades",
+        },
+        0x76: {
+            name: "Tank Crew Commander",
+            description: "Upgraded to Tank Crew Commander",
+        },
+        0x77: {
+            name: "Tank Crew Commander (Firefly)",
+            description: "Upgraded to Tank Crew Commander (Firefly)",
+        },
+        0x78: {
+            name: "Littlejohn Adapter (Tetrarch)",
+            description: "Upgraded to Littlejohn Adapter (Tetrarch)",
+        },
+        0x83: {
+            name: "MG42 Heavy Machine Gun (Bunker)",
+            description: "Upgraded to MG42 Heavy Machine Gun (Bunker)",
+        },
+        0x84: {
+            name: "MG42 Heavy Machine Gun (Bunker)",
+            description: "Upgraded to MG42 Heavy Machine Gun (Bunker)",
+        },
+        0x85: {
+            name: "Repair Station (Bunker)",
+            description: "Upgraded to Repair Station (Bunker)",
+        },
+        0x8c: {
+            name: "Flammenwerfer 42",
+            description: "Upgraded to Flammenwerfer 42",
+        },
+        0x8d: {
+            name: "Flamenwerfer 42 (Pioneers)",
+            description: "Upgraded to Flamenwerfer 42 (Pioneers)",
+        },
+        0x8e: {
+            name: "Flammenwerfers",
+            description: "Upgraded to Flammenwerfers",
+        },
+        0x8f: {
+            name: "Flammenwerfers (Halftrack)",
+            description: "Upgraded to Flammenwerfers (Halftrack)",
+        },
+        0x90: {
+            name: "Walking Stuka",
+            description: "Upgraded to Walking Stuka",
+        },
+        0x91: {
+            name: "Puma 50mm Gun",
+            description: "Upgraded to Puma 50mm Gun",
+        },
+        0x92: {
+            name: "Puma 50mm Gun",
+            description: "Upgraded to Puma 50mm Gun",
+        },
+        0x94: {
+            name: "MG42 Light Machine Gun",
+            description: "Upgraded to MG42 Light Machine Gun",
+        },
+        0x95: {
+            name: "MG42 Light Machine Gun",
+            description: "Upgraded to MG42 Light Machine Gun",
+        },
+        0x97: {
+            name: "Frankfurt 42 Mine Detector",
+            description: "Upgraded to Frankfurt 42 Mine Detector",
+        },
+        0x98: {
+            name: "Frankfurt 42 Mine Detector",
+            description: "Upgraded to Frankfurt 42 Mine Detector",
+        },
+        0x99: {
+            name: "MP44 Sturmgewehr (Assault Rifles)",
+            description: "Upgraded to MP44 Sturmgewehr (Assault Rifles)",
+        },
+        0x9e: {
+            name: "RPzB 54 Panzerschreck",
+            description: "Upgraded to RPzB 54 Panzerschreck",
+        },
+        0x9f: {
+            name: "RPzB 54 Panzerschreck",
+            description: "Upgraded to RPzB 54 Panzerschreck",
+        },
+        0xa6: {
+            name: "MP40 Sub-Machine Gun",
+            description: "Upgraded to MP40 Sub-Machine Gun",
+        },
+        0xa7: {
+            name: "MP40 Sub-Machine Gun",
+            description: "Upgraded to MP40 Sub-Machine Gun",
+        },
+        0xaa: {
+            name: "Skirmish Phase",
+            description: "Upgraded to Skirmish Phase",
+        },
+        0xab: {
+            name: "Escalate to Skirmish Phase",
+            description: "Upgraded to Escalate to Skirmish Phase",
+        },
+        0xac: {
+            name: "Escalate to Assault Phase",
+            description: "Upgraded to Escalate to Assault Phase",
+        },
+        0xad: {
+            name: "Escalate to Battle Phase",
+            description: "Upgraded to Escalate to Battle Phase",
+        },
+        0xae: {
+            name: "Veteran Infantry",
+            description: "Upgraded to Veteran Infantry",
+        },
+        0xaf: {
+            name: "Crack Infantry",
+            description: "Upgraded to Crack Infantry",
+        },
+        0xb0: {
+            name: "Elite Infantry",
+            description: "Upgraded to Elite Infantry",
+        },
+        0xb1: {
+            name: "Veteran Support Units",
+            description: "Upgraded to Veteran Support Units",
+        },
+        0xb2: {
+            name: "Crack Support Units",
+            description: "Upgraded to Crack Support Units",
+        },
+        0xb3: {
+            name: "Elite Support Units",
+            description: "Upgraded to Elite Support Units",
+        },
+        0xb4: {
+            name: "Veteran Tanks",
+            description: "Upgraded to Veteran Tanks",
+        },
         0xb5: { name: "Crack Tanks", description: "Upgraded to Crack Tanks" },
         0xb6: { name: "Elite Tanks", description: "Upgraded to Elite Tanks" },
-        0xb7: { name: "Veteran Vechicles", description: "Upgraded to Veteran Vechicles" },
-        0xb8: { name: "Crack Vehicles", description: "Upgraded to Crack Vehicles" },
-        0xb9: { name: "Elite Vehicles", description: "Upgraded to Elite Vehicles" },
-        0xca: { name: "Activate Panther Battlegroup", description: "Upgraded to Activate Panther Battlegroup" },
-        0xcb: { name: "Activate Panther Battlegroup", description: "Upgraded to Activate Panther Battlegroup" },
-        0xd2: { name: "Support Kommand Upgrade", description: "Upgraded to Support Kommand Upgrade" },
-        0xd3: { name: "Support Kommand Upgrade", description: "Upgraded to Support Kommand Upgrade" },
-        0xd4: { name: "J´┐¢ger Kommand Upgrade", description: "Upgraded to J´┐¢ger Kommand Upgrade" },
-        0xd5: { name: "Panzer Jager Upgrade", description: "Upgraded to Panzer Jager Upgrade" },
-        0xd6: { name: "Logistik Upgrade (SC)", description: "Upgraded to Logistik Upgrade (SC)" },
-        0xd7: { name: "FG42 Assault Rifle", description: "Upgraded to FG42 Assault Rifle" },
-        0xd8: { name: "Spotting Scope", description: "Upgraded to Spotting Scope" },
-        0xd9: { name: "Long-barreled 37mm Cannon", description: "Upgraded to Long-barreled 37mm Cannon" },
-        0xda: { name: "Walking Stuka", description: "Upgraded to Walking Stuka" },
+        0xb7: {
+            name: "Veteran Vechicles",
+            description: "Upgraded to Veteran Vechicles",
+        },
+        0xb8: {
+            name: "Crack Vehicles",
+            description: "Upgraded to Crack Vehicles",
+        },
+        0xb9: {
+            name: "Elite Vehicles",
+            description: "Upgraded to Elite Vehicles",
+        },
+        0xca: {
+            name: "Activate Panther Battlegroup",
+            description: "Upgraded to Activate Panther Battlegroup",
+        },
+        0xcb: {
+            name: "Activate Panther Battlegroup",
+            description: "Upgraded to Activate Panther Battlegroup",
+        },
+        0xd2: {
+            name: "Support Kommand Upgrade",
+            description: "Upgraded to Support Kommand Upgrade",
+        },
+        0xd3: {
+            name: "Support Kommand Upgrade",
+            description: "Upgraded to Support Kommand Upgrade",
+        },
+        0xd4: {
+            name: "J´┐¢ger Kommand Upgrade",
+            description: "Upgraded to J´┐¢ger Kommand Upgrade",
+        },
+        0xd5: {
+            name: "Panzer Jager Upgrade",
+            description: "Upgraded to Panzer Jager Upgrade",
+        },
+        0xd6: {
+            name: "Logistik Upgrade (SC)",
+            description: "Upgraded to Logistik Upgrade (SC)",
+        },
+        0xd7: {
+            name: "FG42 Assault Rifle",
+            description: "Upgraded to FG42 Assault Rifle",
+        },
+        0xd8: {
+            name: "Spotting Scope",
+            description: "Upgraded to Spotting Scope",
+        },
+        0xd9: {
+            name: "Long-barreled 37mm Cannon",
+            description: "Upgraded to Long-barreled 37mm Cannon",
+        },
+        0xda: {
+            name: "Walking Stuka",
+            description: "Upgraded to Walking Stuka",
+        },
         0xdc: { name: "Armor Skirts", description: "Upgraded to Armor Skirts" },
-        0xdd: { name: "Armor Skirts (P4 IST)", description: "Upgraded to Armor Skirts (P4 IST)" },
-        0xde: { name: "MG42 gunner (P4 IST)", description: "Upgraded to MG42 gunner (P4 IST)" },
-        0xe1: { name: "RPzB 54 Panzerschreck", description: "Upgraded to RPzB 54 Panzerschreck" },
+        0xdd: {
+            name: "Armor Skirts (P4 IST)",
+            description: "Upgraded to Armor Skirts (P4 IST)",
+        },
+        0xde: {
+            name: "MG42 gunner (P4 IST)",
+            description: "Upgraded to MG42 gunner (P4 IST)",
+        },
+        0xe1: {
+            name: "RPzB 54 Panzerschreck",
+            description: "Upgraded to RPzB 54 Panzerschreck",
+        },
         0xe2: { name: "Panzershreck", description: "Upgraded to Panzershreck" },
-        0xe3: { name: "Gewehr 43 Package", description: "Upgraded to Gewehr 43 Package" },
-        0xe4: { name: "Gewehr 43 Package", description: "Upgraded to Gewehr 43 Package" },
-        0xe5: { name: "MP44 Sturmgewehr (Assault Rifles)", description: "Upgraded to MP44 Sturmgewehr (Assault Rifles)" },
-        0xf0: { name: "Kampgruppe Kompanie Upgrade", description: "Upgraded to Kampgruppe Kompanie Upgrade" },
-        0xf1: { name: "Kampfgruppe Kompanie Upgrade", description: "Upgraded to Kampfgruppe Kompanie Upgrade" },
-        0xf3: { name: "Defensive Bonus 3 (squad)", description: "Upgraded to Defensive Bonus 3 (squad)" },
-        0xf4: { name: "Advanced Repair", description: "Upgraded to Advanced Repair" },
-        0xf5: { name: "Anti Tank Grenades", description: "Upgraded to Anti Tank Grenades" },
+        0xe3: {
+            name: "Gewehr 43 Package",
+            description: "Upgraded to Gewehr 43 Package",
+        },
+        0xe4: {
+            name: "Gewehr 43 Package",
+            description: "Upgraded to Gewehr 43 Package",
+        },
+        0xe5: {
+            name: "MP44 Sturmgewehr (Assault Rifles)",
+            description: "Upgraded to MP44 Sturmgewehr (Assault Rifles)",
+        },
+        0xf0: {
+            name: "Kampgruppe Kompanie Upgrade",
+            description: "Upgraded to Kampgruppe Kompanie Upgrade",
+        },
+        0xf1: {
+            name: "Kampfgruppe Kompanie Upgrade",
+            description: "Upgraded to Kampfgruppe Kompanie Upgrade",
+        },
+        0xf3: {
+            name: "Defensive Bonus 3 (squad)",
+            description: "Upgraded to Defensive Bonus 3 (squad)",
+        },
+        0xf4: {
+            name: "Advanced Repair",
+            description: "Upgraded to Advanced Repair",
+        },
+        0xf5: {
+            name: "Anti Tank Grenades",
+            description: "Upgraded to Anti Tank Grenades",
+        },
         0xf6: { name: "Field Craft", description: "Upgraded to Field Craft" },
-        0xf7: { name: "Incendiary Grenades", description: "Upgraded to Incendiary Grenades" },
+        0xf7: {
+            name: "Incendiary Grenades",
+            description: "Upgraded to Incendiary Grenades",
+        },
         0xf8: { name: "Group Zeal", description: "Upgraded to Group Zeal" },
-        0xf9: { name: "Defensive Operations", description: "Upgraded to Defensive Operations" },
-        0xfa: { name: "Increase Squad Sizes", description: "Upgraded to Increase Squad Sizes" },
-        0xfb: { name: "Increase Squad Sizes", description: "Upgraded to Increase Squad Sizes" },
-        0xfc: { name: "Veteran Sergeant", description: "Upgraded to Veteran Sergeant" },
-        0xfd: { name: "Defensive Bonus 1 (Infantry)", description: "Upgraded to Defensive Bonus 1 (Infantry)" },
-        0xfe: { name: "Defensive Bonus 2 (Infantry)", description: "Upgraded to Defensive Bonus 2 (Infantry)" },
-        0xff: { name: "Defensive Bonus 3 (Infantry)", description: "Upgraded to Defensive Bonus 3 (Infantry)" },
-        0x100: { name: "Offensive Bonus 1 (Infantry)", description: "Upgraded to Offensive Bonus 1 (Infantry)" },
-        0x101: { name: "Offensive Bonus 2 (Infantry)", description: "Upgraded to Offensive Bonus 2 (Infantry)" },
-        0x102: { name: "Offensive Bonus 3 (Infantry)", description: "Upgraded to Offensive Bonus 3 (Infantry)" },
-        0x103: { name: "Defensive Bonus 1 (Vehicle)", description: "Upgraded to Defensive Bonus 1 (Vehicle)" },
-        0x104: { name: "Defensive Bonus 2 (Vehicle)", description: "Upgraded to Defensive Bonus 2 (Vehicle)" },
-        0x105: { name: "Defensive Bonus 3 (Vehicle)", description: "Upgraded to Defensive Bonus 3 (Vehicle)" },
-        0x106: { name: "Offensive Bonus 1 (Vehicle)", description: "Upgraded to Offensive Bonus 1 (Vehicle)" },
-        0x107: { name: "Offensive Bonus 2 (Vehicle)", description: "Upgraded to Offensive Bonus 2 (Vehicle)" },
-        0x108: { name: "Offensive Bonus 3 (Vehicle)", description: "Upgraded to Offensive Bonus 3 (Vehicle)" },
-        0x110: { name: "Upgrade to Barracks", description: "Upgraded to Upgrade to Barracks" },
-        0x111: { name: "Upgrade to Barracks (FHQ)", description: "Upgraded to Upgrade to Barracks (FHQ)" },
-        0x112: { name: "Reinforce Point (FHQ)", description: "Upgraded to Reinforce Point (FHQ)" },
+        0xf9: {
+            name: "Defensive Operations",
+            description: "Upgraded to Defensive Operations",
+        },
+        0xfa: {
+            name: "Increase Squad Sizes",
+            description: "Upgraded to Increase Squad Sizes",
+        },
+        0xfb: {
+            name: "Increase Squad Sizes",
+            description: "Upgraded to Increase Squad Sizes",
+        },
+        0xfc: {
+            name: "Veteran Sergeant",
+            description: "Upgraded to Veteran Sergeant",
+        },
+        0xfd: {
+            name: "Defensive Bonus 1 (Infantry)",
+            description: "Upgraded to Defensive Bonus 1 (Infantry)",
+        },
+        0xfe: {
+            name: "Defensive Bonus 2 (Infantry)",
+            description: "Upgraded to Defensive Bonus 2 (Infantry)",
+        },
+        0xff: {
+            name: "Defensive Bonus 3 (Infantry)",
+            description: "Upgraded to Defensive Bonus 3 (Infantry)",
+        },
+        0x100: {
+            name: "Offensive Bonus 1 (Infantry)",
+            description: "Upgraded to Offensive Bonus 1 (Infantry)",
+        },
+        0x101: {
+            name: "Offensive Bonus 2 (Infantry)",
+            description: "Upgraded to Offensive Bonus 2 (Infantry)",
+        },
+        0x102: {
+            name: "Offensive Bonus 3 (Infantry)",
+            description: "Upgraded to Offensive Bonus 3 (Infantry)",
+        },
+        0x103: {
+            name: "Defensive Bonus 1 (Vehicle)",
+            description: "Upgraded to Defensive Bonus 1 (Vehicle)",
+        },
+        0x104: {
+            name: "Defensive Bonus 2 (Vehicle)",
+            description: "Upgraded to Defensive Bonus 2 (Vehicle)",
+        },
+        0x105: {
+            name: "Defensive Bonus 3 (Vehicle)",
+            description: "Upgraded to Defensive Bonus 3 (Vehicle)",
+        },
+        0x106: {
+            name: "Offensive Bonus 1 (Vehicle)",
+            description: "Upgraded to Offensive Bonus 1 (Vehicle)",
+        },
+        0x107: {
+            name: "Offensive Bonus 2 (Vehicle)",
+            description: "Upgraded to Offensive Bonus 2 (Vehicle)",
+        },
+        0x108: {
+            name: "Offensive Bonus 3 (Vehicle)",
+            description: "Upgraded to Offensive Bonus 3 (Vehicle)",
+        },
+        0x110: {
+            name: "Upgrade to Barracks",
+            description: "Upgraded to Upgrade to Barracks",
+        },
+        0x111: {
+            name: "Upgrade to Barracks (FHQ)",
+            description: "Upgraded to Upgrade to Barracks (FHQ)",
+        },
+        0x112: {
+            name: "Reinforce Point (FHQ)",
+            description: "Upgraded to Reinforce Point (FHQ)",
+        },
     },
     SPECIAL_ABILITY: {
         0x1: { name: "Field Repairs", description: "Used Field Repairs" },
-        0x5: { name: "Air Reconnaissance", description: "Used Air Reconnaissance" },
+        0x5: {
+            name: "Air Reconnaissance",
+            description: "Used Air Reconnaissance",
+        },
         0x7: { name: "Bombing Run", description: "Used Bombing Run" },
         0x8: { name: "Strafing Run", description: "Used Strafing Run" },
         0x16: { name: "Howitzer Shoot", description: "Used Howitzer Shoot" },
-        0x17: { name: "Airdrop M1 57mm Anti-Tank Gun", description: "Used Airdrop M1 57mm Anti-Tank Gun" },
+        0x17: {
+            name: "Airdrop M1 57mm Anti-Tank Gun",
+            description: "Used Airdrop M1 57mm Anti-Tank Gun",
+        },
         0x18: { name: "Paratroopers", description: "Used Paratroopers" },
         0x1e: { name: "Supply Drops", description: "Used Supply Drops" },
         0x23: { name: "Call in Rangers", description: "Used Call in Rangers" },
-        0x34: { name: "Allied War Machine", description: "Used Allied War Machine" },
-        0x36: { name: "280mm Rocket Barrage", description: "Used 280mm Rocket Barrage" },
-        0x3c: { name: "Inspired Assault", description: "Used Inspired Assault" },
+        0x34: {
+            name: "Allied War Machine",
+            description: "Used Allied War Machine",
+        },
+        0x36: {
+            name: "280mm Rocket Barrage",
+            description: "Used 280mm Rocket Barrage",
+        },
+        0x3c: {
+            name: "Inspired Assault",
+            description: "Used Inspired Assault",
+        },
         0x40: { name: "Manpower Blitz", description: "Used Manpower Blitz" },
-        0x45: { name: "Registered Artillery", description: "Used Registered Artillery" },
-        0x46: { name: "Air-Dropped SD-2 Butterfly Bombs", description: "Used Air-Dropped SD-2 Butterfly Bombs" },
-        0x4a: { name: "Call in King Tiger", description: "Used Call in King Tiger" },
-        0x4c: { name: "Call in Infantry Assault Team (Stormtroopers)", description: "Used Call in Infantry Assault Team (Stormtroopers)" },
-        0x4d: { name: "Call in Urban Assault Support (StuH 42)", description: "Used Call in Urban Assault Support (StuH 42)" },
-        0x4e: { name: "Call in Armored Assault Force (Tiger)", description: "Used Call in Armored Assault Force (Tiger)" },
+        0x45: {
+            name: "Registered Artillery",
+            description: "Used Registered Artillery",
+        },
+        0x46: {
+            name: "Air-Dropped SD-2 Butterfly Bombs",
+            description: "Used Air-Dropped SD-2 Butterfly Bombs",
+        },
+        0x4a: {
+            name: "Call in King Tiger",
+            description: "Used Call in King Tiger",
+        },
+        0x4c: {
+            name: "Call in Infantry Assault Team (Stormtroopers)",
+            description: "Used Call in Infantry Assault Team (Stormtroopers)",
+        },
+        0x4d: {
+            name: "Call in Urban Assault Support (StuH 42)",
+            description: "Used Call in Urban Assault Support (StuH 42)",
+        },
+        0x4e: {
+            name: "Call in Armored Assault Force (Tiger)",
+            description: "Used Call in Armored Assault Force (Tiger)",
+        },
         0x54: { name: "Firestorm", description: "Used Firestorm" },
         0x5a: { name: "Blitzkrieg", description: "Used Blitzkrieg" },
-        0x62: { name: "Call for M4 Sherman Calliope Reinforcement", description: "Used Call for M4 Sherman Calliope Reinforcement" },
-        0x7b: { name: "Call in Churchill AVRE", description: "Used Call in Churchill AVRE" },
-        0x7c: { name: "Call in Churchill Crocodile", description: "Used Call in Churchill Crocodile" },
-        0x7e: { name: "Call in Churchill Tank", description: "Used Call in Churchill Tank" },
-        0x81: { name: "Decoy Artillery Barrage", description: "Used Decoy Artillery Barrage" },
-        0x82: { name: "25 Pounder Artillery Barrage", description: "Used 25 Pounder Artillery Barrage" },
-        0x94: { name: "105mm Priest Self-Propelled Gun", description: "Used 105mm Priest Self-Propelled Gun" },
-        0xc8: { name: "For the Fatherland", description: "Used For the Fatherland" },
-        0xc9: { name: "Call in Glider HQ", description: "Used Call in Glider HQ" },
+        0x62: {
+            name: "Call for M4 Sherman Calliope Reinforcement",
+            description: "Used Call for M4 Sherman Calliope Reinforcement",
+        },
+        0x7b: {
+            name: "Call in Churchill AVRE",
+            description: "Used Call in Churchill AVRE",
+        },
+        0x7c: {
+            name: "Call in Churchill Crocodile",
+            description: "Used Call in Churchill Crocodile",
+        },
+        0x7e: {
+            name: "Call in Churchill Tank",
+            description: "Used Call in Churchill Tank",
+        },
+        0x81: {
+            name: "Decoy Artillery Barrage",
+            description: "Used Decoy Artillery Barrage",
+        },
+        0x82: {
+            name: "25 Pounder Artillery Barrage",
+            description: "Used 25 Pounder Artillery Barrage",
+        },
+        0x94: {
+            name: "105mm Priest Self-Propelled Gun",
+            description: "Used 105mm Priest Self-Propelled Gun",
+        },
+        0xc8: {
+            name: "For the Fatherland",
+            description: "Used For the Fatherland",
+        },
+        0xc9: {
+            name: "Call in Glider HQ",
+            description: "Used Call in Glider HQ",
+        },
         0xca: { name: "Glider HQ", description: "Used Glider HQ" },
-        0xcb: { name: "Call in Glider with Tetrarch", description: "Used Call in Glider with Tetrarch" },
-        0xcc: { name: "Glider with Tetrarch", description: "Used Glider with Tetrarch" },
-        0xcd: { name: "Call in Glider with Commandos", description: "Used Call in Glider with Commandos" },
+        0xcb: {
+            name: "Call in Glider with Tetrarch",
+            description: "Used Call in Glider with Tetrarch",
+        },
+        0xcc: {
+            name: "Glider with Tetrarch",
+            description: "Used Glider with Tetrarch",
+        },
+        0xcd: {
+            name: "Call in Glider with Commandos",
+            description: "Used Call in Glider with Commandos",
+        },
         0xce: { name: "Glider", description: "Used Glider" },
-        0x110: { name: "Henschel 'Panzerknacker' Support", description: "Used Henschel 'Panzerknacker' Support" },
-        0x112: { name: "Henschel 'Panzer Knacker' support", description: "Used Henschel 'Panzer Knacker' support" },
-        0x114: { name: "Call in Hummel 150mm Self-Propelled Howitzer", description: "Used Call in Hummel 150mm Self-Propelled Howitzer" },
-        0x116: { name: "Fallschirmjager Infiltration", description: "Used Fallschirmjager Infiltration" },
-        0x117: { name: "Call in Luftwaffe Ground Forces", description: "Used Call in Luftwaffe Ground Forces" },
-        0x118: { name: "Fallschirmj´┐¢ger Infantry", description: "Used Fallschirmj´┐¢ger Infantry" },
-        0x119: { name: "Luftwaffe Ground Forces", description: "Used Luftwaffe Ground Forces" },
+        0x110: {
+            name: "Henschel 'Panzerknacker' Support",
+            description: "Used Henschel 'Panzerknacker' Support",
+        },
+        0x112: {
+            name: "Henschel 'Panzer Knacker' support",
+            description: "Used Henschel 'Panzer Knacker' support",
+        },
+        0x114: {
+            name: "Call in Hummel 150mm Self-Propelled Howitzer",
+            description: "Used Call in Hummel 150mm Self-Propelled Howitzer",
+        },
+        0x116: {
+            name: "Fallschirmjager Infiltration",
+            description: "Used Fallschirmjager Infiltration",
+        },
+        0x117: {
+            name: "Call in Luftwaffe Ground Forces",
+            description: "Used Call in Luftwaffe Ground Forces",
+        },
+        0x118: {
+            name: "Fallschirmj´┐¢ger Infantry",
+            description: "Used Fallschirmj´┐¢ger Infantry",
+        },
+        0x119: {
+            name: "Luftwaffe Ground Forces",
+            description: "Used Luftwaffe Ground Forces",
+        },
         0x11c: { name: "Call in Hetzer", description: "Used Call in Hetzer" },
-        0x11d: { name: "Call in Jagdpanther", description: "Used Call in Jagdpanther" },
-        0x11e: { name: "Call in Panther Battlegroup", description: "Used Call in Panther Battlegroup" },
-        0x11f: { name: "Jagdpanther Tank Destroyer", description: "Used Jagdpanther Tank Destroyer" },
-        0x120: { name: "Panther Battle Group", description: "Used Panther Battle Group" },
-        0x124: { name: "Call in Wirblewind", description: "Used Call in Wirblewind" },
+        0x11d: {
+            name: "Call in Jagdpanther",
+            description: "Used Call in Jagdpanther",
+        },
+        0x11e: {
+            name: "Call in Panther Battlegroup",
+            description: "Used Call in Panther Battlegroup",
+        },
+        0x11f: {
+            name: "Jagdpanther Tank Destroyer",
+            description: "Used Jagdpanther Tank Destroyer",
+        },
+        0x120: {
+            name: "Panther Battle Group",
+            description: "Used Panther Battle Group",
+        },
+        0x124: {
+            name: "Call in Wirblewind",
+            description: "Used Call in Wirblewind",
+        },
         0x126: { name: "Wirblewind", description: "Used Wirblewind" },
-        0x12f: { name: "Call for M26 Pershing Reinforcement", description: "Used Call for M26 Pershing Reinforcement" },
-        0x131: { name: "Call for Pershing Reinforcement", description: "Used Call for Pershing Reinforcement" },
-        0x135: { name: "Call in Off-Map Combat Group", description: "Used Call in Off-Map Combat Group" },
-        0x137: { name: "Off-Map Combat Group", description: "Used Off-Map Combat Group" },
+        0x12f: {
+            name: "Call for M26 Pershing Reinforcement",
+            description: "Used Call for M26 Pershing Reinforcement",
+        },
+        0x131: {
+            name: "Call for Pershing Reinforcement",
+            description: "Used Call for Pershing Reinforcement",
+        },
+        0x135: {
+            name: "Call in Off-Map Combat Group",
+            description: "Used Call in Off-Map Combat Group",
+        },
+        0x137: {
+            name: "Off-Map Combat Group",
+            description: "Used Off-Map Combat Group",
+        },
         0x148: { name: "Propaganda War", description: "Used Propaganda War" },
         0x14a: { name: "Propaganda War", description: "Used Propaganda War" },
-        0x14d: { name: "Sector Artillery", description: "Used Sector Artillery" },
-        0x14f: { name: "Sector Artillery", description: "Used Sector Artillery" },
+        0x14d: {
+            name: "Sector Artillery",
+            description: "Used Sector Artillery",
+        },
+        0x14f: {
+            name: "Sector Artillery",
+            description: "Used Sector Artillery",
+        },
         0x1d3: { name: "V1 Rocket", description: "Used V1 Rocket" },
-        0x1d4: { name: "V1 Rocket Attack", description: "Used V1 Rocket Attack" },
+        0x1d4: {
+            name: "V1 Rocket Attack",
+            description: "Used V1 Rocket Attack",
+        },
     },
 } as const;
 
 export const isUnit = (id: number): id is 0x3 => [0x3].includes(id);
 export const isUnitCommand = (id: number): id is 0x37 => [0x37].includes(id);
-export const isBuilding = (id: number): id is 0x57 | 0x64 => [0x57, 0x64].includes(id);
-export const isDoctrinal = (id: number): id is 0x5f | 0x62 => [0x5f, 0x62].includes(id);
-export const isUpgrade = (id: number): id is 0x34 | 0x14 => [0x34, 0x14].includes(id);
-export const isSpecialAbility = (id: number): id is 0x37 | 0x5f => [0x37, 0x5f].includes(id);
+export const isBuilding = (id: number): id is 0x57 | 0x64 =>
+    [0x57, 0x64].includes(id);
+export const isDoctrinal = (id: number): id is 0x5f | 0x62 =>
+    [0x5f, 0x62].includes(id);
+export const isUpgrade = (id: number): id is 0x34 | 0x14 =>
+    [0x34, 0x14].includes(id);
+export const isSpecialAbility = (id: number): id is 0x37 | 0x5f =>
+    [0x5f].includes(id);
 
 export const isMoveCommand = (id: number): id is 0x2d => [0x2d].includes(id);
 export const isCaptureCommand = (id: number): id is 0x31 => [0x31].includes(id);
-export const isRallyPointCommand = (id: number): id is 0x0f => [0x0f].includes(id);
+export const isRallyPointCommand = (id: number): id is 0x0f =>
+    [0x0f].includes(id);
 export const isHaltCommand = (id: number): id is 0x2e => [0x2e].includes(id);
-export const isAttackMoveCommand = (id: number): id is 0x36 => [0x36].includes(id);
-export const isGroundAttackCommand = (id: number): id is 0x32 => [0x32].includes(id);
+export const isAttackMoveCommand = (id: number): id is 0x36 =>
+    [0x36].includes(id);
+export const isGroundAttackCommand = (id: number): id is 0x32 =>
+    [0x32].includes(id);
 export const isRetreatCommand = (id: number): id is 0x3f => [0x3f].includes(id);
-
