@@ -1,6 +1,6 @@
 {
     "name": "@fknoobs/replay-parser",
-    "version": "1.4.6",
+    "version": "1.5.0",
     "type": "module",
     "main": "dist/index.js",
     "scripts": {
