@@ -5,6 +5,22 @@ import {
     Action,
     getDoctrineName,
 } from "./replay-types";
+import {
+    DEFINITIONS,
+    isUnit,
+    isUnitCommand,
+    isBuilding,
+    isDoctrinal,
+    isUpgrade,
+    isSpecialAbility,
+    isAttackMoveCommand,
+    isCaptureCommand,
+    isGroundAttackCommand,
+    isHaltCommand,
+    isMoveCommand,
+    isRallyPointCommand,
+    isRetreatCommand
+} from "./action-definitions";
 import { parseDate } from "chrono-node";
 
 export interface ParseOptions {
@@ -40,6 +56,10 @@ export const parseReplay = (
             if (player.doctrine !== undefined) {
                 player.doctrineName = getDoctrineName(player.doctrine);
             }
+
+            player.actions = replay.actions.filter(
+                (action) => action.playerID === player.id,
+            );
         });
     } catch (e) {
         console.error("Error parsing replay:", e);
@@ -362,6 +382,25 @@ const parseActionsInBlock = (
     }
 };
 
+const DYNAMIC_COMMAND_HANDLERS = [
+    { check: isUnit, type: "UNIT", def: DEFINITIONS.UNIT, fallback: "Unknown Unit" },
+    { check: isBuilding, type: "BUILDING", def: DEFINITIONS.BUILDING, fallback: "Unknown Building" },
+    { check: isDoctrinal, type: "DOCTRINAL", def: DEFINITIONS.DOCTRINAL, fallback: "Unknown Doctrinal" },
+    { check: isUpgrade, type: "UPGRADE", def: DEFINITIONS.UPGRADE, fallback: "Unknown Upgrade" },
+    { check: isSpecialAbility, type: "SPECIAL_ABILITY", def: DEFINITIONS.SPECIAL_ABILITY, fallback: "Unknown Special Ability" },
+    { check: isUnitCommand, type: "UNIT_COMMAND", def: DEFINITIONS.UNIT_COMMAND, fallback: "Unknown Unit Command" },
+] as const;
+
+const STATIC_COMMAND_HANDLERS = [
+    { check: isMoveCommand, type: "MOVE_COMMAND", name: "Move", description: "Ordered a unit to move" },
+    { check: isCaptureCommand, type: "CAPTURE_COMMAND", name: "Capture", description: "Ordered a unit to capture a point" },
+    { check: isRallyPointCommand, type: "RALLY_POINT_COMMAND", name: "Rally Point", description: "Set a rally point" },
+    { check: isHaltCommand, type: "HALT_COMMAND", name: "Halt", description: "Ordered a unit to halt" },
+    { check: isAttackMoveCommand, type: "ATTACK_MOVE_COMMAND", name: "Attack Move", description: "Ordered a unit to attack move" },
+    { check: isGroundAttackCommand, type: "GROUND_ATTACK_COMMAND", name: "Ground Attack", description: "Ordered a unit to ground attack" },
+    { check: isRetreatCommand, type: "RETREAT_COMMAND", name: "Retreat", description: "Ordered a unit to retreat" },
+] as const;
+
 const addAction = (
     replay: ReplayData,
     tick: number,
@@ -427,6 +466,27 @@ const addAction = (
     const player = replay.players.find((p) => p.id === playerID);
     const playerName = player ? player.name : "";
 
+    let command: Action['command'];
+
+    const dynamicHandler = DYNAMIC_COMMAND_HANDLERS.find(h => h.check(commandID));
+    if (dynamicHandler) {
+        const def = (dynamicHandler.def as any)[objectID];
+        command = {
+            type: dynamicHandler.type,
+            name: def?.name || dynamicHandler.fallback,
+            description: def?.description || "",
+        };
+    } else {
+        const staticHandler = STATIC_COMMAND_HANDLERS.find(h => h.check(commandID));
+        if (staticHandler) {
+            command = {
+                type: staticHandler.type,
+                name: staticHandler.name,
+                description: staticHandler.description,
+            };
+        }
+    }
+
     const action: Action = {
         tick,
         playerID,
@@ -435,6 +495,7 @@ const addAction = (
         absoluteOffset,
         commandID,
         objectID,
+        command,
         position,
     };
 

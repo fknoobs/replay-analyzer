@@ -6,6 +6,7 @@ export interface Player {
     doctrineName?: string;
     dataInfo1?: number;
     dataInfo2?: number;
+    actions?: Action[];
 }
 
 export interface Message {
@@ -15,6 +16,12 @@ export interface Message {
     content: string;
     recipient: number;
     timestamp: string;
+}
+
+export interface Command {
+    type: string;
+    name: string;
+    description: string;
 }
 
 export interface Action {
@@ -28,6 +35,8 @@ export interface Action {
     timestamp: string;
     commandID: number;
     objectID: number;
+    command?: Command;
+    // For actions with positions (like move, attack, build)
     position?: { x: number; y: number; z: number };
 }
 
