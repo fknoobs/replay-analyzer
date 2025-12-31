@@ -4,7 +4,7 @@
 const UNIT = 0x3; // Might have different subtypes for infantry, vehicles, etc .. did not observe yet
 const UNIT_COMMAND = 0x37; // Might have different subtypes .. did not observe yet
 const BUILDING = [0x57, 0x64] as const; // T1 / T2, observation post etc .. Sandbags, mines, wire etc ..
-const DOCTRINAL = [0x5f, 0x62] as const;
+const DOCTRINAL = [0x62] as const;
 const UPGRADE = [0x34, 0x14] as const; // flamethrower, mp40, but also building upgrades, like sticky bobms, grenades etc ..
 const SPECIAL_ABILITY = [0x37, 0x5f] as const;
 
