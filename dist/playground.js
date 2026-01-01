@@ -39,6 +39,10 @@ fileInput.addEventListener('change', async (e) => {
     }
 });
 function displayResult(data) {
+    data.players?.forEach((player) => {
+        player.actions = data.actions.filter((action) => action.playerID === player.id);
+    });
+    console.log(data.players);
     // Create a download button for the full data
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);

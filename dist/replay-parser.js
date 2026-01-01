@@ -1,6 +1,6 @@
 import { ReplayStream } from "./replay-stream";
 import { createEmptyReplay, getDoctrineName, } from "./replay-types";
-import { DEFINITIONS, isUnit, isUnitCommand, isBuilding, isDoctrinal, isUpgrade, isSpecialAbility, isAttackMoveCommand, isCaptureCommand, isGroundAttackCommand, isHaltCommand, isMoveCommand, isRallyPointCommand, isRetreatCommand, } from "./action-definitions";
+import { DEFINITIONS, isUnit, isUnitCommand, isBuilding, isDoctrinal, isUpgrade, isSpecialAbility, isAttackMoveCommand, isCaptureCommand, isGroundAttackCommand, isHaltCommand, isMoveCommand, isRallyPointCommand, isRetreatCommand, isGetInStructure, isGetOutOfStructure, } from "./action-definitions";
 import { parseDate } from "chrono-node";
 /**
  * Parses the entire replay file.
@@ -351,6 +351,18 @@ const STATIC_COMMAND_HANDLERS = [
         name: "Retreat",
         description: "Ordered a unit to retreat",
     },
+    {
+        check: isGetInStructure,
+        type: "GET_IN_STRUCTURE_COMMAND",
+        name: "Get In Structure",
+        description: "Ordered a unit to get in structure",
+    },
+    {
+        check: isGetOutOfStructure,
+        type: "GET_OUT_OF_STRUCTURE_COMMAND",
+        name: "Get Out Of Structure",
+        description: "Ordered a unit to get out of structure",
+    },
 ];
 const addAction = (replay, tick, data, absoluteOffset, options) => {
     let playerID = 0;
@@ -413,7 +425,7 @@ const addAction = (replay, tick, data, absoluteOffset, options) => {
         };
     }
     else {
-        const staticHandler = STATIC_COMMAND_HANDLERS.find((h) => h.check(commandID));
+        const staticHandler = STATIC_COMMAND_HANDLERS.find((h) => h.check(commandID, objectID));
         if (staticHandler) {
             command = {
                 type: staticHandler.type,

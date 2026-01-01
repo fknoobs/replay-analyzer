@@ -2028,10 +2028,20 @@ export const isBuilding = (id) => [0x57, 0x64].includes(id);
 export const isDoctrinal = (id) => [0x5f, 0x62].includes(id);
 export const isUpgrade = (id) => [0x34, 0x14].includes(id);
 export const isSpecialAbility = (id) => [0x5f].includes(id);
-export const isMoveCommand = (id) => [0x2d].includes(id);
-export const isCaptureCommand = (id) => [0x31].includes(id);
-export const isRallyPointCommand = (id) => [0x0f].includes(id);
-export const isHaltCommand = (id) => [0x2e].includes(id);
-export const isAttackMoveCommand = (id) => [0x36].includes(id);
-export const isGroundAttackCommand = (id) => [0x32].includes(id);
-export const isRetreatCommand = (id) => [0x3f].includes(id);
+export const isCaptureCommand = (commandId, objectId) => commandId === 0x31 && objectId === 0x3;
+export const isMoveCommand = (commandId, objectId) => commandId === 0x2d && objectId === 0x2;
+/**
+ * Rally Point Command
+ *
+ * - commandId: 0x0f
+ * - objectId: 0x2 (Rally Point)
+ * - objectId: 0x3 (Rally Point with action, e.g., capture point or a rally point on a building)
+ */
+export const isRallyPointCommand = (commandId, objectId) => commandId === 0x0f && [0x2, 0x3].includes(objectId); // 0x3 is a rally command thats put in a capture point
+export const isHaltCommand = (commandId, objectId) => commandId === 0x2e && objectId === 0x0;
+export const isAttackMoveCommand = (commandId, objectId) => commandId === 0x36 && objectId === 0x2;
+export const isOrderUnitToBuild = (commandId, objectId) => commandId === 0x30 && objectId === 0x3;
+export const isGroundAttackCommand = (commandId, objectId) => commandId === 0x32 && objectId === 0x2;
+export const isRetreatCommand = (commandId, objectId) => commandId === 0x3f && objectId === 0x0;
+export const isGetInStructure = (commandId, objectId) => commandId === 0x3a && objectId === 0x3;
+export const isGetOutOfStructure = (commandId, objectId) => commandId === 0x19 && objectId === 0x0;

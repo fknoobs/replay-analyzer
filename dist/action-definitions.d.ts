@@ -2334,10 +2334,20 @@ export declare const isBuilding: (id: number) => id is 87 | 100;
 export declare const isDoctrinal: (id: number) => id is 95 | 98;
 export declare const isUpgrade: (id: number) => id is 52 | 20;
 export declare const isSpecialAbility: (id: number) => id is 55 | 95;
-export declare const isMoveCommand: (id: number) => id is 45;
-export declare const isCaptureCommand: (id: number) => id is 49;
-export declare const isRallyPointCommand: (id: number) => id is 15;
-export declare const isHaltCommand: (id: number) => id is 46;
-export declare const isAttackMoveCommand: (id: number) => id is 54;
-export declare const isGroundAttackCommand: (id: number) => id is 50;
-export declare const isRetreatCommand: (id: number) => id is 63;
+export declare const isCaptureCommand: (commandId: number, objectId: number) => commandId is 49;
+export declare const isMoveCommand: (commandId: number, objectId: number) => commandId is 45;
+/**
+ * Rally Point Command
+ *
+ * - commandId: 0x0f
+ * - objectId: 0x2 (Rally Point)
+ * - objectId: 0x3 (Rally Point with action, e.g., capture point or a rally point on a building)
+ */
+export declare const isRallyPointCommand: (commandId: number, objectId: number) => commandId is 15;
+export declare const isHaltCommand: (commandId: number, objectId: number) => commandId is 46;
+export declare const isAttackMoveCommand: (commandId: number, objectId: number) => commandId is 54;
+export declare const isOrderUnitToBuild: (commandId: number, objectId: number) => commandId is 48;
+export declare const isGroundAttackCommand: (commandId: number, objectId: number) => commandId is 50;
+export declare const isRetreatCommand: (commandId: number, objectId: number) => commandId is 63;
+export declare const isGetInStructure: (commandId: number, objectId: number) => commandId is 58;
+export declare const isGetOutOfStructure: (commandId: number, objectId: number) => commandId is 25;
