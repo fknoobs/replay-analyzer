@@ -2036,13 +2036,59 @@ export const isUpgrade = (id: number): id is 0x34 | 0x14 =>
 export const isSpecialAbility = (id: number): id is 0x37 | 0x5f =>
     [0x5f].includes(id);
 
-export const isMoveCommand = (id: number): id is 0x2d => [0x2d].includes(id);
-export const isCaptureCommand = (id: number): id is 0x31 => [0x31].includes(id);
-export const isRallyPointCommand = (id: number): id is 0x0f =>
-    [0x0f].includes(id);
-export const isHaltCommand = (id: number): id is 0x2e => [0x2e].includes(id);
-export const isAttackMoveCommand = (id: number): id is 0x36 =>
-    [0x36].includes(id);
-export const isGroundAttackCommand = (id: number): id is 0x32 =>
-    [0x32].includes(id);
-export const isRetreatCommand = (id: number): id is 0x3f => [0x3f].includes(id);
+export const isCaptureCommand = (
+    commandId: number,
+    objectId: number,
+): commandId is 0x31 => commandId === 0x31 && objectId === 0x3;
+
+export const isMoveCommand = (
+    commandId: number,
+    objectId: number,
+): commandId is 0x2d => commandId === 0x2d && objectId === 0x2;
+
+/**
+ * Rally Point Command
+ * 
+ * - commandId: 0x0f
+ * - objectId: 0x2 (Rally Point)
+ * - objectId: 0x3 (Rally Point with action, e.g., capture point or a rally point on a building)
+ */
+export const isRallyPointCommand = (
+    commandId: number,
+    objectId: number,
+): commandId is 0x0f => commandId === 0x0f && [0x2, 0x3].includes(objectId); // 0x3 is a rally command thats put in a capture point
+
+export const isHaltCommand = (
+    commandId: number,
+    objectId: number,
+): commandId is 0x2e => commandId === 0x2e && objectId === 0x0;
+
+export const isAttackMoveCommand = (
+    commandId: number,
+    objectId: number,
+): commandId is 0x36 => commandId === 0x36 && objectId === 0x2;
+
+export const isOrderUnitToBuild = (
+    commandId: number,
+    objectId: number,
+): commandId is 0x30 => commandId === 0x30 && objectId === 0x3;
+
+export const isGroundAttackCommand = (
+    commandId: number, 
+    objectId: number
+): commandId is 0x32 => commandId === 0x32 && objectId === 0x2;
+
+export const isRetreatCommand = (
+    commandId: number,
+    objectId: number,
+): commandId is 0x3f => commandId === 0x3f && objectId === 0x0;
+
+export const isGetInStructure = (
+    commandId: number,
+    objectId: number,
+): commandId is 0x3a => commandId === 0x3a && objectId === 0x3;
+
+export const isGetOutOfStructure = (
+    commandId: number,
+    objectId: number,
+): commandId is 0x19 => commandId === 0x19 && objectId === 0x0;

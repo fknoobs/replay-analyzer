@@ -20,6 +20,8 @@ import {
     isMoveCommand,
     isRallyPointCommand,
     isRetreatCommand,
+    isGetInStructure,
+    isGetOutOfStructure,
 } from "./action-definitions";
 import { parseDate } from "chrono-node";
 
@@ -460,6 +462,18 @@ const STATIC_COMMAND_HANDLERS = [
         name: "Retreat",
         description: "Ordered a unit to retreat",
     },
+    {
+        check: isGetInStructure,
+        type: "GET_IN_STRUCTURE_COMMAND",
+        name: "Get In Structure",
+        description: "Ordered a unit to get in structure",
+    },
+    {
+        check: isGetOutOfStructure,
+        type: "GET_OUT_OF_STRUCTURE_COMMAND",
+        name: "Get Out Of Structure",
+        description: "Ordered a unit to get out of structure",
+    },
 ] as const;
 
 const addAction = (
@@ -541,7 +555,7 @@ const addAction = (
         };
     } else {
         const staticHandler = STATIC_COMMAND_HANDLERS.find((h) =>
-            h.check(commandID),
+            h.check(commandID, objectID),
         );
         if (staticHandler) {
             command = {

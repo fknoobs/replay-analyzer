@@ -15,6 +15,7 @@ const HALT = 0x2e;
 const ATTACK_MOVE = 0x36;
 const GROUND_ATTACK = 0x32;
 const RETREAT = 0x3f;
+const ORDER_UNIT_TO_BUILD = 0x30; // 0x3
 
 // ???
 
