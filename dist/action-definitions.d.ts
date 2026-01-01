@@ -2337,6 +2337,15 @@ export declare const isSpecialAbility: (id: number) => id is 55 | 95;
 export declare const isCaptureCommand: (commandId: number, objectId: number) => commandId is 49;
 export declare const isMoveCommand: (commandId: number, objectId: number) => commandId is 45;
 /**
+ * AI Take Over Command
+ *
+ * Means player dropped out and AI took over control of the player.
+ *
+ * - commandId: 0x3f
+ * - objectId: 0x3600 (AI Take Over)
+ */
+export declare const isAiTakeOver: (commandId: number, objectId: number) => commandId is 63;
+/**
  * Rally Point Command
  *
  * - commandId: 0x0f

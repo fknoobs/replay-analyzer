@@ -22,6 +22,7 @@ import {
     isRetreatCommand,
     isGetInStructure,
     isGetOutOfStructure,
+    isAiTakeOver,
 } from "./action-definitions";
 import { parseDate } from "chrono-node";
 
@@ -474,6 +475,12 @@ const STATIC_COMMAND_HANDLERS = [
         name: "Get Out Of Structure",
         description: "Ordered a unit to get out of structure",
     },
+    {
+        check: isAiTakeOver,
+        type: "AI_TAKEOVER",
+        name: "AI Takeover",
+        description: "Player has been taken over by AI",
+    }
 ] as const;
 
 const addAction = (

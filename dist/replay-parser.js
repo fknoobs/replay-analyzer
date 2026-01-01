@@ -1,6 +1,6 @@
 import { ReplayStream } from "./replay-stream";
 import { createEmptyReplay, getDoctrineName, } from "./replay-types";
-import { DEFINITIONS, isUnit, isUnitCommand, isBuilding, isDoctrinal, isUpgrade, isSpecialAbility, isAttackMoveCommand, isCaptureCommand, isGroundAttackCommand, isHaltCommand, isMoveCommand, isRallyPointCommand, isRetreatCommand, isGetInStructure, isGetOutOfStructure, } from "./action-definitions";
+import { DEFINITIONS, isUnit, isUnitCommand, isBuilding, isDoctrinal, isUpgrade, isSpecialAbility, isAttackMoveCommand, isCaptureCommand, isGroundAttackCommand, isHaltCommand, isMoveCommand, isRallyPointCommand, isRetreatCommand, isGetInStructure, isGetOutOfStructure, isAiTakeOver, } from "./action-definitions";
 import { parseDate } from "chrono-node";
 /**
  * Parses the entire replay file.
@@ -363,6 +363,12 @@ const STATIC_COMMAND_HANDLERS = [
         name: "Get Out Of Structure",
         description: "Ordered a unit to get out of structure",
     },
+    {
+        check: isAiTakeOver,
+        type: "AI_TAKEOVER",
+        name: "AI Takeover",
+        description: "Player has been taken over by AI",
+    }
 ];
 const addAction = (replay, tick, data, absoluteOffset, options) => {
     let playerID = 0;
