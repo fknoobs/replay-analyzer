@@ -2341,10 +2341,10 @@ export declare const isMoveCommand: (commandId: number, objectId: number) => com
  *
  * Means player dropped out and AI took over control of the player.
  *
- * - commandId: 0x3f
- * - objectId: 0x3600 (AI Take Over)
+ * - commandId: 0x6a
+ * - objectId: 0x4 (AI Take Over)
  */
-export declare const isAiTakeOver: (commandId: number, objectId: number) => commandId is 63;
+export declare const isAiTakeOver: (commandId: number, objectId: number) => commandId is 106;
 /**
  * Rally Point Command
  *
