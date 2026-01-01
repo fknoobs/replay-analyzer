@@ -2030,7 +2030,7 @@ export const isUnitCommand = (id: number): id is 0x37 => [0x37].includes(id);
 export const isBuilding = (id: number): id is 0x57 | 0x64 =>
     [0x57, 0x64].includes(id);
 export const isDoctrinal = (id: number): id is 0x5f | 0x62 =>
-    [0x5f, 0x62].includes(id);
+    [0x62].includes(id);
 export const isUpgrade = (id: number): id is 0x34 | 0x14 =>
     [0x34, 0x14].includes(id);
 export const isSpecialAbility = (id: number): id is 0x37 | 0x5f =>

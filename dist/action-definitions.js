@@ -2025,7 +2025,7 @@ export const DEFINITIONS = {
 export const isUnit = (id) => [0x3].includes(id);
 export const isUnitCommand = (id) => [0x37].includes(id);
 export const isBuilding = (id) => [0x57, 0x64].includes(id);
-export const isDoctrinal = (id) => [0x5f, 0x62].includes(id);
+export const isDoctrinal = (id) => [0x62].includes(id);
 export const isUpgrade = (id) => [0x34, 0x14].includes(id);
 export const isSpecialAbility = (id) => [0x5f].includes(id);
 export const isCaptureCommand = (commandId, objectId) => commandId === 0x31 && objectId === 0x3;
