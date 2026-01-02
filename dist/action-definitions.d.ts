@@ -1608,6 +1608,10 @@ export declare const DEFINITIONS: {
         };
     };
     readonly UPGRADE: {
+        readonly 91: {
+            readonly name: "Become Mobile";
+            readonly description: "Become Mobile";
+        };
         readonly 24: {
             readonly name: "Level 1 Production";
             readonly description: "Upgraded to Level 1 Production";

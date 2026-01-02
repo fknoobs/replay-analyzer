@@ -21,7 +21,7 @@ fileInput.addEventListener('change', async (e) => {
                     result = parseHeader(new Uint8Array(arrayBuffer));
                 }
                 else {
-                    result = parseReplay(new Uint8Array(arrayBuffer));
+                    result = parseReplay(new Uint8Array(arrayBuffer), { includeHexData: true });
                 }
                 const endTime = performance.now();
                 statusDiv.textContent = `Parsed in ${(endTime - startTime).toFixed(2)}ms`;
