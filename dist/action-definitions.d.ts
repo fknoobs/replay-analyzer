@@ -1,5 +1,9 @@
 export declare const DEFINITIONS: {
     readonly UNIT: {
+        readonly 2: {
+            readonly name: "Truck";
+            readonly description: "Truck";
+        };
         readonly 10: {
             readonly name: "Engineers";
             readonly description: "Made an engineer unit";
@@ -266,6 +270,14 @@ export declare const DEFINITIONS: {
         };
     };
     readonly UNIT_COMMAND: {
+        readonly 1495269571: {
+            readonly name: "Repair Vehicle/Structure";
+            readonly description: "Ordered to repair a vehicle or structure";
+        };
+        readonly 4: {
+            readonly name: "Repair Vehicle/Structure";
+            readonly description: "Ordered to repair a vehicle or structure";
+        };
         readonly 2: {
             readonly name: "Armor Piercing Shells (M1 57mm)";
             readonly description: "Ordered to fire armor piercing shells from M1 57mm Anti-Tank Gun";

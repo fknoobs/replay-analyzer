@@ -1,4 +1,5 @@
 9,0,UNIT,"Engineers",0xa,0
+9,0,UNIT,"Truck",0x2,0
 9,0,UNIT,"Heavy Machine Gun Team",0xf,0
 9,0,UNIT,"Mortar Team",0x28,0
 9,0,UNIT,"Riflemen",0x30,0
@@ -554,6 +555,7 @@
 9,0,UNITCOMMAND,"Overdrive",0x12f,0
 9,0,UNITCOMMAND,"Recover Wreck",0x132,0
 9,0,UNITCOMMAND,"Repair vehicle/structure",0x138,0
+9,0,UNITCOMMAND,"Repair vehicle/structure",0x4,0
 9,0,UNITCOMMAND,"Repair",0x13a,0
 9,0,UNITCOMMAND,"Rudimentary Repair vehicle/structure",0x13b,0
 9,0,UNITCOMMAND,"Over Repair",0x13c,0

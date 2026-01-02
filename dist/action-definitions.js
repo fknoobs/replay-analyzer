@@ -1,5 +1,9 @@
 export const DEFINITIONS = {
     UNIT: {
+        0x2: {
+            name: "Truck",
+            description: "Truck",
+        },
         0xa: {
             name: "Engineers",
             description: "Made an engineer unit",
@@ -266,6 +270,14 @@ export const DEFINITIONS = {
         },
     },
     UNIT_COMMAND: {
+        0x592000C3: {
+            name: "Repair Vehicle/Structure",
+            description: "Ordered to repair a vehicle or structure",
+        },
+        0x4: {
+            name: "Repair Vehicle/Structure",
+            description: "Ordered to repair a vehicle or structure",
+        },
         0x2: {
             name: "Armor Piercing Shells (M1 57mm)",
             description: "Ordered to fire armor piercing shells from M1 57mm Anti-Tank Gun",
