@@ -1403,6 +1403,10 @@ export const DEFINITIONS = {
         },
     },
     UPGRADE: {
+        0x5b: {
+            name: "Become Mobile",
+            description: "Become Mobile",
+        },
         0x18: {
             name: "Level 1 Production",
             description: "Upgraded to Level 1 Production",
@@ -2025,7 +2029,7 @@ export const DEFINITIONS = {
     },
 } as const;
 
-export const isUnit = (id: number): id is 0x3 => [0x3].includes(id);
+export const isUnit = (id: number): id is 0x3 => [0x52, 0x3].includes(id); // 0x52 is for brits, wtf? Rest of factions use 0x3, idk why ...
 export const isUnitCommand = (id: number): id is 0x37 => [0x37].includes(id);
 export const isBuilding = (id: number): id is 0x57 | 0x64 =>
     [0x57, 0x64].includes(id);

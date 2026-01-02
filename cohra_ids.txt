@@ -279,6 +279,7 @@
 9,0,UPGRADE,"Expert Engineers",0x71,0
 9,0,UPGRADE,"PIAT",0x72,0
 9,0,UPGRADE,"PIAT",0x73,0
+9,0,UPGRADE,"Become Mobile",0x5b,0
 9,0,UPGRADE,"Recon Element",0x74,0
 9,0,UPGRADE,"Rifle Grenades",0x75,0
 9,0,UPGRADE,"Tank Crew Commander",0x76,0

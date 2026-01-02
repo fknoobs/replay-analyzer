@@ -26,7 +26,7 @@ fileInput.addEventListener('change', async (e) => {
                 if (mode === 'header') {
                     result = parseHeader(new Uint8Array(arrayBuffer));
                 } else {
-                    result = parseReplay(new Uint8Array(arrayBuffer));
+                    result = parseReplay(new Uint8Array(arrayBuffer), { includeHexData: true });
                 }
                 
                 const endTime = performance.now();
