@@ -2333,9 +2333,9 @@ export declare const isUnitCommand: (id: number) => id is 55;
 export declare const isBuilding: (id: number) => id is 87 | 100;
 export declare const isDoctrinal: (id: number) => id is 95 | 98;
 export declare const isUpgrade: (id: number) => id is 52 | 20;
-export declare const isSpecialAbility: (id: number) => id is 55 | 95;
+export declare const isSpecialAbility: (id: number) => id is 95;
 export declare const isCaptureCommand: (commandId: number, objectId: number) => commandId is 49;
-export declare const isMoveCommand: (commandId: number, objectId: number) => commandId is 45;
+export declare const isMoveCommand: (commandId: number, objectId: number, length?: number) => commandId is 45;
 /**
  * AI Take Over Command
  *

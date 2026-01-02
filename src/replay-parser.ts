@@ -505,7 +505,11 @@ const addAction = (
     }
 
     if (data.length >= 18) {
-        objectID = view.getUint32(14, true);
+        if (commandID === 0x31) {
+            objectID = view.getUint8(14);
+        } else {
+            objectID = view.getUint32(14, true);
+        }
     }
 
     let position: { x: number; y: number; z: number } | undefined;
@@ -547,7 +551,7 @@ const addAction = (
 
     const player = replay.players.find((p) => p.id === playerID);
     const playerName = player ? player.name : "";
-
+    
     let command: Action["command"];
 
     const dynamicHandler = DYNAMIC_COMMAND_HANDLERS.find((h) =>
@@ -562,7 +566,7 @@ const addAction = (
         };
     } else {
         const staticHandler = STATIC_COMMAND_HANDLERS.find((h) =>
-            h.check(commandID, objectID),
+            (h.check as any)(commandID, objectID, data.length),
         );
         if (staticHandler) {
             command = {

@@ -383,7 +383,12 @@ const addAction = (replay, tick, data, absoluteOffset, options) => {
         commandID = view.getUint8(2);
     }
     if (data.length >= 18) {
-        objectID = view.getUint32(14, true);
+        if (commandID === 0x31) {
+            objectID = view.getUint8(14);
+        }
+        else {
+            objectID = view.getUint32(14, true);
+        }
     }
     let position;
     // Try to find coordinates (3 consecutive floats)
@@ -431,7 +436,7 @@ const addAction = (replay, tick, data, absoluteOffset, options) => {
         };
     }
     else {
-        const staticHandler = STATIC_COMMAND_HANDLERS.find((h) => h.check(commandID, objectID));
+        const staticHandler = STATIC_COMMAND_HANDLERS.find((h) => h.check(commandID, objectID, data.length));
         if (staticHandler) {
             command = {
                 type: staticHandler.type,

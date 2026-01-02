@@ -2033,18 +2033,19 @@ export const isDoctrinal = (id: number): id is 0x5f | 0x62 =>
     [0x62].includes(id);
 export const isUpgrade = (id: number): id is 0x34 | 0x14 =>
     [0x34, 0x14].includes(id);
-export const isSpecialAbility = (id: number): id is 0x37 | 0x5f =>
+export const isSpecialAbility = (id: number): id is 0x5f =>
     [0x5f].includes(id);
 
 export const isCaptureCommand = (
     commandId: number,
     objectId: number,
-): commandId is 0x31 => commandId === 0x31 && objectId === 0x3;
+): commandId is 0x31 => commandId === 0x31;
 
 export const isMoveCommand = (
     commandId: number,
     objectId: number,
-): commandId is 0x2d => commandId === 0x2d && objectId === 0x2;
+    length?: number,
+): commandId is 0x2d => commandId === 0x2d && objectId === 0x2 && (length === undefined || length === 0x1e);
 
 /** 
  * AI Take Over Command

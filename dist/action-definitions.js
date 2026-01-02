@@ -2028,8 +2028,8 @@ export const isBuilding = (id) => [0x57, 0x64].includes(id);
 export const isDoctrinal = (id) => [0x62].includes(id);
 export const isUpgrade = (id) => [0x34, 0x14].includes(id);
 export const isSpecialAbility = (id) => [0x5f].includes(id);
-export const isCaptureCommand = (commandId, objectId) => commandId === 0x31 && objectId === 0x3;
-export const isMoveCommand = (commandId, objectId) => commandId === 0x2d && objectId === 0x2;
+export const isCaptureCommand = (commandId, objectId) => commandId === 0x31;
+export const isMoveCommand = (commandId, objectId, length) => commandId === 0x2d && objectId === 0x2 && (length === undefined || length === 0x1e);
 /**
  * AI Take Over Command
  *
