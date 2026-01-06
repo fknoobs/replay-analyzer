@@ -664,31 +664,64 @@ const findPlayerIDs = (replay: ReplayData) => {
 
     // Action-based Faction detection
     const idFactionMap = new Map<number, string>();
+    
     // Key units that definitively identify faction
-    const ALLIES_UNITS = new Set([
-        0xa, // Engineers
+    // US (allies)
+    const US_UNITS = new Set([
         0x30, // Riflemen
+        0xa, // Engineers
         0x3d, // Jeep
-        0x72, // Lieutenant
-        0x79, // Sappers
-        0x7b, // Infantry Section
-        0x85, // Bren Carrier
+        0x4b, // M4 Sherman
+        0x4f, // M8 Armored Car
+        0x3f, // M10
+        0x41, // M18 Hellcat
     ]);
-    const AXIS_UNITS = new Set([
+    
+    // Commonwealth (allies_commonwealth)
+    const CW_UNITS = new Set([
+        0x7b, // Infantry Section
+        0x72, // Lieutenant
+        0x85, // Bren Carrier
+        0x79, // Sappers
+        0x8e, // Cromwell
+        0x9a, // Stuart
+        0x5c, // Commandos
+    ]);
+
+    // Wehrmacht (axis)
+    const WEHR_UNITS = new Set([
         0xbc, // Pioneers
         0xcf, // Volksgrenadiers
+        0xa4, // MG42
         0xed, // Motorcycle
+        0xe6, // Sdkfz 251
+        0xbd, // Sniper (Wehr version usually)
+        0xf3, // Panzer IV
+        0xf2, // Panther
+    ]);
+
+    // Panzer Elite (axis_panzer_elite)
+    const PE_UNITS = new Set([
         0x121, // Panzer Grenadiers
-        0x127, // Scout Car (PE)
-        0xe6, // Sdkfz 251 Halftrack (Wehr)
+        0x141, // Kettenkrad
+        0x127, // Scout Car
+        0x139, // Hotchkiss
+        0x13c, // Marder III
+        0x131, // Bergetiger
+        0x12a, // Infantry Halftrack
+        0x12b, // Mortar Halftrack
     ]);
 
     for (const action of replay.actions) {
         if (isUnit(action.commandID)) {
-            if (ALLIES_UNITS.has(action.objectID)) {
+            if (US_UNITS.has(action.objectID)) {
                 idFactionMap.set(action.playerID, "allies");
-            } else if (AXIS_UNITS.has(action.objectID)) {
+            } else if (CW_UNITS.has(action.objectID)) {
+                idFactionMap.set(action.playerID, "allies_commonwealth");
+            } else if (WEHR_UNITS.has(action.objectID)) {
                 idFactionMap.set(action.playerID, "axis");
+            } else if (PE_UNITS.has(action.objectID)) {
+                idFactionMap.set(action.playerID, "axis_panzer_elite");
             }
         }
     }
@@ -704,11 +737,37 @@ const findPlayerIDs = (replay: ReplayData) => {
     const availableIds = actionPlayerIDs.filter((id) => !assignedIds.has(id));
 
     // Strategy 2: Match Unassigned Players to Unassigned IDs by Faction
-    const unassignedPlayers = replay.players.filter(
+    let unassignedPlayers = replay.players.filter(
         (p) => !p.id || p.id === 0,
     );
 
     if (unassignedPlayers.length > 0 && availableIds.length > 0) {
+        // Attempt precise matching first
+        const factions = ["allies", "allies_commonwealth", "axis", "axis_panzer_elite"];
+        
+        for (const f of factions) {
+            const playersOfFaction = unassignedPlayers.filter(p => p.faction === f);
+            const idsOfFaction = availableIds.filter(id => idFactionMap.get(id) === f && !assignedIds.has(id));
+            
+            // If counts match exactly, assign them
+            // If not equal, we might be cautious, but let's assign what we can in order
+            if (playersOfFaction.length > 0 && idsOfFaction.length > 0) {
+                 for (let i = 0; i < Math.min(playersOfFaction.length, idsOfFaction.length); i++) {
+                    playersOfFaction[i].id = idsOfFaction[i];
+                    assignedIds.add(idsOfFaction[i]);
+                 }
+            }
+        }
+    }
+    
+    // Refresh unassigned list
+    unassignedPlayers = replay.players.filter(
+        (p) => !p.id || p.id === 0,
+    );
+    const remainingIds = availableIds.filter((id) => !assignedIds.has(id));
+
+    // Fallback: Broad Matching (Allies vs Axis)
+    if (unassignedPlayers.length > 0 && remainingIds.length > 0) {
         const isAllies = (f: string) => f.includes("allies");
         const isAxis = (f: string) => f.includes("axis");
 
@@ -717,18 +776,20 @@ const findPlayerIDs = (replay: ReplayData) => {
         );
         const axisPlayers = unassignedPlayers.filter((p) => isAxis(p.faction));
 
-        const alliesIds = availableIds.filter(
-            (id) => idFactionMap.get(id) === "allies",
+        const alliesIds = remainingIds.filter(
+            (id) => {
+                const f = idFactionMap.get(id); 
+                return f && f.includes("allies");
+            }
         );
-        const axisIds = availableIds.filter(
-            (id) => idFactionMap.get(id) === "axis",
+        const axisIds = remainingIds.filter(
+            (id) => {
+                const f = idFactionMap.get(id); 
+                return f && f.includes("axis");
+            }
         );
-        const unknownIds = availableIds.filter((id) => !idFactionMap.has(id));
 
         // Assign Allies
-        // Best effort: assign in order. 
-        // Note: Sometimes the list order is reversed vs ID order, but without more info (like slot index), 
-        // sequential assignment is the best default.
         if (alliesPlayers.length > 0 && alliesPlayers.length === alliesIds.length) {
             for (let i = 0; i < alliesPlayers.length; i++) {
                 alliesPlayers[i].id = alliesIds[i];
@@ -747,17 +808,17 @@ const findPlayerIDs = (replay: ReplayData) => {
 
     // Strategy 3: Fallback - Ensure everyone has an ID
     // Assign any remaining unassigned players to remaining available IDs
-    const remainingPlayers = replay.players.filter((p) => !p.id || p.id === 0);
+    const finalPlayers = replay.players.filter((p) => !p.id || p.id === 0);
     const finalAvailableIds = actionPlayerIDs.filter(
         (id) => !assignedIds.has(id),
     );
 
     for (
         let i = 0;
-        i < Math.min(remainingPlayers.length, finalAvailableIds.length);
+        i < Math.min(finalPlayers.length, finalAvailableIds.length);
         i++
     ) {
-        remainingPlayers[i].id = finalAvailableIds[i];
+        finalPlayers[i].id = finalAvailableIds[i];
     }
     
     // Update player names in actions now that we have correct IDs
