@@ -278,6 +278,10 @@ export const DEFINITIONS = {
             name: "Repair Vehicle/Structure",
             description: "Ordered to repair a vehicle or structure",
         },
+        0x3: {
+            name: "Armor Piercing Burst (HMG)",
+            description: "Ordered to fire armor piercing burst from HMG",
+        },
         0x2: {
             name: "Armor Piercing Shells (M1 57mm)",
             description:
