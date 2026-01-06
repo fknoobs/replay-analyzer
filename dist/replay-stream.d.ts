@@ -12,6 +12,7 @@ export declare class ReplayStream {
     skip(count: number): void;
     readByte(): number;
     readBytes(length: number): Uint8Array;
+    readUInt8(): number;
     readUInt16(): number;
     readUInt32(): number;
     readInt32(): number;

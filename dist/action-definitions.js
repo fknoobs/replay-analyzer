@@ -270,7 +270,7 @@ export const DEFINITIONS = {
         },
     },
     UNIT_COMMAND: {
-        0x592000C3: {
+        0x592000c3: {
             name: "Repair Vehicle/Structure",
             description: "Ordered to repair a vehicle or structure",
         },
@@ -278,13 +278,13 @@ export const DEFINITIONS = {
             name: "Repair Vehicle/Structure",
             description: "Ordered to repair a vehicle or structure",
         },
+        0x3: {
+            name: "Armor Piercing Burst (HMG)",
+            description: "Ordered to fire armor piercing burst from HMG",
+        },
         0x2: {
             name: "Armor Piercing Shells (M1 57mm)",
             description: "Ordered to fire armor piercing shells from M1 57mm Anti-Tank Gun",
-        },
-        0x3: {
-            name: "High Explosive Shells (M1 57mm)",
-            description: "Ordered to fire high explosive shells from M1 57mm Anti-Tank Gun",
         },
         0xa: {
             name: "Calliope Barrage",
@@ -2045,7 +2045,9 @@ export const isDoctrinal = (id) => [0x62].includes(id);
 export const isUpgrade = (id) => [0x34, 0x14].includes(id);
 export const isSpecialAbility = (id) => [0x5f].includes(id);
 export const isCaptureCommand = (commandId, objectId) => commandId === 0x31;
-export const isMoveCommand = (commandId, objectId, length) => commandId === 0x2d && objectId === 0x2 && (length === undefined || length === 0x1e);
+export const isMoveCommand = (commandId, objectId, length) => commandId === 0x2d &&
+    objectId === 0x2 &&
+    (length === undefined || length === 0x1e);
 /**
  * AI Take Over Command
  *

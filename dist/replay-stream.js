@@ -35,6 +35,11 @@ export class ReplayStream {
         this._position += length;
         return buf;
     }
+    readUInt8() {
+        const val = this.view.getUint8(this._position);
+        this._position += 1;
+        return val;
+    }
     readUInt16() {
         const val = this.view.getUint16(this._position, true); // true for Little Endian
         this._position += 2;

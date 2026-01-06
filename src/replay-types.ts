@@ -2,6 +2,7 @@ export interface Player {
     name: string;
     faction: string;
     id?: number;
+    slot: number;
     doctrine?: number;
     doctrineName?: string;
     dataInfo1?: number;

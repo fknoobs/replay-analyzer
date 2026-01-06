@@ -278,13 +278,13 @@ export declare const DEFINITIONS: {
             readonly name: "Repair Vehicle/Structure";
             readonly description: "Ordered to repair a vehicle or structure";
         };
+        readonly 3: {
+            readonly name: "Armor Piercing Burst (HMG)";
+            readonly description: "Ordered to fire armor piercing burst from HMG";
+        };
         readonly 2: {
             readonly name: "Armor Piercing Shells (M1 57mm)";
             readonly description: "Ordered to fire armor piercing shells from M1 57mm Anti-Tank Gun";
-        };
-        readonly 3: {
-            readonly name: "High Explosive Shells (M1 57mm)";
-            readonly description: "Ordered to fire high explosive shells from M1 57mm Anti-Tank Gun";
         };
         readonly 10: {
             readonly name: "Calliope Barrage";

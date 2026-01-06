@@ -157,6 +157,7 @@ const processDataChunk = (stream, replay, type, version) => {
         const u1 = stream.readUInt32();
         const u2 = stream.readUInt32();
         const faction = stream.readLengthPrefixedASCIIStr();
+        // u1 is likely the player ID
         addPlayer(replay, playerName, faction, 0, 0, u1, u2);
     }
 };
@@ -165,6 +166,7 @@ const addPlayer = (replay, name, faction, id = 0, doctrine = 0, dataInfo1 = 0, d
         name,
         faction,
         id,
+        slot: replay.players.length,
         doctrine,
         dataInfo1,
         dataInfo2,
@@ -368,7 +370,7 @@ const STATIC_COMMAND_HANDLERS = [
         type: "AI_TAKEOVER",
         name: "AI Takeover",
         description: "Player has been taken over by AI",
-    }
+    },
 ];
 const addAction = (replay, tick, data, absoluteOffset, options) => {
     let playerID = 0;
@@ -505,56 +507,83 @@ const parseMessage = (stream, replay, tick) => {
 };
 const findPlayerIDs = (replay) => {
     // Strategy 1: Use Chat Messages (Most Reliable)
-    for (const player of replay.players) {
-        for (const message of replay.messages) {
-            if (message.sender === player.name) {
+    for (const message of replay.messages) {
+        if (message.sender && message.sender !== "System") {
+            const player = replay.players.find((p) => p.name === message.sender);
+            if (player) {
                 player.id = message.playerID;
-                break;
             }
         }
     }
-    // Strategy 2: Use DATAINFO unique values (u1, u2)
-    // If we have players without IDs, try to match them based on unique dataInfo values
-    // This assumes that players with different names will have different dataInfo values
-    // We can check if any actions have a playerID that is NOT in our current known list
-    // and see if we can correlate it.
-    // However, a simpler heuristic is often used:
-    // The DATAINFO block often contains the player ID in u1 or u2, but it's inconsistent.
-    // Let's try to see if u1 matches any playerID seen in actions.
-    const actionPlayerIDs = new Set(replay.actions.map((a) => a.playerID));
-    const knownPlayerIDs = new Set(replay.players.map((p) => p.id).filter((id) => id !== 0));
-    // Find IDs that appear in actions but are not yet assigned to a player
-    const unassignedActionIDs = [...actionPlayerIDs].filter((id) => !knownPlayerIDs.has(id) && id !== 0);
-    if (unassignedActionIDs.length > 0) {
-        // If we have unassigned IDs, let's try to assign them to players who don't have IDs yet
-        const playersWithoutIDs = replay.players.filter((p) => !p.id || p.id === 0);
-        // If the number of unassigned IDs matches the number of players without IDs,
-        // we can try to assign them. But we need an order.
-        // The order in DATAINFO usually matches the internal slot order.
-        // The IDs in actions usually are 1000, 1001, etc. or 0, 1, 2...
-        // Let's just assign them in order if counts match.
-        if (unassignedActionIDs.length === playersWithoutIDs.length &&
-            unassignedActionIDs.length > 0) {
-            unassignedActionIDs.sort((a, b) => a - b);
-            for (let i = 0; i < playersWithoutIDs.length; i++) {
-                playersWithoutIDs[i].id = unassignedActionIDs[i];
+    // Action-based Faction detection
+    const idFactionMap = new Map();
+    // Key units that definitively identify faction
+    const ALLIES_UNITS = new Set([
+        0xa, // Engineers
+        0x30, // Riflemen
+        0x3d, // Jeep
+        0x72, // Lieutenant
+        0x79, // Sappers
+        0x7b, // Infantry Section
+        0x85, // Bren Carrier
+    ]);
+    const AXIS_UNITS = new Set([
+        0xbc, // Pioneers
+        0xcf, // Volksgrenadiers
+        0xed, // Motorcycle
+        0x121, // Panzer Grenadiers
+        0x127, // Scout Car (PE)
+        0xe6, // Sdkfz 251 Halftrack (Wehr)
+    ]);
+    for (const action of replay.actions) {
+        if (isUnit(action.commandID)) {
+            if (ALLIES_UNITS.has(action.objectID)) {
+                idFactionMap.set(action.playerID, "allies");
+            }
+            else if (AXIS_UNITS.has(action.objectID)) {
+                idFactionMap.set(action.playerID, "axis");
+            }
+        }
+    }
+    // Collect all Action IDs seen
+    const actionPlayerIDs = Array.from(new Set(replay.actions.map((a) => a.playerID))).sort((a, b) => a - b);
+    const assignedIds = new Set(replay.players.map((p) => p.id).filter((id) => id && id !== 0));
+    const availableIds = actionPlayerIDs.filter((id) => !assignedIds.has(id));
+    // Strategy 2: Match Unassigned Players to Unassigned IDs by Faction
+    const unassignedPlayers = replay.players.filter((p) => !p.id || p.id === 0);
+    if (unassignedPlayers.length > 0 && availableIds.length > 0) {
+        const isAllies = (f) => f.includes("allies");
+        const isAxis = (f) => f.includes("axis");
+        const alliesPlayers = unassignedPlayers.filter((p) => isAllies(p.faction));
+        const axisPlayers = unassignedPlayers.filter((p) => isAxis(p.faction));
+        const alliesIds = availableIds.filter((id) => idFactionMap.get(id) === "allies");
+        const axisIds = availableIds.filter((id) => idFactionMap.get(id) === "axis");
+        const unknownIds = availableIds.filter((id) => !idFactionMap.has(id));
+        // Assign Allies
+        // Best effort: assign in order. 
+        // Note: Sometimes the list order is reversed vs ID order, but without more info (like slot index), 
+        // sequential assignment is the best default.
+        if (alliesPlayers.length > 0 && alliesPlayers.length === alliesIds.length) {
+            for (let i = 0; i < alliesPlayers.length; i++) {
+                alliesPlayers[i].id = alliesIds[i];
+                assignedIds.add(alliesIds[i]);
+            }
+        }
+        // Assign Axis
+        if (axisPlayers.length > 0 && axisPlayers.length === axisIds.length) {
+            for (let i = 0; i < axisPlayers.length; i++) {
+                axisPlayers[i].id = axisIds[i];
+                assignedIds.add(axisIds[i]);
             }
         }
     }
     // Strategy 3: Fallback - Ensure everyone has an ID
-    // If any player still has no ID (0 or undefined), assign one.
-    const takenIds = new Set(replay.players.map((p) => p.id).filter((id) => id && id !== 0));
-    replay.players.forEach((player) => {
-        if (!player.id || player.id === 0) {
-            // Find the first available ID starting from 1000
-            let candidateId = 1000;
-            while (takenIds.has(candidateId)) {
-                candidateId++;
-            }
-            player.id = candidateId;
-            takenIds.add(candidateId);
-        }
-    });
+    // Assign any remaining unassigned players to remaining available IDs
+    const remainingPlayers = replay.players.filter((p) => !p.id || p.id === 0);
+    const finalAvailableIds = actionPlayerIDs.filter((id) => !assignedIds.has(id));
+    for (let i = 0; i < Math.min(remainingPlayers.length, finalAvailableIds.length); i++) {
+        remainingPlayers[i].id = finalAvailableIds[i];
+    }
     // Update player names in actions now that we have correct IDs
     updateActionPlayerNames(replay);
 };
