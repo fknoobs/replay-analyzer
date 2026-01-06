@@ -270,7 +270,7 @@ export const DEFINITIONS = {
         },
     },
     UNIT_COMMAND: {
-        0x592000C3: {
+        0x592000c3: {
             name: "Repair Vehicle/Structure",
             description: "Ordered to repair a vehicle or structure",
         },
@@ -282,11 +282,6 @@ export const DEFINITIONS = {
             name: "Armor Piercing Shells (M1 57mm)",
             description:
                 "Ordered to fire armor piercing shells from M1 57mm Anti-Tank Gun",
-        },
-        0x3: {
-            name: "High Explosive Shells (M1 57mm)",
-            description:
-                "Ordered to fire high explosive shells from M1 57mm Anti-Tank Gun",
         },
         0xa: {
             name: "Calliope Barrage",
@@ -2049,8 +2044,7 @@ export const isDoctrinal = (id: number): id is 0x5f | 0x62 =>
     [0x62].includes(id);
 export const isUpgrade = (id: number): id is 0x34 | 0x14 =>
     [0x34, 0x14].includes(id);
-export const isSpecialAbility = (id: number): id is 0x5f =>
-    [0x5f].includes(id);
+export const isSpecialAbility = (id: number): id is 0x5f => [0x5f].includes(id);
 
 export const isCaptureCommand = (
     commandId: number,
@@ -2061,13 +2055,16 @@ export const isMoveCommand = (
     commandId: number,
     objectId: number,
     length?: number,
-): commandId is 0x2d => commandId === 0x2d && objectId === 0x2 && (length === undefined || length === 0x1e);
+): commandId is 0x2d =>
+    commandId === 0x2d &&
+    objectId === 0x2 &&
+    (length === undefined || length === 0x1e);
 
-/** 
+/**
  * AI Take Over Command
- * 
+ *
  * Means player dropped out and AI took over control of the player.
- * 
+ *
  * - commandId: 0x6a
  * - objectId: 0x4 (AI Take Over)
  */
@@ -2078,7 +2075,7 @@ export const isAiTakeOver = (
 
 /**
  * Rally Point Command
- * 
+ *
  * - commandId: 0x0f
  * - objectId: 0x2 (Rally Point)
  * - objectId: 0x3 (Rally Point with action, e.g., capture point or a rally point on a building)
@@ -2104,8 +2101,8 @@ export const isOrderUnitToBuild = (
 ): commandId is 0x30 => commandId === 0x30 && objectId === 0x3;
 
 export const isGroundAttackCommand = (
-    commandId: number, 
-    objectId: number
+    commandId: number,
+    objectId: number,
 ): commandId is 0x32 => commandId === 0x32 && objectId === 0x2;
 
 export const isRetreatCommand = (
