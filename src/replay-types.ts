@@ -35,6 +35,7 @@ export interface Action {
     timestamp: string;
     commandID: number;
     objectID: number;
+    packetLength: number;
     command?: Command;
     // For actions with positions (like move, attack, build)
     position?: { x: number; y: number; z: number };

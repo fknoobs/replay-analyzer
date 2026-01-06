@@ -274,13 +274,17 @@ export const DEFINITIONS = {
             name: "Repair Vehicle/Structure",
             description: "Ordered to repair a vehicle or structure",
         },
+        0x139: {
+            name: "Rudimentary Repair vehicle/structure",
+            description: "Ordered to perform rudimentary repairs on a vehicle or structure",
+        },
         0x4: {
             name: "Repair Vehicle/Structure",
             description: "Ordered to repair a vehicle or structure",
         },
         0x3: {
-            name: "Armor Piercing Burst (HMG)",
-            description: "Ordered to fire armor piercing burst from HMG",
+            name: "Repair Vehicle/Structure",
+            description: "Ordered to repair a vehicle or structure",
         },
         0x2: {
             name: "Armor Piercing Shells (M1 57mm)",
@@ -1714,11 +1718,11 @@ export const DEFINITIONS = {
             name: "Spotting Scope",
             description: "Upgraded to Spotting Scope",
         },
-        0xd9: {
+        0xda: {
             name: "Long-barreled 37mm Cannon",
             description: "Upgraded to Long-barreled 37mm Cannon",
         },
-        0xda: {
+        0xdb: {
             name: "Walking Stuka",
             description: "Upgraded to Walking Stuka",
         },

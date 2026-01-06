@@ -428,6 +428,7 @@
 9,0,SPECIALABILITY,"V1 Rocket Attack",0x1d4,1
 9,0,UNITCOMMAND,"Armor Piercing Shells (M1 57mm)",0x2,0
 9,0,UNITCOMMAND,"Armor Piercing Burst (HMG)",0x3,0
+9,0,UNITCOMMAND,"Repair Vehicle",0x3,0
 9,0,UNITCOMMAND,"Calliope Barrage",0xa,1
 9,0,UNITCOMMAND,"Fire-Up!",0xb,0
 9,0,UNITCOMMAND,"Lower/Raise the Bulldozer",0xe,0
@@ -558,6 +559,7 @@
 9,0,UNITCOMMAND,"Repair vehicle/structure",0x4,0
 9,0,UNITCOMMAND,"Repair",0x13a,0
 9,0,UNITCOMMAND,"Rudimentary Repair vehicle/structure",0x13b,0
+9,0,UNITCOMMAND,"Rudimentary Repair vehicle/structure",0x139,0
 9,0,UNITCOMMAND,"Over Repair",0x13c,0
 9,0,UNITCOMMAND,"Advanced Repair vehicle/structure",0x13d,0
 9,0,UNITCOMMAND,"Advanced Repair",0x13f,0

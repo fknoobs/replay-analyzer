@@ -31,6 +31,7 @@ export interface Action {
     timestamp: string;
     commandID: number;
     objectID: number;
+    packetLength: number;
     command?: Command;
     position?: {
         x: number;

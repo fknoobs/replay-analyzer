@@ -43,10 +43,11 @@ export const parseReplay = (
     const stream = new ReplayStream(input);
     const replay = createEmptyReplay();
 
-    try {
+        try {
         parseHeaderInternal(stream, replay);
         parseDataInternal(stream, replay, options);
         findPlayerIDs(replay);
+        refineActionDefinitions(replay);
 
         replay.players.forEach((player) => {
             player.doctrine =
@@ -377,7 +378,7 @@ const parseActionsInBlock = (
         const safeCaptureLength = Math.min(captureLength, data.length - i);
 
         const actionData = data.subarray(i, i + safeCaptureLength);
-        addAction(replay, tick, actionData, tickDataStart + i, options);
+        addAction(replay, tick, actionData, tickDataStart + i, actionLength, options);
         actionCount++;
 
         i += actionLength;
@@ -491,6 +492,7 @@ const addAction = (
     tick: number,
     data: Uint8Array,
     absoluteOffset: number,
+    packetLength: number,
     options?: ParseOptions,
 ) => {
     let playerID = 0;
@@ -588,6 +590,7 @@ const addAction = (
         absoluteOffset,
         commandID,
         objectID,
+        packetLength,
         command,
         position,
     };
@@ -836,6 +839,68 @@ const updateActionPlayerNames = (replay: ReplayData) => {
     for (const action of replay.actions) {
         if (playerMap.has(action.playerID)) {
             action.playerName = playerMap.get(action.playerID)!;
+        }
+    }
+};
+
+const refineActionDefinitions = (replay: ReplayData) => {
+    // Create a map of PlayerID -> Faction
+    const playerFactionMap = new Map<number, string>();
+    for (const p of replay.players) {
+        if (p.id !== undefined && p.faction) {
+            playerFactionMap.set(p.id, p.faction);
+        }
+    }
+
+    for (const action of replay.actions) {
+        // Special Case: Command ID 0x3 is overloaded
+        // 1. "Armor Piercing Burst (HMG)" - Allies, Short Packet (approx 19 bytes)
+        // 2. "Repair vehicle/structure" - Allies, Long Packet (approx 22 bytes + Target ID)
+        // 3. "Repair vehicle/structure" - Panzer Elite (Always)
+        if (action.commandID === 0x3 && action.objectID === 3) {
+             const faction = playerFactionMap.get(action.playerID);
+             
+             if (faction === "axis_panzer_elite") {
+                // PE is always repair
+                 action.command = {
+                    type: "UNIT_COMMAND",
+                    name: "Repair and Recovery Vehicle",
+                    description: "Ordered to repair a vehicle or structure",
+                };
+             } else if (faction === "allies") {
+                 // Check packet length to distinguish
+                 // Short packet (19) = HMG Burst
+                 // Long packet (22) = Repair
+                 if (action.packetLength > 20) {
+                     action.command = {
+                        type: "UNIT_COMMAND",
+                        name: "Repair vehicle/structure",
+                        description: "Ordered to repair a vehicle or structure",
+                    };
+                 } else {
+                     // Default is HMG Burst, no change needed (as defined in regular definitions)
+                 }
+             }
+        }
+
+        // Only refine Unit Commands for now
+        if (isUnitCommand(action.commandID)) {
+            const faction = playerFactionMap.get(action.playerID);
+            if (!faction) continue;
+
+            const baseDef = (DEFINITIONS.UNIT_COMMAND as any)[action.objectID];
+            if (
+                baseDef &&
+                baseDef.factionVariants &&
+                baseDef.factionVariants[faction]
+            ) {
+                const variant = baseDef.factionVariants[faction];
+                action.command = {
+                    type: action.command?.type || "UNIT_COMMAND",
+                    name: variant.name,
+                    description: variant.description,
+                };
+            }
         }
     }
 };

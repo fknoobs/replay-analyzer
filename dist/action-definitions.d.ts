@@ -281,6 +281,12 @@ export declare const DEFINITIONS: {
         readonly 3: {
             readonly name: "Armor Piercing Burst (HMG)";
             readonly description: "Ordered to fire armor piercing burst from HMG";
+            readonly factionVariants: {
+                readonly axis_panzer_elite: {
+                    readonly name: "Repair Vehicle";
+                    readonly description: "Ordered to repair a vehicle";
+                };
+            };
         };
         readonly 2: {
             readonly name: "Armor Piercing Shells (M1 57mm)";
@@ -1956,11 +1962,11 @@ export declare const DEFINITIONS: {
             readonly name: "Spotting Scope";
             readonly description: "Upgraded to Spotting Scope";
         };
-        readonly 217: {
+        readonly 218: {
             readonly name: "Long-barreled 37mm Cannon";
             readonly description: "Upgraded to Long-barreled 37mm Cannon";
         };
-        readonly 218: {
+        readonly 219: {
             readonly name: "Walking Stuka";
             readonly description: "Upgraded to Walking Stuka";
         };
