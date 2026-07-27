@@ -14,18 +14,22 @@ export const parseReplay = (input, options) => {
     try {
         parseHeaderInternal(stream, replay);
         parseDataInternal(stream, replay, options);
+        replay.dataParsed = true;
         findPlayerIDs(replay);
         refineActionDefinitions(replay);
         replay.players.forEach((player) => {
             player.doctrine =
-                replay.actions.find((action) => action.commandID === 98 &&
-                    action.playerID === player.id)?.objectID || undefined;
+                replay.actions.find((action) => isDoctrinal(action.commandID) &&
+                    action.playerID === player.id &&
+                    getDoctrineName(action.objectID) !== undefined)?.objectID || undefined;
             if (player.doctrine !== undefined) {
                 player.doctrineName = getDoctrineName(player.doctrine);
             }
         });
     }
     catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        replay.errors.push(message);
         console.error("Error parsing replay:", e);
     }
     return replay;
@@ -42,6 +46,8 @@ export const parseHeader = (input) => {
         parseHeaderInternal(stream, replay);
     }
     catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        replay.errors.push(message);
         console.error("Error parsing replay header:", e);
     }
     return replay;
@@ -52,14 +58,21 @@ const parseHeaderInternal = (stream, replay) => {
     // Decode date: C# code scans for null terminator in uint16 steps
     const startPos = stream.position;
     let length = 0;
-    while (stream.readUInt16() !== 0) {
+    while (stream.has(2)) {
+        if (stream.readUInt16() === 0)
+            break;
         length++;
+        // Sanity cap — dates are short; avoid scanning the whole file
+        if (length > 256) {
+            throw new RangeError("Replay date string exceeds maximum length");
+        }
     }
     stream.seek(startPos);
-    replay.gameDate =
-        parseDate(stream.readUnicodeStr(length))?.toISOString() ||
-            stream.readUnicodeStr(length);
-    stream.readUInt16(); // Skip null terminator
+    const dateStr = stream.readUnicodeStr(length);
+    replay.gameDate = parseDate(dateStr)?.toISOString() || dateStr;
+    if (stream.has(2)) {
+        stream.readUInt16(); // Skip null terminator
+    }
     stream.seek(76); // Fixed offset from C# code
     parseChunky(stream, replay);
     parseChunky(stream, replay);
@@ -76,8 +89,10 @@ const parseChunky = (stream, replay) => {
     }
     stream.skip(4);
     const version = stream.readUInt32();
-    if (version !== 3)
+    if (version !== 3) {
+        stream.seek(pos);
         return false;
+    }
     stream.skip(4);
     const length = stream.readUInt32();
     stream.skip(length - 28);
@@ -136,7 +151,8 @@ const processDataChunk = (stream, replay, type, version) => {
         replay.highResources = stream.readUInt32() === 1;
         stream.skip(4);
         const vpVal = stream.readUInt32();
-        replay.vpCount = 250 * (1 << vpVal);
+        const clampedVp = Math.max(0, Math.min(vpVal, 8));
+        replay.vpCount = 250 * (1 << clampedVp);
         stream.skip(5);
         replay.replayName = stream.readLengthPrefixedUnicodeStr();
         stream.skip(8);
@@ -178,14 +194,19 @@ const parseDataInternal = (stream, replay, options) => {
     let tickIndex = 0;
     let tickCount = 0;
     while (stream.position < stream.length) {
-        if (stream.position + 4 > stream.length)
+        if (!stream.has(4))
             break;
         const marker = stream.readUInt32();
         if (marker === 0) {
             // Tick Data
+            if (!stream.has(4))
+                break;
             const tickLength = stream.readUInt32();
             if (tickLength === 0 || tickLength > 10000000)
                 continue; // Safety
+            // Truncated / incomplete tick — stop cleanly instead of reading past EOF
+            if (!stream.has(tickLength))
+                break;
             const tickDataStart = stream.position;
             const tickData = stream.readBytes(tickLength);
             parseTick(tickData, tickDataStart, tickCount, replay, options);
@@ -203,10 +224,12 @@ const parseDataInternal = (stream, replay, options) => {
         }
         else if (marker === 1) {
             // Message
-            parseMessage(stream, replay, tickIndex);
+            if (!parseMessage(stream, replay, tickIndex))
+                break;
         }
         else {
-            // Old format fallback or unknown, skipping for safety in this port
+            // Old format / unknown marker — already consumed 4 bytes; keep scanning
+            continue;
         }
     }
     // If tickIndex is 0 (or invalid), fallback to tickCount
@@ -260,9 +283,11 @@ const parseActionsInBlock = (tick, data, startIndex, endIndex, tickDataStart, re
     const maxActions = 10000;
     let actionCount = 0;
     const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
-    while (i + 2 <= endIndex && actionCount < maxActions) {
+    while (i + 2 <= endIndex && i + 2 <= data.length && actionCount < maxActions) {
         const actionLength = view.getUint16(i, true);
         if (actionLength <= 0 || actionLength > 1000)
+            break;
+        if (i + actionLength > endIndex || i + actionLength > data.length)
             break;
         // Capture up to 30 bytes for output matching, even if it overlaps next action
         const captureLength = Math.max(actionLength, 30);
@@ -373,10 +398,56 @@ const STATIC_COMMAND_HANDLERS = [
         description: "Player has been taken over by AI",
     },
 ];
-const addAction = (replay, tick, data, absoluteOffset, packetLength, options) => {
+const COMMANDS_WITHOUT_POSITION = new Set([
+    "UNIT",
+    "BUILDING",
+    "DOCTRINAL",
+    "UPGRADE",
+    "SPECIAL_ABILITY",
+    "UNIT_COMMAND",
+    "HALT_COMMAND",
+    "RETREAT_COMMAND",
+    "AI_TAKEOVER",
+]);
+/**
+ * Resolves the action subtype / objectID from a command packet.
+ *
+ * Simple packets store objectID at offset 14 (after a 1-byte entity count and
+ * 1-byte payload size at offsets 12-13).
+ *
+ * Multi-entity packets start at offset 8 with `0x40 | entityCount`, followed by
+ * `entityCount` little-endian u32 entity handles. The count/size/objectID
+ * triplet then follows; a trailing `0xff` means objectID 0 (halt/retreat).
+ */
+const extractObjectID = (data, commandID, packetLength) => {
+    const len = Math.min(data.length, packetLength);
+    if (len < 15)
+        return 0;
+    let objectOffset = 14;
+    if (len > 8 && (data[8] & 0xf0) === 0x40) {
+        const entityCount = data[8] & 0x0f;
+        const afterEntities = 9 + entityCount * 4;
+        if (afterEntities >= len)
+            return 0;
+        if (data[afterEntities] === 0xff)
+            return 0;
+        // [count][size][objectID:u32]
+        objectOffset = afterEntities + 2;
+    }
+    if (commandID === 0x31) {
+        return objectOffset < len ? data[objectOffset] : 0;
+    }
+    if (objectOffset + 4 <= len) {
+        return (data[objectOffset] |
+            (data[objectOffset + 1] << 8) |
+            (data[objectOffset + 2] << 16) |
+            (data[objectOffset + 3] << 24)) >>> 0;
+    }
+    return objectOffset < len ? data[objectOffset] : 0;
+};
+const addAction = (replay, tick, data, absoluteOffset, packetLength, options, playerMap) => {
     let playerID = 0;
     let commandID = 0;
-    let objectID = 0;
     const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
     // Player ID is consistently at offset 4 (UInt16) for most commands
     if (data.length >= 6) {
@@ -385,17 +456,31 @@ const addAction = (replay, tick, data, absoluteOffset, packetLength, options) =>
     if (data.length >= 3) {
         commandID = view.getUint8(2);
     }
-    if (data.length >= 18) {
-        if (commandID === 0x31) {
-            objectID = view.getUint8(14);
-        }
-        else {
-            objectID = view.getUint32(14, true);
+    const objectID = extractObjectID(data, commandID, packetLength);
+    let command;
+    const dynamicHandler = DYNAMIC_COMMAND_HANDLERS.find((h) => h.check(commandID));
+    if (dynamicHandler) {
+        const def = dynamicHandler.def[objectID];
+        command = {
+            type: dynamicHandler.type,
+            name: def?.name || dynamicHandler.fallback,
+            description: def?.description || "",
+        };
+    }
+    else {
+        const staticHandler = STATIC_COMMAND_HANDLERS.find((h) => h.check(commandID, objectID, packetLength));
+        if (staticHandler) {
+            command = {
+                type: staticHandler.type,
+                name: staticHandler.name,
+                description: staticHandler.description,
+            };
         }
     }
     let position;
+    const skipPosition = command !== undefined && COMMANDS_WITHOUT_POSITION.has(command.type);
     // Try to find coordinates (3 consecutive floats)
-    if (data.length >= 12) {
+    if (!skipPosition && data.length >= 12) {
         for (let i = 0; i <= data.length - 12; i++) {
             const x = view.getFloat32(i, true);
             const y = view.getFloat32(i + 4, true);
@@ -426,28 +511,7 @@ const addAction = (replay, tick, data, absoluteOffset, packetLength, options) =>
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
     const timestamp = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-    const player = replay.players.find((p) => p.id === playerID);
-    const playerName = player ? player.name : "";
-    let command;
-    const dynamicHandler = DYNAMIC_COMMAND_HANDLERS.find((h) => h.check(commandID));
-    if (dynamicHandler) {
-        const def = dynamicHandler.def[objectID];
-        command = {
-            type: dynamicHandler.type,
-            name: def?.name || dynamicHandler.fallback,
-            description: def?.description || "",
-        };
-    }
-    else {
-        const staticHandler = STATIC_COMMAND_HANDLERS.find((h) => h.check(commandID, objectID, data.length));
-        if (staticHandler) {
-            command = {
-                type: staticHandler.type,
-                name: staticHandler.name,
-                description: staticHandler.description,
-            };
-        }
-    }
+    const playerName = playerMap?.get(playerID) ?? "";
     const action = {
         tick,
         playerID,
@@ -461,7 +525,6 @@ const addAction = (replay, tick, data, absoluteOffset, packetLength, options) =>
         position,
     };
     if (options?.includeHexData) {
-        // Convert to hex string manually since Buffer is not available
         const rawHex = Array.from(data)
             .map((b) => b.toString(16).padStart(2, "0"))
             .join("");
@@ -471,49 +534,83 @@ const addAction = (replay, tick, data, absoluteOffset, packetLength, options) =>
     replay.actions.push(action);
 };
 const parseMessage = (stream, replay, tick) => {
+    if (!stream.has(4))
+        return false;
     const pos = stream.position;
     const length = stream.readUInt32();
-    if (stream.readUInt32() > 0) {
-        stream.skip(4);
-        const L = stream.readUInt32();
-        let playerName = "";
-        let playerID = 0;
-        if (L > 0) {
-            playerName = stream.readUnicodeStr(L);
-            playerID = stream.readUInt16();
-        }
-        else {
-            playerName = "System";
-            playerID = 0;
-            stream.skip(2);
-        }
-        stream.skip(6);
-        const recipient = stream.readUInt32();
-        const message = stream.readLengthPrefixedUnicodeStr();
-        // 8 ticks per second
-        const totalSeconds = Math.floor(tick / 8);
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-        const timestamp = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-        replay.messages.push({
-            tick,
-            sender: playerName,
-            playerID: playerID,
-            content: message,
-            recipient,
-            timestamp,
-        });
+    const messageEnd = pos + length + 4;
+    // Incomplete message payload
+    if (length < 0 || messageEnd > stream.length) {
+        return false;
     }
-    stream.seek(pos + length + 4);
+    try {
+        if (stream.has(4) && stream.readUInt32() > 0) {
+            if (!stream.has(4)) {
+                stream.seek(messageEnd);
+                return true;
+            }
+            stream.skip(4);
+            if (!stream.has(4)) {
+                stream.seek(messageEnd);
+                return true;
+            }
+            const L = stream.readUInt32();
+            let playerName = "";
+            let playerID = 0;
+            if (L > 0) {
+                if (!stream.has(L * 2 + 2)) {
+                    stream.seek(messageEnd);
+                    return true;
+                }
+                playerName = stream.readUnicodeStr(L);
+                playerID = stream.readUInt16();
+            }
+            else {
+                playerName = "System";
+                playerID = 0;
+                if (stream.has(2))
+                    stream.skip(2);
+            }
+            if (!stream.has(10)) {
+                stream.seek(messageEnd);
+                return true;
+            }
+            stream.skip(6);
+            const recipient = stream.readUInt32();
+            const message = stream.readLengthPrefixedUnicodeStr();
+            // 8 ticks per second
+            const totalSeconds = Math.floor(tick / 8);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            const timestamp = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+            replay.messages.push({
+                tick,
+                sender: playerName,
+                playerID: playerID,
+                content: message,
+                recipient,
+                timestamp,
+            });
+        }
+    }
+    catch {
+        // Malformed message — jump to declared end when possible
+        stream.seek(messageEnd);
+        return stream.position < stream.length;
+    }
+    stream.seek(messageEnd);
+    return true;
 };
 const findPlayerIDs = (replay) => {
     // Strategy 1: Use Chat Messages (Most Reliable)
+    const claimedIds = new Set();
     for (const message of replay.messages) {
         if (message.sender && message.sender !== "System") {
             const player = replay.players.find((p) => p.name === message.sender);
-            if (player) {
+            if (player && (!player.id || player.id === 0) && !claimedIds.has(message.playerID)) {
                 player.id = message.playerID;
+                claimedIds.add(message.playerID);
             }
         }
     }
@@ -580,20 +677,18 @@ const findPlayerIDs = (replay) => {
     }
     // Collect all Action IDs seen
     const actionPlayerIDs = Array.from(new Set(replay.actions.map((a) => a.playerID))).sort((a, b) => a - b);
-    const assignedIds = new Set(replay.players.map((p) => p.id).filter((id) => id && id !== 0));
+    const assignedIds = new Set(replay.players.map((p) => p.id).filter((id) => !!id && id !== 0));
     const availableIds = actionPlayerIDs.filter((id) => !assignedIds.has(id));
     // Strategy 2: Match Unassigned Players to Unassigned IDs by Faction
     let unassignedPlayers = replay.players.filter((p) => !p.id || p.id === 0);
     if (unassignedPlayers.length > 0 && availableIds.length > 0) {
-        // Attempt precise matching first
         const factions = ["allies", "allies_commonwealth", "axis", "axis_panzer_elite"];
         for (const f of factions) {
             const playersOfFaction = unassignedPlayers.filter(p => p.faction === f);
             const idsOfFaction = availableIds.filter(id => idFactionMap.get(id) === f && !assignedIds.has(id));
-            // If counts match exactly, assign them
-            // If not equal, we might be cautious, but let's assign what we can in order
-            if (playersOfFaction.length > 0 && idsOfFaction.length > 0) {
-                for (let i = 0; i < Math.min(playersOfFaction.length, idsOfFaction.length); i++) {
+            // Only assign when counts match exactly
+            if (playersOfFaction.length > 0 && playersOfFaction.length === idsOfFaction.length) {
+                for (let i = 0; i < playersOfFaction.length; i++) {
                     playersOfFaction[i].id = idsOfFaction[i];
                     assignedIds.add(idsOfFaction[i]);
                 }

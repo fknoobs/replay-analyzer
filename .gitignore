@@ -95,4 +95,10 @@ jspm_packages/
 ehthumbs.db
 Thumbs.db
 
-*.rec
+# Local large replay dumps (fixtures/ keeps small CI samples)
+/*.rec
+
+# Scratch research scripts
+research-objectid.ts
+verify-fixes.ts
+debug-rj5.ts

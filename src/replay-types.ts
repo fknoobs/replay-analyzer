@@ -66,6 +66,8 @@ export interface ReplayData {
     actions: Action[];
 
     headerParsed: boolean;
+    dataParsed: boolean;
+    errors: string[];
 }
 
 export const createEmptyReplay = (): ReplayData => ({
@@ -91,6 +93,8 @@ export const createEmptyReplay = (): ReplayData => ({
     messages: [],
     actions: [],
     headerParsed: false,
+    dataParsed: false,
+    errors: [],
 });
 
 export const DOCTRINES: { [key: number]: string } = {
@@ -108,6 +112,6 @@ export const DOCTRINES: { [key: number]: string } = {
     330: "Royal Engineers",
 };
 
-export const getDoctrineName = (doctrineID: number): string => {
+export const getDoctrineName = (doctrineID: number): string | undefined => {
     return DOCTRINES[doctrineID];
 };

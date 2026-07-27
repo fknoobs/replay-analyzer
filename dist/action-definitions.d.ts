@@ -270,23 +270,17 @@ export declare const DEFINITIONS: {
         };
     };
     readonly UNIT_COMMAND: {
-        readonly 1495269571: {
-            readonly name: "Repair Vehicle/Structure";
-            readonly description: "Ordered to repair a vehicle or structure";
+        readonly 313: {
+            readonly name: "Rudimentary Repair vehicle/structure";
+            readonly description: "Ordered to perform rudimentary repairs on a vehicle or structure";
         };
         readonly 4: {
             readonly name: "Repair Vehicle/Structure";
             readonly description: "Ordered to repair a vehicle or structure";
         };
         readonly 3: {
-            readonly name: "Armor Piercing Burst (HMG)";
-            readonly description: "Ordered to fire armor piercing burst from HMG";
-            readonly factionVariants: {
-                readonly axis_panzer_elite: {
-                    readonly name: "Repair Vehicle";
-                    readonly description: "Ordered to repair a vehicle";
-                };
-            };
+            readonly name: "Repair Vehicle/Structure";
+            readonly description: "Ordered to repair a vehicle or structure";
         };
         readonly 2: {
             readonly name: "Armor Piercing Shells (M1 57mm)";
@@ -697,8 +691,8 @@ export declare const DEFINITIONS: {
             readonly description: "Ordered to Throw Anti Tank Grenade";
         };
         readonly 268: {
-            readonly name: "Fire Panzerfaust (Fallschrimjager)";
-            readonly description: "Ordered to Fire Panzerfaust (Fallschrimjager)";
+            readonly name: "Fire Panzerfaust (Fallschirmjager)";
+            readonly description: "Ordered to Fire Panzerfaust (Fallschirmjager)";
         };
         readonly 269: {
             readonly name: "Throw Anti Tank Grenade";
@@ -749,12 +743,12 @@ export declare const DEFINITIONS: {
             readonly description: "Ordered to fire 81mm Mortar Bombardment (MHT)";
         };
         readonly 290: {
-            readonly name: "Throw Incediary Grenade";
-            readonly description: "Ordered to Throw Incediary Grenade";
+            readonly name: "Throw Incendiary Grenade";
+            readonly description: "Ordered to Throw Incendiary Grenade";
         };
         readonly 291: {
-            readonly name: "Suppresive Volley Fire";
-            readonly description: "Ordered to fire Suppresive Volley Fire";
+            readonly name: "Suppressive Volley Fire";
+            readonly description: "Ordered to fire Suppressive Volley Fire";
         };
         readonly 292: {
             readonly name: "Throw Incendiary Grenade";
@@ -769,24 +763,24 @@ export declare const DEFINITIONS: {
             readonly description: "Ordered to Toggle Rapid Fire Artillery (Hummel)";
         };
         readonly 298: {
-            readonly name: "Toggle Site Main Gun (Marder III)";
-            readonly description: "Ordered to Toggle Site Main Gun (Marder III)";
+            readonly name: "Toggle Sight Main Gun (Marder III)";
+            readonly description: "Ordered to Toggle Sight Main Gun (Marder III)";
         };
         readonly 299: {
             readonly name: "Toggle Rapid Fire (P4 IST)";
             readonly description: "Ordered to Toggle Rapid Fire (P4 IST)";
         };
         readonly 300: {
-            readonly name: "Toggle Site Main Gun";
-            readonly description: "Ordered to Toggle Site Main Gun";
+            readonly name: "Toggle Sight Main Gun";
+            readonly description: "Ordered to Toggle Sight Main Gun";
         };
         readonly 301: {
             readonly name: "Overdrive (AC)";
             readonly description: "Ordered to Overdrive (AC)";
         };
         readonly 302: {
-            readonly name: "Tread Braker (AT HT)";
-            readonly description: "Ordered to Tread Braker (AT HT)";
+            readonly name: "Tread Breaker (AT HT)";
+            readonly description: "Ordered to Tread Breaker (AT HT)";
         };
         readonly 303: {
             readonly name: "Overdrive";
@@ -1227,8 +1221,8 @@ export declare const DEFINITIONS: {
             readonly description: "Built Panzer-Support Kommand";
         };
         readonly 1862: {
-            readonly name: "Panzer-J´┐¢ger Kommand";
-            readonly description: "Built Panzer-J´┐¢ger Kommand";
+            readonly name: "Panzer-Jäger Kommand";
+            readonly description: "Built Panzer-Jäger Kommand";
         };
         readonly 1863: {
             readonly name: "Sand Bags";
@@ -1719,8 +1713,8 @@ export declare const DEFINITIONS: {
             readonly description: "Upgraded to Secured Resourcing";
         };
         readonly 95: {
-            readonly name: "Speed Governers";
-            readonly description: "Upgraded to Speed Governers";
+            readonly name: "Speed Governors";
+            readonly description: "Upgraded to Speed Governors";
         };
         readonly 96: {
             readonly name: "Speed Governors";
@@ -1915,8 +1909,8 @@ export declare const DEFINITIONS: {
             readonly description: "Upgraded to Elite Tanks";
         };
         readonly 183: {
-            readonly name: "Veteran Vechicles";
-            readonly description: "Upgraded to Veteran Vechicles";
+            readonly name: "Veteran Vehicles";
+            readonly description: "Upgraded to Veteran Vehicles";
         };
         readonly 184: {
             readonly name: "Crack Vehicles";
@@ -1943,8 +1937,8 @@ export declare const DEFINITIONS: {
             readonly description: "Upgraded to Support Kommand Upgrade";
         };
         readonly 212: {
-            readonly name: "J´┐¢ger Kommand Upgrade";
-            readonly description: "Upgraded to J´┐¢ger Kommand Upgrade";
+            readonly name: "Jäger Kommand Upgrade";
+            readonly description: "Upgraded to Jäger Kommand Upgrade";
         };
         readonly 213: {
             readonly name: "Panzer Jager Upgrade";
@@ -1987,8 +1981,8 @@ export declare const DEFINITIONS: {
             readonly description: "Upgraded to RPzB 54 Panzerschreck";
         };
         readonly 226: {
-            readonly name: "Panzershreck";
-            readonly description: "Upgraded to Panzershreck";
+            readonly name: "Panzerschreck";
+            readonly description: "Upgraded to Panzerschreck";
         };
         readonly 227: {
             readonly name: "Gewehr 43 Package";
@@ -2003,8 +1997,8 @@ export declare const DEFINITIONS: {
             readonly description: "Upgraded to MP44 Sturmgewehr (Assault Rifles)";
         };
         readonly 240: {
-            readonly name: "Kampgruppe Kompanie Upgrade";
-            readonly description: "Upgraded to Kampgruppe Kompanie Upgrade";
+            readonly name: "Kampfgruppe Kompanie Upgrade";
+            readonly description: "Upgraded to Kampfgruppe Kompanie Upgrade";
         };
         readonly 241: {
             readonly name: "Kampfgruppe Kompanie Upgrade";
@@ -2100,11 +2094,11 @@ export declare const DEFINITIONS: {
         };
         readonly 272: {
             readonly name: "Upgrade to Barracks";
-            readonly description: "Upgraded to Upgrade to Barracks";
+            readonly description: "Upgraded to Barracks";
         };
         readonly 273: {
             readonly name: "Upgrade to Barracks (FHQ)";
-            readonly description: "Upgraded to Upgrade to Barracks (FHQ)";
+            readonly description: "Upgraded to Barracks (FHQ)";
         };
         readonly 274: {
             readonly name: "Reinforce Point (FHQ)";
@@ -2273,8 +2267,8 @@ export declare const DEFINITIONS: {
             readonly description: "Used Call in Luftwaffe Ground Forces";
         };
         readonly 280: {
-            readonly name: "Fallschirmj´┐¢ger Infantry";
-            readonly description: "Used Fallschirmj´┐¢ger Infantry";
+            readonly name: "Fallschirmjäger Infantry";
+            readonly description: "Used Fallschirmjäger Infantry";
         };
         readonly 281: {
             readonly name: "Luftwaffe Ground Forces";
@@ -2301,12 +2295,12 @@ export declare const DEFINITIONS: {
             readonly description: "Used Panther Battle Group";
         };
         readonly 292: {
-            readonly name: "Call in Wirblewind";
-            readonly description: "Used Call in Wirblewind";
+            readonly name: "Call in Wirbelwind";
+            readonly description: "Used Call in Wirbelwind";
         };
         readonly 294: {
-            readonly name: "Wirblewind";
-            readonly description: "Used Wirblewind";
+            readonly name: "Wirbelwind";
+            readonly description: "Used Wirbelwind";
         };
         readonly 303: {
             readonly name: "Call for M26 Pershing Reinforcement";
@@ -2350,14 +2344,14 @@ export declare const DEFINITIONS: {
         };
     };
 };
-export declare const isUnit: (id: number) => id is 3;
+export declare const isUnit: (id: number) => id is 3 | 82;
 export declare const isUnitCommand: (id: number) => id is 55;
 export declare const isBuilding: (id: number) => id is 87 | 100;
-export declare const isDoctrinal: (id: number) => id is 95 | 98;
+export declare const isDoctrinal: (id: number) => id is 98;
 export declare const isUpgrade: (id: number) => id is 52 | 20;
 export declare const isSpecialAbility: (id: number) => id is 95;
-export declare const isCaptureCommand: (commandId: number, objectId: number) => commandId is 49;
-export declare const isMoveCommand: (commandId: number, objectId: number, length?: number) => commandId is 45;
+export declare const isCaptureCommand: (commandId: number, _objectId?: number) => commandId is 49;
+export declare const isMoveCommand: (commandId: number, objectId: number, _packetLength?: number) => commandId is 45;
 /**
  * AI Take Over Command
  *

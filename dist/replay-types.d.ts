@@ -62,9 +62,11 @@ export interface ReplayData {
     messages: Message[];
     actions: Action[];
     headerParsed: boolean;
+    dataParsed: boolean;
+    errors: string[];
 }
 export declare const createEmptyReplay: () => ReplayData;
 export declare const DOCTRINES: {
     [key: number]: string;
 };
-export declare const getDoctrineName: (doctrineID: number) => string;
+export declare const getDoctrineName: (doctrineID: number) => string | undefined;

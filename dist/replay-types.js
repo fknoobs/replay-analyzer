@@ -21,6 +21,8 @@ export const createEmptyReplay = () => ({
     messages: [],
     actions: [],
     headerParsed: false,
+    dataParsed: false,
+    errors: [],
 });
 export const DOCTRINES = {
     2: "Airborne",

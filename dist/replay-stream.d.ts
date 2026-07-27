@@ -8,8 +8,11 @@ export declare class ReplayStream {
     constructor(buffer: ArrayBuffer | Uint8Array);
     get position(): number;
     get length(): number;
+    remaining(): number;
+    has(byteCount: number): boolean;
     seek(pos: number): void;
     skip(count: number): void;
+    private ensure;
     readByte(): number;
     readBytes(length: number): Uint8Array;
     readUInt8(): number;

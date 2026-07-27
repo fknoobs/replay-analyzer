@@ -270,23 +270,17 @@ export const DEFINITIONS = {
         },
     },
     UNIT_COMMAND: {
-        0x592000c3: {
-            name: "Repair Vehicle/Structure",
-            description: "Ordered to repair a vehicle or structure",
+        0x139: {
+            name: "Rudimentary Repair vehicle/structure",
+            description: "Ordered to perform rudimentary repairs on a vehicle or structure",
         },
         0x4: {
             name: "Repair Vehicle/Structure",
             description: "Ordered to repair a vehicle or structure",
         },
         0x3: {
-            name: "Armor Piercing Burst (HMG)",
-            description: "Ordered to fire armor piercing burst from HMG",
-            factionVariants: {
-                axis_panzer_elite: {
-                    name: "Repair Vehicle",
-                    description: "Ordered to repair a vehicle",
-                },
-            },
+            name: "Repair Vehicle/Structure",
+            description: "Ordered to repair a vehicle or structure",
         },
         0x2: {
             name: "Armor Piercing Shells (M1 57mm)",
@@ -697,8 +691,8 @@ export const DEFINITIONS = {
             description: "Ordered to Throw Anti Tank Grenade",
         },
         0x10c: {
-            name: "Fire Panzerfaust (Fallschrimjager)",
-            description: "Ordered to Fire Panzerfaust (Fallschrimjager)",
+            name: "Fire Panzerfaust (Fallschirmjager)",
+            description: "Ordered to Fire Panzerfaust (Fallschirmjager)",
         },
         0x10d: {
             name: "Throw Anti Tank Grenade",
@@ -749,12 +743,12 @@ export const DEFINITIONS = {
             description: "Ordered to fire 81mm Mortar Bombardment (MHT)",
         },
         0x122: {
-            name: "Throw Incediary Grenade",
-            description: "Ordered to Throw Incediary Grenade",
+            name: "Throw Incendiary Grenade",
+            description: "Ordered to Throw Incendiary Grenade",
         },
         0x123: {
-            name: "Suppresive Volley Fire",
-            description: "Ordered to fire Suppresive Volley Fire",
+            name: "Suppressive Volley Fire",
+            description: "Ordered to fire Suppressive Volley Fire",
         },
         0x124: {
             name: "Throw Incendiary Grenade",
@@ -769,24 +763,24 @@ export const DEFINITIONS = {
             description: "Ordered to Toggle Rapid Fire Artillery (Hummel)",
         },
         0x12a: {
-            name: "Toggle Site Main Gun (Marder III)",
-            description: "Ordered to Toggle Site Main Gun (Marder III)",
+            name: "Toggle Sight Main Gun (Marder III)",
+            description: "Ordered to Toggle Sight Main Gun (Marder III)",
         },
         0x12b: {
             name: "Toggle Rapid Fire (P4 IST)",
             description: "Ordered to Toggle Rapid Fire (P4 IST)",
         },
         0x12c: {
-            name: "Toggle Site Main Gun",
-            description: "Ordered to Toggle Site Main Gun",
+            name: "Toggle Sight Main Gun",
+            description: "Ordered to Toggle Sight Main Gun",
         },
         0x12d: {
             name: "Overdrive (AC)",
             description: "Ordered to Overdrive (AC)",
         },
         0x12e: {
-            name: "Tread Braker (AT HT)",
-            description: "Ordered to Tread Braker (AT HT)",
+            name: "Tread Breaker (AT HT)",
+            description: "Ordered to Tread Breaker (AT HT)",
         },
         0x12f: {
             name: "Overdrive",
@@ -1119,8 +1113,8 @@ export const DEFINITIONS = {
             description: "Built Panzer-Support Kommand",
         },
         0x746: {
-            name: "Panzer-J´┐¢ger Kommand",
-            description: "Built Panzer-J´┐¢ger Kommand",
+            name: "Panzer-Jäger Kommand",
+            description: "Built Panzer-Jäger Kommand",
         },
         0x747: { name: "Sand Bags", description: "Built Sand Bags" },
         0x748: { name: "Road Blocks", description: "Built Road Blocks" },
@@ -1491,8 +1485,8 @@ export const DEFINITIONS = {
             description: "Upgraded to Secured Resourcing",
         },
         0x5f: {
-            name: "Speed Governers",
-            description: "Upgraded to Speed Governers",
+            name: "Speed Governors",
+            description: "Upgraded to Speed Governors",
         },
         0x60: {
             name: "Speed Governors",
@@ -1672,8 +1666,8 @@ export const DEFINITIONS = {
         0xb5: { name: "Crack Tanks", description: "Upgraded to Crack Tanks" },
         0xb6: { name: "Elite Tanks", description: "Upgraded to Elite Tanks" },
         0xb7: {
-            name: "Veteran Vechicles",
-            description: "Upgraded to Veteran Vechicles",
+            name: "Veteran Vehicles",
+            description: "Upgraded to Veteran Vehicles",
         },
         0xb8: {
             name: "Crack Vehicles",
@@ -1700,8 +1694,8 @@ export const DEFINITIONS = {
             description: "Upgraded to Support Kommand Upgrade",
         },
         0xd4: {
-            name: "J´┐¢ger Kommand Upgrade",
-            description: "Upgraded to J´┐¢ger Kommand Upgrade",
+            name: "Jäger Kommand Upgrade",
+            description: "Upgraded to Jäger Kommand Upgrade",
         },
         0xd5: {
             name: "Panzer Jager Upgrade",
@@ -1740,7 +1734,7 @@ export const DEFINITIONS = {
             name: "RPzB 54 Panzerschreck",
             description: "Upgraded to RPzB 54 Panzerschreck",
         },
-        0xe2: { name: "Panzershreck", description: "Upgraded to Panzershreck" },
+        0xe2: { name: "Panzerschreck", description: "Upgraded to Panzerschreck" },
         0xe3: {
             name: "Gewehr 43 Package",
             description: "Upgraded to Gewehr 43 Package",
@@ -1754,8 +1748,8 @@ export const DEFINITIONS = {
             description: "Upgraded to MP44 Sturmgewehr (Assault Rifles)",
         },
         0xf0: {
-            name: "Kampgruppe Kompanie Upgrade",
-            description: "Upgraded to Kampgruppe Kompanie Upgrade",
+            name: "Kampfgruppe Kompanie Upgrade",
+            description: "Upgraded to Kampfgruppe Kompanie Upgrade",
         },
         0xf1: {
             name: "Kampfgruppe Kompanie Upgrade",
@@ -1845,11 +1839,11 @@ export const DEFINITIONS = {
         },
         0x110: {
             name: "Upgrade to Barracks",
-            description: "Upgraded to Upgrade to Barracks",
+            description: "Upgraded to Barracks",
         },
         0x111: {
             name: "Upgrade to Barracks (FHQ)",
-            description: "Upgraded to Upgrade to Barracks (FHQ)",
+            description: "Upgraded to Barracks (FHQ)",
         },
         0x112: {
             name: "Reinforce Point (FHQ)",
@@ -1982,8 +1976,8 @@ export const DEFINITIONS = {
             description: "Used Call in Luftwaffe Ground Forces",
         },
         0x118: {
-            name: "Fallschirmj´┐¢ger Infantry",
-            description: "Used Fallschirmj´┐¢ger Infantry",
+            name: "Fallschirmjäger Infantry",
+            description: "Used Fallschirmjäger Infantry",
         },
         0x119: {
             name: "Luftwaffe Ground Forces",
@@ -2007,10 +2001,10 @@ export const DEFINITIONS = {
             description: "Used Panther Battle Group",
         },
         0x124: {
-            name: "Call in Wirblewind",
-            description: "Used Call in Wirblewind",
+            name: "Call in Wirbelwind",
+            description: "Used Call in Wirbelwind",
         },
-        0x126: { name: "Wirblewind", description: "Used Wirblewind" },
+        0x126: { name: "Wirbelwind", description: "Used Wirbelwind" },
         0x12f: {
             name: "Call for M26 Pershing Reinforcement",
             description: "Used Call for M26 Pershing Reinforcement",
@@ -2044,16 +2038,16 @@ export const DEFINITIONS = {
         },
     },
 };
-export const isUnit = (id) => [0x52, 0x3].includes(id); // 0x52 is for brits, wtf? Rest of factions use 0x3, idk why ...
-export const isUnitCommand = (id) => [0x37].includes(id);
-export const isBuilding = (id) => [0x57, 0x64].includes(id);
-export const isDoctrinal = (id) => [0x62].includes(id);
-export const isUpgrade = (id) => [0x34, 0x14].includes(id);
-export const isSpecialAbility = (id) => [0x5f].includes(id);
-export const isCaptureCommand = (commandId, objectId) => commandId === 0x31;
-export const isMoveCommand = (commandId, objectId, length) => commandId === 0x2d &&
-    objectId === 0x2 &&
-    (length === undefined || length === 0x1e);
+export const isUnit = (id) => id === 0x3 || id === 0x52; // 0x52 is used by Commonwealth; other factions use 0x3
+export const isUnitCommand = (id) => id === 0x37;
+export const isBuilding = (id) => id === 0x57 || id === 0x64;
+export const isDoctrinal = (id) => id === 0x62;
+export const isUpgrade = (id) => id === 0x34 || id === 0x14;
+export const isSpecialAbility = (id) => id === 0x5f;
+export const isCaptureCommand = (commandId, _objectId) => commandId === 0x31;
+export const isMoveCommand = (commandId, objectId, _packetLength) => 
+// objectId 0x2 = move to position; 0x4 = move / interact with entity
+commandId === 0x2d && (objectId === 0x2 || objectId === 0x4);
 /**
  * AI Take Over Command
  *
@@ -2074,7 +2068,9 @@ export const isRallyPointCommand = (commandId, objectId) => commandId === 0x0f &
 export const isHaltCommand = (commandId, objectId) => commandId === 0x2e && objectId === 0x0;
 export const isAttackMoveCommand = (commandId, objectId) => commandId === 0x36 && objectId === 0x2;
 export const isOrderUnitToBuild = (commandId, objectId) => commandId === 0x30 && objectId === 0x3;
-export const isGroundAttackCommand = (commandId, objectId) => commandId === 0x32 && objectId === 0x2;
+export const isGroundAttackCommand = (commandId, objectId) => 
+// objectId 0x2 = attack ground; 0x4 = attack entity
+commandId === 0x32 && (objectId === 0x2 || objectId === 0x4);
 export const isRetreatCommand = (commandId, objectId) => commandId === 0x3f && objectId === 0x0;
 export const isGetInStructure = (commandId, objectId) => commandId === 0x3a && objectId === 0x3;
 export const isGetOutOfStructure = (commandId, objectId) => commandId === 0x19 && objectId === 0x0;
