@@ -1,7 +1,9 @@
 import { ReplayStream } from "./replay-stream";
 import { createEmptyReplay, getDoctrineName, } from "./replay-types";
 import { DEFINITIONS, isUnit, isUnitCommand, isBuilding, isDoctrinal, isUpgrade, isSpecialAbility, isAttackMoveCommand, isCaptureCommand, isGroundAttackCommand, isHaltCommand, isMoveCommand, isRallyPointCommand, isRetreatCommand, isGetInStructure, isGetOutOfStructure, isAiTakeOver, } from "./action-definitions";
-import { parseDate } from "chrono-node";
+import { parseReplayDate } from "./parse-replay-date";
+import { extractReplayMetadata } from "./replay-metadata";
+import { applyPlayerSteamIds } from "./apply-player-steam-ids";
 /**
  * Parses the entire replay file.
  * @param input The replay file content as ArrayBuffer or Uint8Array.
@@ -9,7 +11,8 @@ import { parseDate } from "chrono-node";
  * @returns The parsed ReplayData object.
  */
 export const parseReplay = (input, options) => {
-    const stream = new ReplayStream(input);
+    const { body, metadata } = extractReplayMetadata(input);
+    const stream = new ReplayStream(body);
     const replay = createEmptyReplay();
     try {
         parseHeaderInternal(stream, replay);
@@ -26,6 +29,9 @@ export const parseReplay = (input, options) => {
                 player.doctrineName = getDoctrineName(player.doctrine);
             }
         });
+        if (metadata?.steamIdsByName) {
+            applyPlayerSteamIds(replay, metadata.steamIdsByName);
+        }
     }
     catch (e) {
         const message = e instanceof Error ? e.message : String(e);
@@ -40,10 +46,14 @@ export const parseReplay = (input, options) => {
  * @returns The ReplayData object with only header fields populated.
  */
 export const parseHeader = (input) => {
-    const stream = new ReplayStream(input);
+    const { body, metadata } = extractReplayMetadata(input);
+    const stream = new ReplayStream(body);
     const replay = createEmptyReplay();
     try {
         parseHeaderInternal(stream, replay);
+        if (metadata?.steamIdsByName) {
+            applyPlayerSteamIds(replay, metadata.steamIdsByName);
+        }
     }
     catch (e) {
         const message = e instanceof Error ? e.message : String(e);
@@ -69,7 +79,7 @@ const parseHeaderInternal = (stream, replay) => {
     }
     stream.seek(startPos);
     const dateStr = stream.readUnicodeStr(length);
-    replay.gameDate = parseDate(dateStr)?.toISOString() || dateStr;
+    replay.gameDate = parseReplayDate(dateStr);
     if (stream.has(2)) {
         stream.readUInt16(); // Skip null terminator
     }
@@ -129,6 +139,31 @@ const parseChunk = (stream, replay) => {
     stream.seek(startPosition + chunkLength);
     return true;
 };
+/**
+ * Relic CoH 2.700+ may store a 0x0BADC0DE binary blob after the "matchname" key
+ * instead of a plain lobby name ("automatch", custom name, …).
+ */
+const RELIC_BINARY_BLOB_MAGIC = 0x0badc0de;
+/** Lobby / match names are printable ASCII; reject binary payloads as empty. */
+const readLobbyMatchType = (stream) => {
+    const length = stream.readUInt32();
+    if (length === 0)
+        return "";
+    if (length > stream.remaining()) {
+        throw new RangeError(`ASCII string length ${length} exceeds remaining ${stream.remaining()} bytes`);
+    }
+    if (length >= 4) {
+        const start = stream.position;
+        const magic = stream.readUInt32();
+        stream.seek(start);
+        if (magic === RELIC_BINARY_BLOB_MAGIC) {
+            stream.skip(length);
+            return "";
+        }
+    }
+    const value = stream.readASCIIStr(length);
+    return /^[\x20-\x7E]*$/.test(value) ? value : "";
+};
 const processDataChunk = (stream, replay, type, version) => {
     if (type.startsWith("DATASDSC") && version === 0x7d4) {
         stream.skip(4);
@@ -166,8 +201,8 @@ const processDataChunk = (stream, replay, type, version) => {
             stream.readLengthPrefixedASCIIStr(); // gameversion
             stream.readLengthPrefixedASCIIStr(); // date
         }
-        stream.readLengthPrefixedASCIIStr(); // matchname
-        replay.matchType = stream.readLengthPrefixedASCIIStr();
+        stream.readLengthPrefixedASCIIStr(); // matchname key
+        replay.matchType = readLobbyMatchType(stream);
     }
     else if (type.startsWith("DATAINFO") && version === 6) {
         const playerName = stream.readLengthPrefixedUnicodeStr();

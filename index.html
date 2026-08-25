@@ -64,6 +64,71 @@
             background: #ccc;
             cursor: not-allowed;
         }
+        #steamIdsPanel {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e9ecef;
+        }
+        #steamIdsPanel.visible {
+            display: block;
+        }
+        #steamIdsPanel h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+        }
+        #steamIdsPanel .hint {
+            margin: 0 0 12px;
+            color: #666;
+            font-size: 13px;
+        }
+        #steamIdRows {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .steam-id-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .steam-id-row .player-name {
+            min-width: 160px;
+            font-weight: 600;
+        }
+        .steam-id-row .faction {
+            color: #666;
+            font-size: 13px;
+            min-width: 140px;
+        }
+        .steam-id-row input {
+            flex: 1;
+            min-width: 220px;
+            padding: 6px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .replay-name-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .replay-name-row label {
+            min-width: 100px;
+        }
+        .replay-name-row input {
+            flex: 1;
+            min-width: 220px;
+            padding: 6px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -87,6 +152,17 @@
             </div>
 
             <div id="status" style="margin-top: 10px; color: #666;"></div>
+
+            <div id="steamIdsPanel">
+                <h3>Edit replay &amp; link Steam IDs</h3>
+                <p class="hint">Replay name is written into the official CoH header (visible in-game). Steam IDs are stored in an <code>FKSTMETA</code> trailer.</p>
+                <div class="replay-name-row">
+                    <label for="replayNameInput">Replay name</label>
+                    <input type="text" id="replayNameInput" placeholder="Replay name" autocomplete="off">
+                </div>
+                <div id="steamIdRows"></div>
+                <button type="button" id="applySteamIdsBtn">Apply &amp; Download .rec</button>
+            </div>
         </div>
 
         <div id="output"></div>

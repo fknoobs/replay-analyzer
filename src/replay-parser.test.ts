@@ -6,6 +6,10 @@ import { parseReplay, parseHeader } from "../src/replay-parser";
 const fixturesDir = path.resolve(__dirname, "../fixtures");
 const mainFixture = path.join(fixturesDir, "replay_rj5d3iuirq.rec");
 const tinyFixture = path.join(fixturesDir, "2p_angoville.rec");
+const badc0deMatchTypeFixture = path.join(
+    fixturesDir,
+    "matchtype_badc0de_header.rec",
+);
 
 const readFixture = (filePath: string) => new Uint8Array(fs.readFileSync(filePath));
 
@@ -20,6 +24,9 @@ describe("parseReplay", () => {
         expect(replay.actions.length).toBeGreaterThan(500);
         expect(replay.duration).toBeGreaterThan(0);
         expect(replay.durationReadable).toMatch(/^\d{2}:\d{2}:\d{2}$/);
+        // Raw header date is "26/07/2026 19:47" (DMY) — wall-clock, no UTC Z
+        expect(replay.gameDate).toBe("2026-07-26T19:47:00");
+        expect(replay.matchType).toBe("automatch");
     });
 
     it("classifies the majority of move commands", () => {
@@ -57,5 +64,14 @@ describe("parseReplay", () => {
         // ensure we never throw and return a ReplayData shape.
         expect(replay).toHaveProperty("headerParsed");
         expect(replay).toHaveProperty("dataParsed", false);
+        expect(replay.matchType).toBe("asd");
+    });
+
+    it("returns empty matchType for CoH 2.700+ Relic 0xBADC0DE blobs", () => {
+        const replay = parseHeader(readFixture(badc0deMatchTypeFixture));
+        expect(replay.errors).toEqual([]);
+        expect(replay.headerParsed).toBe(true);
+        expect(replay.matchType).toBe("");
+        expect(replay.players.length).toBe(4);
     });
 });

@@ -1,66 +1,149 @@
-# Company of Heroes 1 Replay Parser (TypeScript)
+# Company of Heroes 1 Replay Parser (`@fknoobs/replay-parser`)
 
-A robust, fully functioning replay parser for Company of Heroes 1 (CoH1), written in TypeScript.
+A lightweight, type-safe TypeScript parser for Company of Heroes 1 (CoH1) `.rec` files.
 
-This project is a modernization and rewrite of older parsing logic, designed to be lightweight, type-safe, and easily embeddable in modern applications (like Tauri, Electron, or Node.js backends).
+Designed to run in modern environments (browser, Tauri, Electron, Node.js) with **no runtime dependencies**. Input is `ArrayBuffer` / `Uint8Array` so file access can stay in the host app (drag-and-drop, Tauri FS, `fs.readFileSync`, etc.).
 
 ## Features
 
-*   **Full Header Parsing**: Extracts game version, map details, mod info, timestamp, and match settings.
-*   **Player Info**: Retrieves player names, factions, IDs, and team information.
-*   **Chat Log**: Extracts in-game chat messages with timestamps and sender info.
-*   **Action Parsing**: Parses the raw command stream (ticks), allowing analysis of player actions (orders, construction, abilities).
-*   **Buffer Support**: Can parse replays directly from memory (`Buffer`) or from a file path. This makes it perfect for frontend-heavy apps where file access might be restricted or handled via drag-and-drop.
-*   **No External Dependencies**: Does not require `cohra_helper` or external definition files to function.
+- **Header parsing** — game version, map details, mod info, match settings, wall-clock date
+- **Players** — names, factions, inferred in-game IDs, doctrines when present
+- **Chat log** — messages with timestamps and sender info
+- **Action stream** — ticks/commands (orders, construction, abilities), optionally with raw hex
+- **Steam ID metadata** — optional name → Steam ID linking, persistable as an `FKSTMETA` trailer on the `.rec`
+- **Rename replays** — rewrite the official header `replayName` (visible in CoH) while preserving any `FKSTMETA` trailer
+- **No external deps** — does not require `cohra_helper` or external definition files
 
-## Usage
-
-### Installation
+## Install / build
 
 ```bash
-npm install
-npm run build
+pnpm install   # or npm install
+pnpm build     # or npm run build
 ```
 
-### Basic Usage
+Package entry: `dist/index.js` (ESM). Public API is re-exported from `src/index.ts`.
 
-You can parse a replay by providing a file path or a raw Buffer.
+## Basic usage
 
 ```typescript
-import { ReplayParser } from './src/ReplayParser';
-import * as fs from 'fs';
+import { readFileSync } from "node:fs";
+import { parseReplay, parseHeader } from "@fknoobs/replay-parser";
 
-// Option 1: Parse from file path
-const parser = new ReplayParser('./replays/my_replay.rec');
-const replay = parser.parse();
+const bytes = new Uint8Array(readFileSync("./replays/my_replay.rec"));
 
-// Option 2: Parse from Buffer (e.g., in a Tauri app)
-const buffer = fs.readFileSync('./replays/my_replay.rec');
-const parserFromBuffer = new ReplayParser(buffer);
-const replayFromBuffer = parserFromBuffer.parse();
+// Full parse (header + ticks/actions/chat)
+const replay = parseReplay(bytes);
+// Optional: include raw hex on actions
+// const replay = parseReplay(bytes, { includeHexData: true });
 
-console.log(`Map: ${replay.mapName}`);
-console.log(`Players: ${replay.players.map(p => p.name).join(', ')}`);
+console.log(replay.mapName);
+console.log(replay.players.map((p) => `${p.name} (${p.faction})`).join(", "));
+console.log(replay.durationReadable);
+
+// Header only (faster; no actions/messages)
+const header = parseHeader(bytes);
 ```
 
-## Output Structure
+In the browser / Tauri, pass a `Uint8Array` from `file.arrayBuffer()` the same way.
 
-The `parse()` method returns a `Replay` object containing:
+## Output (`ReplayData`)
 
-*   `version`: Replay version.
-*   `gameDate`: Date the match was played.
-*   `mapName` / `mapFileName`: Map details.
-*   `players`: Array of player objects `{ name, faction, id, ... }`.
-*   `messages`: Array of chat messages.
-*   `actions`: Array of game actions (ticks), including raw hex data and timestamps.
+| Field | Notes |
+| --- | --- |
+| `version`, `gameType` | From the file header |
+| `gameDate` | Local wall-clock `YYYY-MM-DDTHH:mm:ss` (no timezone). Covers Gregorian Windows locales worldwide (DMY/MDY/YMD, CJK meridiems, Thai Buddhist years, etc.). Hijri/Persian calendars stay as the raw string; `3/6`+AM/PM can still be US vs AU ambiguous |
+| `mapName`, `mapFileName`, `mapDescription`, `mapWidth`, `mapHeight` | Map info |
+| `modName`, `matchType`, `replayName` | Match / lobby metadata |
+| `highResources`, `randomStart`, `vpCount`, `vpGame` | Match settings |
+| `playerCount`, `duration`, `durationReadable` | Summary (`HH:MM:SS`) |
+| `players` | See `Player` below |
+| `messages` | Chat entries |
+| `actions` | Command stream |
+| `headerParsed`, `dataParsed`, `errors` | Parse status |
+
+### `Player`
+
+```ts
+{
+  name: string;
+  faction: string;
+  id?: number;           // inferred in-game command ID (not Steam / Relic)
+  slot: number;
+  doctrine?: number;
+  doctrineName?: string;
+  dataInfo1?: number;    // opaque header ints
+  dataInfo2?: number;
+  steamId?: string;      // optional; from metadata or applyPlayerSteamIds
+}
+```
+
+The CoH1 header does **not** contain Steam IDs. Link them by player name (see below).
+
+## Steam ID metadata
+
+### In memory
+
+```typescript
+import { parseReplay, applyPlayerSteamIds } from "@fknoobs/replay-parser";
+
+const replay = parseReplay(bytes);
+applyPlayerSteamIds(replay, {
+  Alice: "76561198000000001",
+  Bob: "76561198000000002",
+});
+// Matching is trim + case-insensitive; mutates replay.players in place
+```
+
+### Persist in the `.rec` file
+
+Steam IDs can be stored in an **`FKSTMETA` trailer** appended after the official replay bytes. The game tick stream never sees it: the parser strips the trailer before reading.
+
+```typescript
+import {
+  embedPlayerSteamIds,
+  extractReplayMetadata,
+  parseReplay,
+} from "@fknoobs/replay-parser";
+import { writeFileSync } from "node:fs";
+
+const withIds = embedPlayerSteamIds(bytes, {
+  Alice: "76561198000000001",
+  Bob: "76561198000000002",
+});
+writeFileSync("./replays/my_replay.with-steamids.rec", withIds);
+
+// Later: parseReplay / parseHeader auto-apply steamId onto matching players
+const replay = parseReplay(withIds);
+console.log(replay.players.map((p) => [p.name, p.steamId]));
+
+// Or inspect the trailer without a full parse
+const { body, metadata } = extractReplayMetadata(withIds);
+```
+
+Re-embedding replaces any existing trailer (it does not stack).
+
+## Rename replay (`replayName`)
+
+`setReplayName` rewrites the length-prefixed UTF-16 `replayName` inside the CoH1 `DATABASE` header chunk (ancestor Relic Chunky lengths are updated). Any existing `FKSTMETA` trailer is preserved.
+
+```typescript
+import { parseHeader, setReplayName } from "@fknoobs/replay-parser";
+import { writeFileSync } from "node:fs";
+
+const renamed = setReplayName(bytes, "My custom replay title");
+writeFileSync("./replays/my_replay.renamed.rec", renamed);
+
+console.log(parseHeader(renamed).replayName);
+// → "My custom replay title"
+```
 
 ## Development
 
-To run the included test script against a replay file:
-
 ```bash
-npm run build
-node dist/index.js path/to/replay.rec
+pnpm dev      # Vite playground (upload .rec, edit name / Steam IDs, download .rec)
+pnpm test     # Vitest unit tests
+pnpm smoke    # Parse every *.rec in the project root + fixtures/
+pnpm build    # tsc → dist/
 ```
 
 ## Credits

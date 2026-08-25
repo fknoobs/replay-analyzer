@@ -7,6 +7,8 @@ export interface Player {
     doctrineName?: string;
     dataInfo1?: number;
     dataInfo2?: number;
+    /** Optional Steam ID, typically applied post-parse via name matching. */
+    steamId?: string;
 }
 
 export interface Message {
