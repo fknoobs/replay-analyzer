@@ -135,7 +135,7 @@ function parseCurrentFile() {
     if (currentMode === "header") {
         return parseHeader(currentFileBytes);
     }
-    return parseReplay(currentFileBytes, { includeHexData: true });
+    return parseReplay(currentFileBytes);
 }
 function updateResetButtonState() {
     resetMetadataBtn.disabled =

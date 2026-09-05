@@ -9,7 +9,7 @@ Designed to run in modern environments (browser, Tauri, Electron, Node.js) with 
 - **Header parsing** — game version, map details, mod info, match settings, wall-clock date
 - **Players** — names, factions, inferred in-game IDs, doctrines when present
 - **Chat log** — messages with timestamps and sender info
-- **Action stream** — ticks/commands (orders, construction, abilities), optionally with raw hex
+- **Action stream** — ticks/commands (orders, construction, abilities)
 - **Steam ID metadata** — optional name → Steam ID linking, persistable as an `FKSTMETA` trailer on the `.rec`
 - **Player ID overrides** — persist ambiguous name → action playerID fixes in the same trailer; Replay Manager `0xBADC0DE` ladder blobs are applied automatically when present
 - **Rename replays** — rewrite the official header `replayName` (visible in CoH) while preserving any `FKSTMETA` trailer
@@ -34,8 +34,6 @@ const bytes = new Uint8Array(readFileSync("./replays/my_replay.rec"));
 
 // Full parse (header + ticks/actions/chat)
 const replay = parseReplay(bytes);
-// Optional: include raw hex on actions
-// const replay = parseReplay(bytes, { includeHexData: true });
 
 console.log(replay.mapName);
 console.log(replay.players.map((p) => `${p.name} (${p.faction})`).join(", "));
@@ -61,6 +59,25 @@ In the browser / Tauri, pass a `Uint8Array` from `file.arrayBuffer()` the same w
 | `messages` | Chat entries |
 | `actions` | Command stream |
 | `headerParsed`, `dataParsed`, `errors` | Parse status |
+
+### CPM (`playerCpm`)
+
+Aligned with Replay Manager’s `C2A.EXE` backend:
+
+```typescript
+import { parseReplay, playerCpm, playerCpmLabel } from "@fknoobs/replay-parser";
+
+const replay = parseReplay(bytes);
+for (const p of replay.players) {
+  console.log(p.name, playerCpm(replay, p.id)); // number
+  // playerCpmLabel(replay, p.id) → "99"
+}
+```
+
+- Counts unique `(tick, commandID, objectID)` (collapses multi-entity spam on one tick)
+- Stops at the first `AI_TAKEOVER`; divisor is minutes until that tick (else full duration)
+- Excludes aura / non-input `UNIT_COMMAND`s (`Maintain Command Range`, `Set Up Truck`, …)
+- Does **not** count the takeover packet itself (early dropout → CPM `0`)
 
 ### `Player`
 

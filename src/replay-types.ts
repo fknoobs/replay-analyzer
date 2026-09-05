@@ -41,10 +41,7 @@ export interface Command {
 
 export interface Action {
     tick: number;
-    // We use Uint8Array instead of Buffer for web compatibility
-    data?: Uint8Array;
     absoluteOffset: number;
-    rawHex?: string;
     playerID: number;
     playerName: string;
     timestamp: string;

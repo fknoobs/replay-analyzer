@@ -1,6 +1,6 @@
 import { ReplayStream } from "./replay-stream";
 import { createEmptyReplay, getDoctrineName, } from "./replay-types";
-import { DEFINITIONS, isUnit, isUnitCommand, isBuilding, isDoctrinal, isUpgrade, isSpecialAbility, isAttackMoveCommand, isCaptureCommand, isGroundAttackCommand, isHaltCommand, isMoveCommand, isRallyPointCommand, isRetreatCommand, isGetInStructure, isGetOutOfStructure, isAiTakeOver, } from "./action-definitions";
+import { DEFINITIONS, isUnit, isUnitCommand, isDoctrinal, } from "./action-definitions";
 import { parseReplayDate } from "./parse-replay-date";
 import { extractReplayMetadata } from "./replay-metadata";
 import { applyPlayerSteamIds } from "./apply-player-steam-ids";
@@ -313,7 +313,7 @@ const parseDataInternal = (stream, replay, options) => {
                 break;
             const tickDataStart = stream.position;
             const tickData = stream.readBytes(tickLength);
-            parseTick(tickData, tickDataStart, tickCount, replay, options);
+            parseTick(tickData, tickDataStart, tickCount, replay);
             tickCount++;
             if (tickData.length >= 4) {
                 // We need to read from the Uint8Array directly here since tickData is a subarray
@@ -349,7 +349,7 @@ const parseDataInternal = (stream, replay, options) => {
     const seconds = totalSeconds % 60;
     replay.durationReadable = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 };
-const parseTick = (data, tickDataStart, currentTickCount, replay, options) => {
+const parseTick = (data, tickDataStart, currentTickCount, replay) => {
     if (data.length < 16)
         return;
     const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
@@ -359,6 +359,7 @@ const parseTick = (data, tickDataStart, currentTickCount, replay, options) => {
     }
     // Bytes 4-11 are timestamp
     const bundleCount = view.getUint32(12, true);
+    const timestamp = formatTickTimestamp(tickId);
     let offset = 16;
     for (let i = 0; i < bundleCount; i++) {
         if (offset + 12 > data.length)
@@ -374,7 +375,7 @@ const parseTick = (data, tickDataStart, currentTickCount, replay, options) => {
             const actionEnd = offset + actionBlockSize;
             if (actionEnd > data.length)
                 break;
-            parseActionsInBlock(tickId, data, offset, actionEnd, tickDataStart, replay, options);
+            parseActionsInBlock(tickId, timestamp, data, offset, actionEnd, tickDataStart, replay);
             offset = actionEnd;
         }
         else {
@@ -382,7 +383,14 @@ const parseTick = (data, tickDataStart, currentTickCount, replay, options) => {
         }
     }
 };
-const parseActionsInBlock = (tick, data, startIndex, endIndex, tickDataStart, replay, options) => {
+const formatTickTimestamp = (tick) => {
+    const totalSeconds = Math.floor(tick / 8);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+};
+const parseActionsInBlock = (tick, timestamp, data, startIndex, endIndex, tickDataStart, replay) => {
     let i = startIndex;
     const maxActions = 10000;
     let actionCount = 0;
@@ -393,115 +401,53 @@ const parseActionsInBlock = (tick, data, startIndex, endIndex, tickDataStart, re
             break;
         if (i + actionLength > endIndex || i + actionLength > data.length)
             break;
-        // Capture up to 30 bytes for output matching, even if it overlaps next action
-        const captureLength = Math.max(actionLength, 30);
-        const safeCaptureLength = Math.min(captureLength, data.length - i);
-        const actionData = data.subarray(i, i + safeCaptureLength);
-        addAction(replay, tick, actionData, tickDataStart + i, actionLength, options);
+        addAction(replay, tick, timestamp, data.subarray(i, i + actionLength), tickDataStart + i, actionLength);
         actionCount++;
         i += actionLength;
     }
 };
-const DYNAMIC_COMMAND_HANDLERS = [
-    {
-        check: isUnit,
-        type: "UNIT",
-        def: DEFINITIONS.UNIT,
-        fallback: "Unknown Unit",
-    },
-    {
-        check: isBuilding,
-        type: "BUILDING",
-        def: DEFINITIONS.BUILDING,
-        fallback: "Unknown Building",
-    },
-    {
-        check: isDoctrinal,
-        type: "DOCTRINAL",
-        def: DEFINITIONS.DOCTRINAL,
-        fallback: "Unknown Doctrinal",
-    },
-    {
-        check: isUpgrade,
-        type: "UPGRADE",
-        def: DEFINITIONS.UPGRADE,
-        fallback: "Unknown Upgrade",
-    },
-    {
-        check: isSpecialAbility,
-        type: "SPECIAL_ABILITY",
-        def: DEFINITIONS.SPECIAL_ABILITY,
-        fallback: "Unknown Special Ability",
-    },
-    {
-        check: isUnitCommand,
-        type: "UNIT_COMMAND",
-        def: DEFINITIONS.UNIT_COMMAND,
-        fallback: "Unknown Unit Command",
-    },
-];
-const STATIC_COMMAND_HANDLERS = [
-    {
-        check: isMoveCommand,
-        type: "MOVE_COMMAND",
-        name: "Move",
-        description: "Ordered a unit to move",
-    },
-    {
-        check: isCaptureCommand,
-        type: "CAPTURE_COMMAND",
-        name: "Capture",
-        description: "Ordered a unit to capture a point",
-    },
-    {
-        check: isRallyPointCommand,
-        type: "RALLY_POINT_COMMAND",
-        name: "Rally Point",
-        description: "Set a rally point",
-    },
-    {
-        check: isHaltCommand,
-        type: "HALT_COMMAND",
-        name: "Halt",
-        description: "Ordered a unit to halt",
-    },
-    {
-        check: isAttackMoveCommand,
-        type: "ATTACK_MOVE_COMMAND",
-        name: "Attack Move",
-        description: "Ordered a unit to attack move",
-    },
-    {
-        check: isGroundAttackCommand,
-        type: "GROUND_ATTACK_COMMAND",
-        name: "Ground Attack",
-        description: "Ordered a unit to ground attack",
-    },
-    {
-        check: isRetreatCommand,
-        type: "RETREAT_COMMAND",
-        name: "Retreat",
-        description: "Ordered a unit to retreat",
-    },
-    {
-        check: isGetInStructure,
-        type: "GET_IN_STRUCTURE_COMMAND",
-        name: "Get In Structure",
-        description: "Ordered a unit to get in structure",
-    },
-    {
-        check: isGetOutOfStructure,
-        type: "GET_OUT_OF_STRUCTURE_COMMAND",
-        name: "Get Out Of Structure",
-        description: "Ordered a unit to get out of structure",
-    },
-    {
-        check: isAiTakeOver,
-        type: "AI_TAKEOVER",
-        name: "AI Takeover",
-        description: "Player has been taken over by AI",
-    },
-];
+const UNIT_DEF = {
+    type: "UNIT",
+    def: DEFINITIONS.UNIT,
+    fallback: "Unknown Unit",
+};
+const BUILDING_DEF = {
+    type: "BUILDING",
+    def: DEFINITIONS.BUILDING,
+    fallback: "Unknown Building",
+};
+const DOCTRINAL_DEF = {
+    type: "DOCTRINAL",
+    def: DEFINITIONS.DOCTRINAL,
+    fallback: "Unknown Doctrinal",
+};
+const UPGRADE_DEF = {
+    type: "UPGRADE",
+    def: DEFINITIONS.UPGRADE,
+    fallback: "Unknown Upgrade",
+};
+const SPECIAL_ABILITY_DEF = {
+    type: "SPECIAL_ABILITY",
+    def: DEFINITIONS.SPECIAL_ABILITY,
+    fallback: "Unknown Special Ability",
+};
+const UNIT_COMMAND_DEF = {
+    type: "UNIT_COMMAND",
+    def: DEFINITIONS.UNIT_COMMAND,
+    fallback: "Unknown Unit Command",
+};
+/** Fast path: commandID → definition table (avoids .find() per action). */
+const DYNAMIC_BY_COMMAND_ID = {
+    0x3: UNIT_DEF,
+    0x52: UNIT_DEF,
+    0x57: BUILDING_DEF,
+    0x64: BUILDING_DEF,
+    0x62: DOCTRINAL_DEF,
+    0x34: UPGRADE_DEF,
+    0x14: UPGRADE_DEF,
+    0x5f: SPECIAL_ABILITY_DEF,
+    0x37: UNIT_COMMAND_DEF,
+};
 const COMMANDS_WITHOUT_POSITION = new Set([
     "UNIT",
     "BUILDING",
@@ -513,6 +459,98 @@ const COMMANDS_WITHOUT_POSITION = new Set([
     "RETREAT_COMMAND",
     "AI_TAKEOVER",
 ]);
+const resolveStaticCommand = (commandID, objectID) => {
+    switch (commandID) {
+        case 0x2d:
+            if (objectID === 0x2 || objectID === 0x4) {
+                return {
+                    type: "MOVE_COMMAND",
+                    name: "Move",
+                    description: "Ordered a unit to move",
+                };
+            }
+            break;
+        case 0x31:
+            return {
+                type: "CAPTURE_COMMAND",
+                name: "Capture",
+                description: "Ordered a unit to capture a point",
+            };
+        case 0x0f:
+            if (objectID === 0x2 || objectID === 0x3) {
+                return {
+                    type: "RALLY_POINT_COMMAND",
+                    name: "Rally Point",
+                    description: "Set a rally point",
+                };
+            }
+            break;
+        case 0x2e:
+            if (objectID === 0x0) {
+                return {
+                    type: "HALT_COMMAND",
+                    name: "Halt",
+                    description: "Ordered a unit to halt",
+                };
+            }
+            break;
+        case 0x36:
+            if (objectID === 0x2) {
+                return {
+                    type: "ATTACK_MOVE_COMMAND",
+                    name: "Attack Move",
+                    description: "Ordered a unit to attack move",
+                };
+            }
+            break;
+        case 0x32:
+            if (objectID === 0x2 || objectID === 0x4) {
+                return {
+                    type: "GROUND_ATTACK_COMMAND",
+                    name: "Ground Attack",
+                    description: "Ordered a unit to ground attack",
+                };
+            }
+            break;
+        case 0x3f:
+            if (objectID === 0x0) {
+                return {
+                    type: "RETREAT_COMMAND",
+                    name: "Retreat",
+                    description: "Ordered a unit to retreat",
+                };
+            }
+            break;
+        case 0x3a:
+            if (objectID === 0x3) {
+                return {
+                    type: "GET_IN_STRUCTURE_COMMAND",
+                    name: "Get In Structure",
+                    description: "Ordered a unit to get in structure",
+                };
+            }
+            break;
+        case 0x19:
+            if (objectID === 0x0) {
+                return {
+                    type: "GET_OUT_OF_STRUCTURE_COMMAND",
+                    name: "Get Out Of Structure",
+                    description: "Ordered a unit to get out of structure",
+                };
+            }
+            break;
+        case 0x6a:
+            if (objectID === 0x4) {
+                return {
+                    type: "AI_TAKEOVER",
+                    name: "AI Takeover",
+                    description: "Player has been taken over by AI",
+                };
+            }
+            break;
+    }
+    return undefined;
+};
 /**
  * Resolves the action subtype / objectID from a command packet.
  *
@@ -549,77 +587,58 @@ const extractObjectID = (data, commandID, packetLength) => {
     }
     return objectOffset < len ? data[objectOffset] : 0;
 };
-const addAction = (replay, tick, data, absoluteOffset, packetLength, options, playerMap) => {
-    let playerID = 0;
-    let commandID = 0;
+const isValidCoord = (n) => {
+    if (!Number.isFinite(n))
+        return false;
+    const abs = Math.abs(n);
+    if (abs > 2048)
+        return false;
+    if (abs > 0 && abs < 0.01)
+        return false;
+    return true;
+};
+const extractPosition = (data, packetLength) => {
+    const len = Math.min(data.length, packetLength);
+    if (len < 12)
+        return undefined;
     const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
-    // Player ID is consistently at offset 4 (UInt16) for most commands
-    if (data.length >= 6) {
-        playerID = view.getUint16(4, true);
+    const end = len - 12;
+    for (let i = 0; i <= end; i++) {
+        const x = view.getFloat32(i, true);
+        const y = view.getFloat32(i + 4, true);
+        const z = view.getFloat32(i + 8, true);
+        if (!isValidCoord(x) || !isValidCoord(y) || !isValidCoord(z))
+            continue;
+        if (Math.abs(x) > 0.01 || Math.abs(y) > 0.01 || Math.abs(z) > 0.01) {
+            return { x, y, z };
+        }
     }
-    if (data.length >= 3) {
-        commandID = view.getUint8(2);
-    }
+    return undefined;
+};
+const addAction = (replay, tick, timestamp, data, absoluteOffset, packetLength) => {
+    const commandID = packetLength >= 3 ? data[2] : 0;
+    const playerID = packetLength >= 6 ? data[4] | (data[5] << 8) : 0;
     const objectID = extractObjectID(data, commandID, packetLength);
     let command;
-    const dynamicHandler = DYNAMIC_COMMAND_HANDLERS.find((h) => h.check(commandID));
-    if (dynamicHandler) {
-        const def = dynamicHandler.def[objectID];
+    const dynamic = DYNAMIC_BY_COMMAND_ID[commandID];
+    if (dynamic) {
+        const def = dynamic.def[objectID];
         command = {
-            type: dynamicHandler.type,
-            name: def?.name || dynamicHandler.fallback,
+            type: dynamic.type,
+            name: def?.name || dynamic.fallback,
             description: def?.description || "",
         };
     }
     else {
-        const staticHandler = STATIC_COMMAND_HANDLERS.find((h) => h.check(commandID, objectID, packetLength));
-        if (staticHandler) {
-            command = {
-                type: staticHandler.type,
-                name: staticHandler.name,
-                description: staticHandler.description,
-            };
-        }
+        command = resolveStaticCommand(commandID, objectID);
     }
-    let position;
-    const skipPosition = command !== undefined && COMMANDS_WITHOUT_POSITION.has(command.type);
-    // Try to find coordinates (3 consecutive floats)
-    if (!skipPosition && data.length >= 12) {
-        for (let i = 0; i <= data.length - 12; i++) {
-            const x = view.getFloat32(i, true);
-            const y = view.getFloat32(i + 4, true);
-            const z = view.getFloat32(i + 8, true);
-            const isValid = (n) => {
-                if (isNaN(n) || !isFinite(n))
-                    return false;
-                const abs = Math.abs(n);
-                if (abs > 2048)
-                    return false;
-                if (abs > 0 && abs < 0.01)
-                    return false;
-                return true;
-            };
-            if (isValid(x) && isValid(y) && isValid(z)) {
-                if (Math.abs(x) > 0.01 ||
-                    Math.abs(y) > 0.01 ||
-                    Math.abs(z) > 0.01) {
-                    position = { x, y, z };
-                    break;
-                }
-            }
-        }
-    }
-    // 8 ticks per second
-    const totalSeconds = Math.floor(tick / 8);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    const timestamp = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-    const playerName = playerMap?.get(playerID) ?? "";
-    const action = {
+    const position = command !== undefined && COMMANDS_WITHOUT_POSITION.has(command.type)
+        ? undefined
+        : extractPosition(data, packetLength);
+    replay.actions.push({
         tick,
         playerID,
-        playerName,
+        playerName: "",
         timestamp,
         absoluteOffset,
         commandID,
@@ -627,15 +646,7 @@ const addAction = (replay, tick, data, absoluteOffset, packetLength, options, pl
         packetLength,
         command,
         position,
-    };
-    if (options?.includeHexData) {
-        const rawHex = Array.from(data)
-            .map((b) => b.toString(16).padStart(2, "0"))
-            .join("");
-        action.data = data;
-        action.rawHex = rawHex;
-    }
-    replay.actions.push(action);
+    });
 };
 const parseMessage = (stream, replay, tick) => {
     if (!stream.has(4))

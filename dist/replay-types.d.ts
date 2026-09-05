@@ -37,9 +37,7 @@ export interface Command {
 }
 export interface Action {
     tick: number;
-    data?: Uint8Array;
     absoluteOffset: number;
-    rawHex?: string;
     playerID: number;
     playerName: string;
     timestamp: string;

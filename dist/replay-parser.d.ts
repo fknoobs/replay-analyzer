@@ -1,5 +1,6 @@
 import { ReplayData } from "./replay-types";
 export interface ParseOptions {
+    /** @deprecated Hex payloads were removed; option is ignored. */
     includeHexData?: boolean;
 }
 /**
