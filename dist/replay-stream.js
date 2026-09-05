@@ -75,6 +75,12 @@ export class ReplayStream {
         this._position += 4;
         return val;
     }
+    readBigUInt64() {
+        this.ensure(8);
+        const val = this.view.getBigUint64(this._position, true);
+        this._position += 8;
+        return val;
+    }
     readInt32() {
         this.ensure(4);
         const val = this.view.getInt32(this._position, true);

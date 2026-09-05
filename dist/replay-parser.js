@@ -4,6 +4,7 @@ import { DEFINITIONS, isUnit, isUnitCommand, isBuilding, isDoctrinal, isUpgrade,
 import { parseReplayDate } from "./parse-replay-date";
 import { extractReplayMetadata } from "./replay-metadata";
 import { applyPlayerSteamIds } from "./apply-player-steam-ids";
+import { applyPlayerIds } from "./apply-player-ids";
 /**
  * Parses the entire replay file.
  * @param input The replay file content as ArrayBuffer or Uint8Array.
@@ -29,6 +30,9 @@ export const parseReplay = (input, options) => {
                 player.doctrineName = getDoctrineName(player.doctrine);
             }
         });
+        if (metadata?.playerIdsByName) {
+            applyPlayerIds(replay, metadata.playerIdsByName);
+        }
         if (metadata?.steamIdsByName) {
             applyPlayerSteamIds(replay, metadata.steamIdsByName);
         }
@@ -51,6 +55,10 @@ export const parseHeader = (input) => {
     const replay = createEmptyReplay();
     try {
         parseHeaderInternal(stream, replay);
+        applyRelicLadderPlayers(replay);
+        if (metadata?.playerIdsByName) {
+            applyPlayerIds(replay, metadata.playerIdsByName);
+        }
         if (metadata?.steamIdsByName) {
             applyPlayerSteamIds(replay, metadata.steamIdsByName);
         }
@@ -140,12 +148,69 @@ const parseChunk = (stream, replay) => {
     return true;
 };
 /**
- * Relic CoH 2.700+ may store a 0x0BADC0DE binary blob after the "matchname" key
- * instead of a plain lobby name ("automatch", custom name, …).
+ * Relic CoH 2.700+ / Replay Manager may store a 0x0BADC0DE binary blob after
+ * the "matchname" key instead of a plain lobby name ("automatch", …).
+ *
+ * Replay Manager layout (minianalyzer.cpp):
+ *   u32 magic 0x0BADC0DE
+ *   u8 version (=1), u8 loglevel (1–3), u8 nplayers
+ *   per player: u64 steamId, u8 mpn, u16 rankBefore, u16 rankAfter, u8 level, u8 result
  */
 const RELIC_BINARY_BLOB_MAGIC = 0x0badc0de;
+const readRelicLadderPlayers = (stream, payloadLength) => {
+    const payloadStart = stream.position;
+    if (payloadLength < 7) {
+        stream.skip(payloadLength);
+        return undefined;
+    }
+    const magic = stream.readUInt32();
+    if (magic !== RELIC_BINARY_BLOB_MAGIC) {
+        stream.seek(payloadStart);
+        return undefined;
+    }
+    try {
+        const version = stream.readUInt8();
+        const loglevel = stream.readUInt8();
+        const nplayers = stream.readUInt8();
+        if (version !== 1 || loglevel < 1 || loglevel > 3) {
+            return undefined;
+        }
+        if (nplayers < 1 || nplayers > 8) {
+            return undefined;
+        }
+        // Each record is 8+1+2+2+1+1 = 15 bytes
+        const needed = 3 + nplayers * 15;
+        if (needed > payloadLength - 4) {
+            return undefined;
+        }
+        const players = [];
+        for (let i = 0; i < nplayers; i++) {
+            const steamId = stream.readBigUInt64().toString();
+            const mpn = stream.readUInt8();
+            const rankingBefore = stream.readUInt16();
+            const rankingAfter = stream.readUInt16();
+            const level = stream.readUInt8();
+            const result = stream.readUInt8();
+            players.push({
+                steamId,
+                mpn,
+                rankingBefore,
+                rankingAfter,
+                level,
+                result,
+            });
+        }
+        return players;
+    }
+    catch {
+        return undefined;
+    }
+    finally {
+        stream.seek(payloadStart + payloadLength);
+    }
+};
 /** Lobby / match names are printable ASCII; reject binary payloads as empty. */
-const readLobbyMatchType = (stream) => {
+const readLobbyMatchType = (stream, replay) => {
     const length = stream.readUInt32();
     if (length === 0)
         return "";
@@ -157,7 +222,10 @@ const readLobbyMatchType = (stream) => {
         const magic = stream.readUInt32();
         stream.seek(start);
         if (magic === RELIC_BINARY_BLOB_MAGIC) {
-            stream.skip(length);
+            const ladder = readRelicLadderPlayers(stream, length);
+            if (ladder) {
+                replay.relicLadderPlayers = ladder;
+            }
             return "";
         }
     }
@@ -202,14 +270,15 @@ const processDataChunk = (stream, replay, type, version) => {
             stream.readLengthPrefixedASCIIStr(); // date
         }
         stream.readLengthPrefixedASCIIStr(); // matchname key
-        replay.matchType = readLobbyMatchType(stream);
+        replay.matchType = readLobbyMatchType(stream, replay);
     }
     else if (type.startsWith("DATAINFO") && version === 6) {
         const playerName = stream.readLengthPrefixedUnicodeStr();
+        // u1: 0 = host / recorder seat; other values are opaque (not the action playerID).
+        // u2: team index (0 = allies side, 1 = axis side in observed replays).
         const u1 = stream.readUInt32();
         const u2 = stream.readUInt32();
         const faction = stream.readLengthPrefixedASCIIStr();
-        // u1 is likely the player ID
         addPlayer(replay, playerName, faction, 0, 0, u1, u2);
     }
 };
@@ -637,22 +706,74 @@ const parseMessage = (stream, replay, tick) => {
     stream.seek(messageEnd);
     return true;
 };
-const findPlayerIDs = (replay) => {
-    // Strategy 1: Use Chat Messages (Most Reliable)
-    const claimedIds = new Set();
-    for (const message of replay.messages) {
-        if (message.sender && message.sender !== "System") {
-            const player = replay.players.find((p) => p.name === message.sender);
-            if (player && (!player.id || player.id === 0) && !claimedIds.has(message.playerID)) {
-                player.id = message.playerID;
-                claimedIds.add(message.playerID);
-            }
+const normalizePlayerName = (name) => name.trim().toLowerCase();
+const isPlayerUnassigned = (player) => player.id === undefined || player.id === 0;
+/**
+ * Applies Replay Manager `0xBADC0DE` steam IDs + MPN→playerID links when the
+ * blob player count matches the header lobby order.
+ */
+const applyRelicLadderPlayers = (replay) => {
+    const ladder = replay.relicLadderPlayers;
+    if (!ladder || ladder.length === 0)
+        return;
+    if (ladder.length !== replay.players.length)
+        return;
+    const claimedIds = new Set(replay.players
+        .map((p) => p.id)
+        .filter((id) => !!id && id !== 0));
+    for (let i = 0; i < replay.players.length; i++) {
+        const player = replay.players[i];
+        const entry = ladder[i];
+        if ((player.steamId === undefined || player.steamId.length === 0) &&
+            entry.steamId !== "0") {
+            player.steamId = entry.steamId;
         }
+        if (!isPlayerUnassigned(player))
+            continue;
+        if (entry.mpn > 7)
+            continue;
+        const id = 1000 + entry.mpn;
+        if (claimedIds.has(id))
+            continue;
+        player.id = id;
+        claimedIds.add(id);
     }
-    // Action-based Faction detection
+};
+/**
+ * Links header players to in-game action playerIDs (1000–1007).
+ *
+ * Evidence from GameReplays/pingtoft (`findPlayerIDs` is chat-only + TODO) and
+ * COHRA Helper (`E8` = #1 allied only in *fixed* position games):
+ *   - Replay Manager `0xBADC0DE` blob: authoritative name-index → MPN
+ *   - Fixed start: engine ID is reliably `1000 + lobby slot`
+ *   - Random start: lobby slot ≠ engine ID; chat is the only hard name↔ID link
+ *   - Unique faction residuals can fill the last seat on a faction/side
+ *
+ * Never assign multiple same-faction teammates by sorted-ID ↔ lobby order —
+ * that coin-flip swapped Armor/Infantry on random-start 2v2 replays.
+ */
+const findPlayerIDs = (replay) => {
+    // Strategy 0: Replay Manager ladder blob (live-captured MPN + Steam)
+    applyRelicLadderPlayers(replay);
+    const claimedIds = new Set(replay.players
+        .map((p) => p.id)
+        .filter((id) => !!id && id !== 0));
+    // Strategy 1: Chat messages (only hard name ↔ playerID link in the format)
+    for (const message of replay.messages) {
+        if (!message.sender || message.sender === "System")
+            continue;
+        if (!message.playerID || claimedIds.has(message.playerID))
+            continue;
+        const senderKey = normalizePlayerName(message.sender);
+        const player = replay.players.find((p) => isPlayerUnassigned(p) &&
+            normalizePlayerName(p.name) === senderKey);
+        if (!player)
+            continue;
+        player.id = message.playerID;
+        claimedIds.add(message.playerID);
+    }
+    // Action-based faction detection for residual / slot validation
     const idFactionMap = new Map();
-    // Key units that definitively identify faction
-    // US (allies)
     const US_UNITS = new Set([
         0x30, // Riflemen
         0xa, // Engineers
@@ -662,7 +783,6 @@ const findPlayerIDs = (replay) => {
         0x3f, // M10
         0x41, // M18 Hellcat
     ]);
-    // Commonwealth (allies_commonwealth)
     const CW_UNITS = new Set([
         0x7b, // Infantry Section
         0x72, // Lieutenant
@@ -672,18 +792,16 @@ const findPlayerIDs = (replay) => {
         0x9a, // Stuart
         0x5c, // Commandos
     ]);
-    // Wehrmacht (axis)
     const WEHR_UNITS = new Set([
         0xbc, // Pioneers
         0xcf, // Volksgrenadiers
         0xa4, // MG42
         0xed, // Motorcycle
         0xe6, // Sdkfz 251
-        0xbd, // Sniper (Wehr version usually)
+        0xbd, // Sniper (Wehr)
         0xf3, // Panzer IV
         0xf2, // Panther
     ]);
-    // Panzer Elite (axis_panzer_elite)
     const PE_UNITS = new Set([
         0x121, // Panzer Grenadiers
         0x141, // Kettenkrad
@@ -695,81 +813,104 @@ const findPlayerIDs = (replay) => {
         0x12b, // Mortar Halftrack
     ]);
     for (const action of replay.actions) {
-        if (isUnit(action.commandID)) {
-            if (US_UNITS.has(action.objectID)) {
-                idFactionMap.set(action.playerID, "allies");
-            }
-            else if (CW_UNITS.has(action.objectID)) {
-                idFactionMap.set(action.playerID, "allies_commonwealth");
-            }
-            else if (WEHR_UNITS.has(action.objectID)) {
-                idFactionMap.set(action.playerID, "axis");
-            }
-            else if (PE_UNITS.has(action.objectID)) {
-                idFactionMap.set(action.playerID, "axis_panzer_elite");
-            }
+        if (!isUnit(action.commandID))
+            continue;
+        if (US_UNITS.has(action.objectID)) {
+            idFactionMap.set(action.playerID, "allies");
+        }
+        else if (CW_UNITS.has(action.objectID)) {
+            idFactionMap.set(action.playerID, "allies_commonwealth");
+        }
+        else if (WEHR_UNITS.has(action.objectID)) {
+            idFactionMap.set(action.playerID, "axis");
+        }
+        else if (PE_UNITS.has(action.objectID)) {
+            idFactionMap.set(action.playerID, "axis_panzer_elite");
         }
     }
-    // Collect all Action IDs seen
     const actionPlayerIDs = Array.from(new Set(replay.actions.map((a) => a.playerID))).sort((a, b) => a - b);
-    const assignedIds = new Set(replay.players.map((p) => p.id).filter((id) => !!id && id !== 0));
-    const availableIds = actionPlayerIDs.filter((id) => !assignedIds.has(id));
-    // Strategy 2: Match Unassigned Players to Unassigned IDs by Faction
-    let unassignedPlayers = replay.players.filter((p) => !p.id || p.id === 0);
-    if (unassignedPlayers.length > 0 && availableIds.length > 0) {
-        const factions = ["allies", "allies_commonwealth", "axis", "axis_panzer_elite"];
-        for (const f of factions) {
-            const playersOfFaction = unassignedPlayers.filter(p => p.faction === f);
-            const idsOfFaction = availableIds.filter(id => idFactionMap.get(id) === f && !assignedIds.has(id));
-            // Only assign when counts match exactly
-            if (playersOfFaction.length > 0 && playersOfFaction.length === idsOfFaction.length) {
-                for (let i = 0; i < playersOfFaction.length; i++) {
-                    playersOfFaction[i].id = idsOfFaction[i];
-                    assignedIds.add(idsOfFaction[i]);
-                }
+    const assignedIds = new Set(replay.players
+        .map((p) => p.id)
+        .filter((id) => !!id && id !== 0));
+    const factionsMatch = (playerFaction, id) => {
+        const inferred = idFactionMap.get(id);
+        if (!inferred)
+            return true; // no unit evidence yet — don't block
+        return inferred === playerFaction;
+    };
+    /**
+     * COHRA Helper: in fixed-position games, engine IDs follow lobby slots
+     * (`1000 + slot`). On random-start we only keep the mapping when every
+     * candidate is faction-consistent with the unit stream (otherwise slots
+     * were shuffled relative to engine IDs).
+     */
+    const tryAssignSlotIds = (requireFactionEvidence) => {
+        const candidates = replay.players
+            .filter(isPlayerUnassigned)
+            .map((p) => ({ player: p, id: 1000 + p.slot }));
+        if (candidates.length === 0)
+            return;
+        const available = new Set(actionPlayerIDs.filter((id) => !assignedIds.has(id)));
+        for (const { player, id } of candidates) {
+            if (!available.has(id))
+                return; // slot scheme doesn't fit this replay
+            if (requireFactionEvidence) {
+                const inferred = idFactionMap.get(id);
+                if (!inferred || inferred !== player.faction)
+                    return;
+            }
+            else if (!factionsMatch(player.faction, id)) {
+                return;
             }
         }
+        for (const { player, id } of candidates) {
+            player.id = id;
+            assignedIds.add(id);
+        }
+    };
+    if (!replay.randomStart) {
+        // Fixed start — slot index is the engine player index (COHRA model)
+        tryAssignSlotIds(false);
     }
-    // Refresh unassigned list
-    unassignedPlayers = replay.players.filter((p) => !p.id || p.id === 0);
-    const remainingIds = availableIds.filter((id) => !assignedIds.has(id));
-    // Fallback: Broad Matching (Allies vs Axis)
-    if (unassignedPlayers.length > 0 && remainingIds.length > 0) {
-        const isAllies = (f) => f.includes("allies");
-        const isAxis = (f) => f.includes("axis");
-        const alliesPlayers = unassignedPlayers.filter((p) => isAllies(p.faction));
-        const axisPlayers = unassignedPlayers.filter((p) => isAxis(p.faction));
-        const alliesIds = remainingIds.filter((id) => {
+    else {
+        // Random start — only accept slot==id when factions line up for everyone
+        tryAssignSlotIds(true);
+    }
+    const assignUnique = (players, ids) => {
+        if (players.length !== 1 || ids.length !== 1)
+            return;
+        const player = players[0];
+        const id = ids[0];
+        if (!isPlayerUnassigned(player) || assignedIds.has(id))
+            return;
+        player.id = id;
+        assignedIds.add(id);
+    };
+    // Unique residual per exact faction
+    const factions = [
+        "allies",
+        "allies_commonwealth",
+        "axis",
+        "axis_panzer_elite",
+    ];
+    for (const faction of factions) {
+        const playersOfFaction = replay.players.filter((p) => isPlayerUnassigned(p) && p.faction === faction);
+        const idsOfFaction = actionPlayerIDs.filter((id) => !assignedIds.has(id) && idFactionMap.get(id) === faction);
+        assignUnique(playersOfFaction, idsOfFaction);
+    }
+    // Unique residual on broad Allies vs Axis side
+    {
+        const unassigned = replay.players.filter(isPlayerUnassigned);
+        const remainingIds = actionPlayerIDs.filter((id) => !assignedIds.has(id));
+        assignUnique(unassigned.filter((p) => p.faction.includes("allies")), remainingIds.filter((id) => {
             const f = idFactionMap.get(id);
-            return f && f.includes("allies");
-        });
-        const axisIds = remainingIds.filter((id) => {
+            return !!f && f.includes("allies");
+        }));
+        assignUnique(unassigned.filter((p) => p.faction.includes("axis")), remainingIds.filter((id) => {
             const f = idFactionMap.get(id);
-            return f && f.includes("axis");
-        });
-        // Assign Allies
-        if (alliesPlayers.length > 0 && alliesPlayers.length === alliesIds.length) {
-            for (let i = 0; i < alliesPlayers.length; i++) {
-                alliesPlayers[i].id = alliesIds[i];
-                assignedIds.add(alliesIds[i]);
-            }
-        }
-        // Assign Axis
-        if (axisPlayers.length > 0 && axisPlayers.length === axisIds.length) {
-            for (let i = 0; i < axisPlayers.length; i++) {
-                axisPlayers[i].id = axisIds[i];
-                assignedIds.add(axisIds[i]);
-            }
-        }
+            return !!f && f.includes("axis");
+        }));
     }
-    // Strategy 3: Fallback - Ensure everyone has an ID
-    // Assign any remaining unassigned players to remaining available IDs
-    const finalPlayers = replay.players.filter((p) => !p.id || p.id === 0);
-    const finalAvailableIds = actionPlayerIDs.filter((id) => !assignedIds.has(id));
-    for (let i = 0; i < Math.min(finalPlayers.length, finalAvailableIds.length); i++) {
-        finalPlayers[i].id = finalAvailableIds[i];
-    }
-    // Update player names in actions now that we have correct IDs
     updateActionPlayerNames(replay);
 };
 const updateActionPlayerNames = (replay) => {

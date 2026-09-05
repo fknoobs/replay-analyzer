@@ -1,4 +1,4 @@
-import { embedPlayerSteamIds, extractReplayMetadata, } from "./replay-metadata";
+import { embedReplayMetadata, extractReplayMetadata, } from "./replay-metadata";
 import { ReplayStream } from "./replay-stream";
 const HEADER_CHUNKY_OFFSET = 76;
 /** Fixed bytes before the length-prefixed replayName in DATABASE v0xb. */
@@ -129,8 +129,8 @@ export const setReplayName = (input, replayName) => {
             view.setUint32(offset, prev + delta, true);
         }
     }
-    if (metadata?.steamIdsByName) {
-        return embedPlayerSteamIds(rewritten, metadata.steamIdsByName);
+    if (metadata) {
+        return embedReplayMetadata(rewritten, metadata);
     }
     return rewritten;
 };

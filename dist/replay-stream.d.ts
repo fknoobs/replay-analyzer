@@ -18,6 +18,7 @@ export declare class ReplayStream {
     readUInt8(): number;
     readUInt16(): number;
     readUInt32(): number;
+    readBigUInt64(): bigint;
     readInt32(): number;
     readFloat(): number;
     readASCIIStr(length: number): string;

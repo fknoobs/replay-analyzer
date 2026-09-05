@@ -64,6 +64,18 @@
             background: #ccc;
             cursor: not-allowed;
         }
+        button.secondary {
+            background: #6c757d;
+        }
+        button.secondary:hover:not(:disabled) {
+            background: #5a6268;
+        }
+        .steam-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
         #steamIdsPanel {
             display: none;
             margin-top: 16px;
@@ -103,13 +115,18 @@
             font-size: 13px;
             min-width: 140px;
         }
-        .steam-id-row input {
+        .steam-id-row input,
+        .steam-id-row select {
             flex: 1;
-            min-width: 220px;
+            min-width: 160px;
             padding: 6px 10px;
             border: 1px solid #ced4da;
             border-radius: 4px;
             font-size: 14px;
+        }
+        .steam-id-row select {
+            flex: 0 1 200px;
+            min-width: 140px;
         }
         .replay-name-row {
             display: flex;
@@ -154,14 +171,18 @@
             <div id="status" style="margin-top: 10px; color: #666;"></div>
 
             <div id="steamIdsPanel">
-                <h3>Edit replay &amp; link Steam IDs</h3>
-                <p class="hint">Replay name is written into the official CoH header (visible in-game). Steam IDs are stored in an <code>FKSTMETA</code> trailer.</p>
+                <h3>Edit replay &amp; link IDs</h3>
+                <p class="hint">Replay name is written into the official CoH header (visible in-game). Steam IDs and player-ID overrides are stored in an <code>FKSTMETA</code> trailer. Reset removes only that trailer (not header renames).</p>
+                <p id="ambiguityHint" class="hint"></p>
                 <div class="replay-name-row">
                     <label for="replayNameInput">Replay name</label>
                     <input type="text" id="replayNameInput" placeholder="Replay name" autocomplete="off">
                 </div>
                 <div id="steamIdRows"></div>
-                <button type="button" id="applySteamIdsBtn">Apply &amp; Download .rec</button>
+                <div class="steam-actions">
+                    <button type="button" id="applySteamIdsBtn">Apply &amp; Download .rec</button>
+                    <button type="button" id="resetMetadataBtn" class="secondary" disabled title="Remove FKSTMETA trailer">Reset custom metadata &amp; Download .rec</button>
+                </div>
             </div>
         </div>
 

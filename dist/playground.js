@@ -1,4 +1,4 @@
-import { embedPlayerSteamIds, parseHeader, parseReplay, setReplayName, } from "./index";
+import { embedPlayerIds, embedPlayerSteamIds, getUnresolvedPlayerIds, hasReplayMetadata, parseHeader, parseReplay, resetReplayMetadata, setReplayName, } from "./index";
 const fileInput = document.getElementById("fileInput");
 const outputDiv = document.getElementById("output");
 const statusDiv = document.getElementById("status");
@@ -6,6 +6,8 @@ const steamIdsPanel = document.getElementById("steamIdsPanel");
 const steamIdRows = document.getElementById("steamIdRows");
 const replayNameInput = document.getElementById("replayNameInput");
 const applySteamIdsBtn = document.getElementById("applySteamIdsBtn");
+const resetMetadataBtn = document.getElementById("resetMetadataBtn");
+const ambiguityHint = document.getElementById("ambiguityHint");
 /** Last parsed replay; used so Steam IDs can be applied without re-parsing. */
 let currentReplay = null;
 /** Original file bytes (may already include a metadata trailer). */
@@ -35,6 +37,7 @@ fileInput.addEventListener("change", async (e) => {
                 const endTime = performance.now();
                 statusDiv.textContent = `Parsed in ${(endTime - startTime).toFixed(2)}ms`;
                 renderSteamIdInputs(currentReplay);
+                updateResetButtonState();
                 displayResult(currentReplay);
             }
             catch (err) {
@@ -52,30 +55,77 @@ applySteamIdsBtn.addEventListener("click", () => {
     if (!currentReplay || !currentFileBytes)
         return;
     const steamIdsByName = {};
-    const inputs = Array.from(steamIdRows.querySelectorAll("input[data-player-name]"));
-    for (const input of inputs) {
+    const playerIdsByName = {};
+    const steamInputs = Array.from(steamIdRows.querySelectorAll("input[data-player-name]"));
+    const idSelects = Array.from(steamIdRows.querySelectorAll("select[data-player-name]"));
+    for (const input of steamInputs) {
         const name = input.dataset.playerName;
         const steamId = input.value.trim();
         if (name && steamId) {
             steamIdsByName[name] = steamId;
         }
     }
+    for (const select of idSelects) {
+        const name = select.dataset.playerName;
+        const raw = select.value.trim();
+        if (name && raw) {
+            const id = Number(raw);
+            if (Number.isInteger(id) && id !== 0) {
+                playerIdsByName[name] = id;
+            }
+        }
+    }
+    // Keep already-resolved IDs so re-download does not drop them
+    for (const player of currentReplay.players) {
+        if (player.id !== undefined &&
+            player.id !== 0 &&
+            playerIdsByName[player.name] === undefined) {
+            playerIdsByName[player.name] = player.id;
+        }
+    }
     try {
-        // Rewrite official header replayName, then (re)embed Steam ID trailer
-        const renamed = setReplayName(currentFileBytes, replayNameInput.value);
-        const embedded = embedPlayerSteamIds(renamed, steamIdsByName);
-        currentFileBytes = embedded;
-        // Re-parse so header + steamIds match the downloaded bytes
+        // Rewrite official header replayName, then (re)embed metadata trailer
+        let next = setReplayName(currentFileBytes, replayNameInput.value);
+        next = embedPlayerSteamIds(next, steamIdsByName);
+        next = embedPlayerIds(next, playerIdsByName);
+        currentFileBytes = next;
+        // Re-parse so header + metadata match the downloaded bytes
         currentReplay = parseCurrentFile();
-        const linked = currentReplay.players.filter((p) => p.steamId).length;
-        statusDiv.textContent = `Wrote replay name "${currentReplay.replayName}" and Steam IDs for ${linked}/${currentReplay.players.length} players into .rec`;
+        const linkedSteam = currentReplay.players.filter((p) => p.steamId)
+            .length;
+        const linkedIds = currentReplay.players.filter((p) => p.id !== undefined && p.id !== 0).length;
+        statusDiv.textContent = `Wrote replay name "${currentReplay.replayName}", Steam IDs ${linkedSteam}/${currentReplay.players.length}, player IDs ${linkedIds}/${currentReplay.players.length}`;
         renderSteamIdInputs(currentReplay);
+        updateResetButtonState();
         displayResult(currentReplay);
-        downloadRecFile(embedded, currentFileName);
+        downloadRecFile(next, currentFileName, "edited");
     }
     catch (err) {
         console.error(err);
         statusDiv.textContent = `Error writing .rec: ${err}`;
+    }
+});
+resetMetadataBtn.addEventListener("click", () => {
+    if (!currentFileBytes)
+        return;
+    try {
+        if (!hasReplayMetadata(currentFileBytes)) {
+            statusDiv.textContent = "No custom FKSTMETA trailer to remove";
+            return;
+        }
+        const reset = resetReplayMetadata(currentFileBytes);
+        currentFileBytes = reset;
+        currentReplay = parseCurrentFile();
+        statusDiv.textContent =
+            "Removed FKSTMETA trailer (Steam / player IDs); downloaded original replay body";
+        renderSteamIdInputs(currentReplay);
+        updateResetButtonState();
+        displayResult(currentReplay);
+        downloadRecFile(reset, currentFileName, "reset");
+    }
+    catch (err) {
+        console.error(err);
+        statusDiv.textContent = `Error resetting .rec: ${err}`;
     }
 });
 function parseCurrentFile() {
@@ -87,7 +137,11 @@ function parseCurrentFile() {
     }
     return parseReplay(currentFileBytes, { includeHexData: true });
 }
-function downloadRecFile(bytes, originalName) {
+function updateResetButtonState() {
+    resetMetadataBtn.disabled =
+        !currentFileBytes || !hasReplayMetadata(currentFileBytes);
+}
+function downloadRecFile(bytes, originalName, suffix) {
     const base = originalName.replace(/\.rec$/i, "") || "replay";
     const copy = new Uint8Array(bytes.byteLength);
     copy.set(bytes);
@@ -95,7 +149,7 @@ function downloadRecFile(bytes, originalName) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${base}.edited.rec`;
+    a.download = `${base}.${suffix}.rec`;
     a.click();
     URL.revokeObjectURL(url);
 }
@@ -103,15 +157,34 @@ function hideSteamIdsPanel() {
     steamIdsPanel.classList.remove("visible");
     steamIdRows.innerHTML = "";
     replayNameInput.value = "";
+    ambiguityHint.textContent = "";
+    resetMetadataBtn.disabled = true;
 }
 function renderSteamIdInputs(replay) {
     steamIdRows.innerHTML = "";
     replayNameInput.value = replay.replayName;
+    const unresolved = getUnresolvedPlayerIds(replay);
+    if (unresolved.unassignedPlayers.length > 0) {
+        const idHints = unresolved.unclaimedIds
+            .map((c) => {
+            const doc = c.doctrineName ? ` ${c.doctrineName}` : "";
+            const fac = c.faction ? ` (${c.faction})` : "";
+            return `${c.id}${doc}${fac}`;
+        })
+            .join(", ");
+        ambiguityHint.textContent = unresolved.unclaimedIds.length
+            ? `Ambiguous player IDs: pick an ID for unassigned teammates (${idHints}). Saved into FKSTMETA.`
+            : "Some players have no action playerID yet.";
+    }
+    else {
+        ambiguityHint.textContent = "";
+    }
     if (!replay.players.length) {
         // Still allow renaming when header-only / no players
         steamIdsPanel.classList.add("visible");
         return;
     }
+    const idOptions = buildIdOptions(replay);
     for (const player of replay.players) {
         const row = document.createElement("div");
         row.className = "steam-id-row";
@@ -121,23 +194,77 @@ function renderSteamIdInputs(replay) {
         const factionEl = document.createElement("span");
         factionEl.className = "faction";
         factionEl.textContent = player.faction;
+        const idSelect = document.createElement("select");
+        idSelect.dataset.playerName = player.name;
+        idSelect.title = "Action player ID (MPN + 1000)";
+        const emptyOpt = document.createElement("option");
+        emptyOpt.value = "";
+        emptyOpt.textContent = "player ID…";
+        idSelect.appendChild(emptyOpt);
+        for (const opt of idOptions) {
+            const option = document.createElement("option");
+            option.value = String(opt.id);
+            option.textContent = opt.label;
+            idSelect.appendChild(option);
+        }
+        if (player.id !== undefined && player.id !== 0) {
+            // Ensure current id is in the list
+            if (!Array.from(idSelect.options).some((o) => o.value === String(player.id))) {
+                const option = document.createElement("option");
+                option.value = String(player.id);
+                option.textContent = String(player.id);
+                idSelect.appendChild(option);
+            }
+            idSelect.value = String(player.id);
+        }
         const input = document.createElement("input");
         input.type = "text";
         input.placeholder = "Steam ID (e.g. 76561198...)";
         input.dataset.playerName = player.name;
         input.value = player.steamId ?? "";
         input.autocomplete = "off";
-        row.append(nameEl, factionEl, input);
+        row.append(nameEl, factionEl, idSelect, input);
         steamIdRows.appendChild(row);
     }
     steamIdsPanel.classList.add("visible");
 }
+function buildIdOptions(replay) {
+    const byId = new Map();
+    for (const player of replay.players) {
+        if (player.id !== undefined && player.id !== 0) {
+            const doc = player.doctrineName
+                ? ` — ${player.doctrineName}`
+                : "";
+            byId.set(player.id, `${player.id}${doc}`);
+        }
+    }
+    for (const claim of getUnresolvedPlayerIds(replay).unclaimedIds) {
+        if (byId.has(claim.id))
+            continue;
+        const doc = claim.doctrineName ? ` — ${claim.doctrineName}` : "";
+        const fac = claim.faction ? ` (${claim.faction})` : "";
+        byId.set(claim.id, `${claim.id}${doc}${fac}`);
+    }
+    // Always offer the standard 1000–1007 range as fallback
+    for (let id = 1000; id <= 1007; id++) {
+        if (!byId.has(id))
+            byId.set(id, String(id));
+    }
+    return Array.from(byId.entries())
+        .sort((a, b) => a[0] - b[0])
+        .map(([id, label]) => ({ id, label }));
+}
 function displayResult(data) {
+    const unresolved = getUnresolvedPlayerIds(data);
     const displayPlayers = data.players.map((player) => ({
         ...player,
         actions: data.actions.filter((action) => action.playerID === player.id),
     }));
-    const dataForJson = { ...data, players: displayPlayers };
+    const dataForJson = {
+        ...data,
+        players: displayPlayers,
+        unresolvedPlayerIds: unresolved,
+    };
     // Create a download button for the full data
     const blob = new Blob([JSON.stringify(dataForJson, null, 2)], {
         type: "application/json",

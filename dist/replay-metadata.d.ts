@@ -12,6 +12,8 @@
  */
 export type ReplayMetadata = {
     steamIdsByName: Record<string, string>;
+    /** Saved name → action playerID corrections (e.g. ambiguous teammates). */
+    playerIdsByName: Record<string, number>;
 };
 export type ExtractedReplay = {
     /** Bytes the official parser should read (trailer stripped). */
@@ -23,10 +25,29 @@ export type ExtractedReplay = {
  * Otherwise returns the full buffer as body with null metadata.
  */
 export declare const extractReplayMetadata: (input: ArrayBuffer | Uint8Array) => ExtractedReplay;
-/** Strips any existing FKSTMETA trailer; returns the official replay body. */
+/** Strips any existing FKSTMETA trailer; returns the official replay body (may be a view). */
 export declare const stripReplayMetadata: (input: ArrayBuffer | Uint8Array) => Uint8Array;
+/** True when the buffer ends with a valid FKSTMETA trailer. */
+export declare const hasReplayMetadata: (input: ArrayBuffer | Uint8Array) => boolean;
 /**
- * Appends (or replaces) a FKSTMETA trailer with the given steam ID map.
+ * Removes custom FKSTMETA metadata and returns a detached copy of the original
+ * CoH1 replay bytes (suitable for saving as a `.rec`).
+ *
+ * Does not undo official header edits such as `setReplayName`.
+ */
+export declare const resetReplayMetadata: (input: ArrayBuffer | Uint8Array) => Uint8Array;
+/**
+ * Appends (or replaces) a FKSTMETA trailer with the given metadata.
  * Returns a new Uint8Array suitable for saving as a `.rec` file.
  */
+export declare const embedReplayMetadata: (input: ArrayBuffer | Uint8Array, metadata: ReplayMetadata) => Uint8Array;
+/**
+ * Appends (or replaces) steam IDs in the FKSTMETA trailer.
+ * Preserves any existing `playerIdsByName` entries.
+ */
 export declare const embedPlayerSteamIds: (input: ArrayBuffer | Uint8Array, steamIdsByName: Record<string, string>) => Uint8Array;
+/**
+ * Appends (or replaces) action playerID overrides in the FKSTMETA trailer.
+ * Preserves any existing `steamIdsByName` entries.
+ */
+export declare const embedPlayerIds: (input: ArrayBuffer | Uint8Array, playerIdsByName: Record<string, number>) => Uint8Array;

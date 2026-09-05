@@ -1,5 +1,5 @@
 import {
-    embedPlayerSteamIds,
+    embedReplayMetadata,
     extractReplayMetadata,
 } from "./replay-metadata";
 import { ReplayStream } from "./replay-stream";
@@ -181,8 +181,8 @@ export const setReplayName = (
         }
     }
 
-    if (metadata?.steamIdsByName) {
-        return embedPlayerSteamIds(rewritten, metadata.steamIdsByName);
+    if (metadata) {
+        return embedReplayMetadata(rewritten, metadata);
     }
     return rewritten;
 };

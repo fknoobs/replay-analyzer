@@ -11,6 +11,19 @@ export interface Player {
     steamId?: string;
 }
 
+/**
+ * Per-player ladder fields from a Replay Manager `0xBADC0DE` matchname blob.
+ * `mpn` is the in-game map position number; action playerID = `1000 + mpn`.
+ */
+export interface RelicLadderPlayer {
+    steamId: string;
+    mpn: number;
+    rankingBefore: number;
+    rankingAfter: number;
+    level: number;
+    result: number;
+}
+
 export interface Message {
     tick: number;
     sender: string;
@@ -66,6 +79,12 @@ export interface ReplayData {
     players: Player[];
     messages: Message[];
     actions: Action[];
+
+    /**
+     * Present when Replay Manager wrote a `0xBADC0DE` blob into the matchname
+     * field (live ladder capture). Index aligns with `players` / lobby order.
+     */
+    relicLadderPlayers?: RelicLadderPlayer[];
 
     headerParsed: boolean;
     dataParsed: boolean;

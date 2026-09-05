@@ -11,6 +11,7 @@ Designed to run in modern environments (browser, Tauri, Electron, Node.js) with 
 - **Chat log** — messages with timestamps and sender info
 - **Action stream** — ticks/commands (orders, construction, abilities), optionally with raw hex
 - **Steam ID metadata** — optional name → Steam ID linking, persistable as an `FKSTMETA` trailer on the `.rec`
+- **Player ID overrides** — persist ambiguous name → action playerID fixes in the same trailer; Replay Manager `0xBADC0DE` ladder blobs are applied automatically when present
 - **Rename replays** — rewrite the official header `replayName` (visible in CoH) while preserving any `FKSTMETA` trailer
 - **No external deps** — does not require `cohra_helper` or external definition files
 
@@ -71,22 +72,45 @@ In the browser / Tauri, pass a `Uint8Array` from `file.arrayBuffer()` the same w
   slot: number;
   doctrine?: number;
   doctrineName?: string;
-  dataInfo1?: number;    // opaque header ints
-  dataInfo2?: number;
+  dataInfo1?: number;    // 0 ≈ host seat; not the action playerID
+  dataInfo2?: number;    // team side in observed replays
   steamId?: string;      // optional; from metadata or applyPlayerSteamIds
 }
 ```
 
-The CoH1 header does **not** contain Steam IDs. Link them by player name (see below).
+**Player ID linking:** DATAINFO has names/factions but not the action-stream playerID (`1000`…). The parser links in this order:
 
-## Steam ID metadata
+1. Replay Manager `0xBADC0DE` matchname blob (`mpn` → `1000 + mpn`, plus Steam IDs) when present
+2. Chat (name ↔ playerID)
+3. Fixed start: `1000 + lobby slot`
+4. Unique faction residuals (exactly one unassigned player + ID)
+
+It does **not** guess by lobby order for same-faction teammates on random start. Ambiguous players stay without `id`/`doctrine`. Inspect leftovers with `getUnresolvedPlayerIds(replay)`, then correct with `applyPlayerIds` and/or persist via `embedPlayerIds`.
+
+The CoH1 header does **not** contain Steam IDs (unless a BADCOE blob or FKSTMETA trailer supplies them).
+
+## Steam ID & player ID metadata
 
 ### In memory
 
 ```typescript
-import { parseReplay, applyPlayerSteamIds } from "@fknoobs/replay-parser";
+import {
+  parseReplay,
+  applyPlayerSteamIds,
+  applyPlayerIds,
+  getUnresolvedPlayerIds,
+} from "@fknoobs/replay-parser";
 
 const replay = parseReplay(bytes);
+
+const unresolved = getUnresolvedPlayerIds(replay);
+// unresolved.unassignedPlayers / unresolved.unclaimedIds (with doctrine hints)
+
+applyPlayerIds(replay, {
+  "EGY | GAZA": 1003,
+  CamoFILMs: 1002,
+});
+
 applyPlayerSteamIds(replay, {
   Alice: "76561198000000001",
   Bob: "76561198000000002",
@@ -96,31 +120,57 @@ applyPlayerSteamIds(replay, {
 
 ### Persist in the `.rec` file
 
-Steam IDs can be stored in an **`FKSTMETA` trailer** appended after the official replay bytes. The game tick stream never sees it: the parser strips the trailer before reading.
+Steam IDs and player-ID overrides can be stored in an **`FKSTMETA` trailer** appended after the official replay bytes. The game tick stream never sees it: the parser strips the trailer before reading.
 
 ```typescript
 import {
   embedPlayerSteamIds,
+  embedPlayerIds,
   extractReplayMetadata,
   parseReplay,
 } from "@fknoobs/replay-parser";
 import { writeFileSync } from "node:fs";
 
-const withIds = embedPlayerSteamIds(bytes, {
+let withMeta = embedPlayerSteamIds(bytes, {
   Alice: "76561198000000001",
   Bob: "76561198000000002",
 });
-writeFileSync("./replays/my_replay.with-steamids.rec", withIds);
+withMeta = embedPlayerIds(withMeta, {
+  Alice: 1000,
+  Bob: 1001,
+});
+writeFileSync("./replays/my_replay.with-meta.rec", withMeta);
 
-// Later: parseReplay / parseHeader auto-apply steamId onto matching players
-const replay = parseReplay(withIds);
-console.log(replay.players.map((p) => [p.name, p.steamId]));
+// Later: parseReplay / parseHeader auto-apply steamId + player id onto matching players
+const replay = parseReplay(withMeta);
+console.log(replay.players.map((p) => [p.name, p.id, p.steamId]));
 
 // Or inspect the trailer without a full parse
-const { body, metadata } = extractReplayMetadata(withIds);
+const { body, metadata } = extractReplayMetadata(withMeta);
 ```
 
-Re-embedding replaces any existing trailer (it does not stack).
+`embedPlayerSteamIds` / `embedPlayerIds` each preserve the other map when replacing the trailer. Re-embedding replaces any existing trailer (it does not stack).
+
+### Reset to original replay bytes
+
+`resetReplayMetadata` removes the `FKSTMETA` trailer and returns a detached copy of the official CoH1 body. It does **not** undo header edits from `setReplayName`.
+
+```typescript
+import {
+  hasReplayMetadata,
+  resetReplayMetadata,
+  parseReplay,
+} from "@fknoobs/replay-parser";
+import { writeFileSync } from "node:fs";
+
+if (hasReplayMetadata(bytes)) {
+  const original = resetReplayMetadata(bytes);
+  writeFileSync("./replays/my_replay.reset.rec", original);
+
+  const replay = parseReplay(original);
+  // players have no steamId / ID overrides from trailer
+}
+```
 
 ## Rename replay (`replayName`)
 
@@ -140,7 +190,7 @@ console.log(parseHeader(renamed).replayName);
 ## Development
 
 ```bash
-pnpm dev      # Vite playground (upload .rec, edit name / Steam IDs, download .rec)
+pnpm dev      # Vite playground (upload .rec, edit name / Steam / player IDs, download .rec)
 pnpm test     # Vitest unit tests
 pnpm smoke    # Parse every *.rec in the project root + fixtures/
 pnpm build    # tsc → dist/

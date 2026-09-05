@@ -25,14 +25,33 @@ const endsWithMagic = (bytes) => {
     }
     return true;
 };
+const cleanSteamIdsByName = (map) => {
+    if (!map || typeof map !== "object" || Array.isArray(map))
+        return {};
+    return Object.fromEntries(Object.entries(map).filter(([name, id]) => typeof name === "string" &&
+        name.trim().length > 0 &&
+        typeof id === "string" &&
+        id.trim().length > 0));
+};
+const cleanPlayerIdsByName = (map) => {
+    if (!map || typeof map !== "object" || Array.isArray(map))
+        return {};
+    return Object.fromEntries(Object.entries(map).filter(([name, id]) => typeof name === "string" &&
+        name.trim().length > 0 &&
+        typeof id === "number" &&
+        Number.isInteger(id) &&
+        id !== 0));
+};
+const normalizeMetadata = (parsed) => ({
+    steamIdsByName: cleanSteamIdsByName(parsed?.steamIdsByName),
+    playerIdsByName: cleanPlayerIdsByName(parsed?.playerIdsByName),
+});
 /**
  * If a FKSTMETA trailer is present, returns the official body and parsed metadata.
  * Otherwise returns the full buffer as body with null metadata.
  */
 export const extractReplayMetadata = (input) => {
-    const bytes = input instanceof Uint8Array
-        ? input
-        : new Uint8Array(input);
+    const bytes = input instanceof Uint8Array ? input : new Uint8Array(input);
     if (bytes.length < TRAILER_FOOTER_SIZE || !endsWithMagic(bytes)) {
         return { body: bytes, metadata: null };
     }
@@ -49,35 +68,36 @@ export const extractReplayMetadata = (input) => {
     try {
         const jsonText = textDecoder.decode(bytes.subarray(jsonStart, jsonStart + jsonLength));
         const parsed = JSON.parse(jsonText);
-        const steamIdsByName = parsed.steamIdsByName &&
-            typeof parsed.steamIdsByName === "object" &&
-            !Array.isArray(parsed.steamIdsByName)
-            ? Object.fromEntries(Object.entries(parsed.steamIdsByName).filter(([name, id]) => typeof name === "string" &&
-                typeof id === "string" &&
-                id.length > 0))
-            : {};
         return {
             body: bytes.subarray(0, jsonStart),
-            metadata: { steamIdsByName },
+            metadata: normalizeMetadata(parsed),
         };
     }
     catch {
         return { body: bytes, metadata: null };
     }
 };
-/** Strips any existing FKSTMETA trailer; returns the official replay body. */
+/** Strips any existing FKSTMETA trailer; returns the official replay body (may be a view). */
 export const stripReplayMetadata = (input) => extractReplayMetadata(input).body;
+/** True when the buffer ends with a valid FKSTMETA trailer. */
+export const hasReplayMetadata = (input) => extractReplayMetadata(input).metadata !== null;
 /**
- * Appends (or replaces) a FKSTMETA trailer with the given steam ID map.
+ * Removes custom FKSTMETA metadata and returns a detached copy of the original
+ * CoH1 replay bytes (suitable for saving as a `.rec`).
+ *
+ * Does not undo official header edits such as `setReplayName`.
+ */
+export const resetReplayMetadata = (input) => {
+    const body = stripReplayMetadata(input);
+    return body.slice();
+};
+/**
+ * Appends (or replaces) a FKSTMETA trailer with the given metadata.
  * Returns a new Uint8Array suitable for saving as a `.rec` file.
  */
-export const embedPlayerSteamIds = (input, steamIdsByName) => {
+export const embedReplayMetadata = (input, metadata) => {
     const body = stripReplayMetadata(input);
-    const cleanedEntries = Object.fromEntries(Object.entries(steamIdsByName).filter(([name, id]) => typeof name === "string" &&
-        name.trim().length > 0 &&
-        typeof id === "string" &&
-        id.trim().length > 0));
-    const payload = { steamIdsByName: cleanedEntries };
+    const payload = normalizeMetadata(metadata);
     const jsonBytes = textEncoder.encode(JSON.stringify(payload));
     const out = new Uint8Array(body.length + jsonBytes.length + TRAILER_FOOTER_SIZE);
     out.set(body, 0);
@@ -88,4 +108,26 @@ export const embedPlayerSteamIds = (input, steamIdsByName) => {
     view.setUint32(footerStart + 4, TRAILER_VERSION, true);
     out.set(MAGIC, footerStart + 8);
     return out;
+};
+/**
+ * Appends (or replaces) steam IDs in the FKSTMETA trailer.
+ * Preserves any existing `playerIdsByName` entries.
+ */
+export const embedPlayerSteamIds = (input, steamIdsByName) => {
+    const existing = extractReplayMetadata(input).metadata;
+    return embedReplayMetadata(input, {
+        steamIdsByName,
+        playerIdsByName: existing?.playerIdsByName ?? {},
+    });
+};
+/**
+ * Appends (or replaces) action playerID overrides in the FKSTMETA trailer.
+ * Preserves any existing `steamIdsByName` entries.
+ */
+export const embedPlayerIds = (input, playerIdsByName) => {
+    const existing = extractReplayMetadata(input).metadata;
+    return embedReplayMetadata(input, {
+        steamIdsByName: existing?.steamIdsByName ?? {},
+        playerIdsByName,
+    });
 };

@@ -98,7 +98,8 @@ Thumbs.db
 # Local large replay dumps (fixtures/ keeps small CI samples)
 /*.rec
 
-# Scratch research scripts
+# Scratch research / downloaded third-party parser sources
+tmp-gr/
 research-objectid.ts
 verify-fixes.ts
 debug-rj5.ts
