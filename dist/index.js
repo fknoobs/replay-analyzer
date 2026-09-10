@@ -8,3 +8,4 @@ export * from './player-id-ambiguity';
 export * from './player-cpm';
 export * from './replay-metadata';
 export * from './set-replay-name';
+export * from './rewrite-local-map-path';

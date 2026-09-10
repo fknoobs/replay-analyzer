@@ -1,6 +1,6 @@
 {
     "name": "@fknoobs/replay-parser",
-    "version": "1.10.0",
+    "version": "1.11.0",
     "type": "module",
     "main": "dist/index.js",
     "scripts": {
@@ -15,11 +15,11 @@
     "license": "ISC",
     "description": "",
     "devDependencies": {
-        "@types/node": "^25.0.0",
+        "@types/node": "^25.9.5",
         "ts-node": "^10.9.2",
-        "tsx": "^4.23.1",
+        "tsx": "^4.23.13",
         "typescript": "^5.9.3",
-        "vite": "^7.2.7",
-        "vitest": "^4.1.10"
+        "vite": "^7.3.6",
+        "vitest": "^4.1.11"
     }
 }

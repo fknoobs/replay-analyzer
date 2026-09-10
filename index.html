@@ -115,6 +115,13 @@
             font-size: 13px;
             min-width: 140px;
         }
+        .steam-id-row .cpm {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            font-size: 13px;
+            min-width: 72px;
+            color: #0b5cab;
+        }
         .steam-id-row input,
         .steam-id-row select {
             flex: 1;
@@ -172,16 +179,20 @@
 
             <div id="steamIdsPanel">
                 <h3>Edit replay &amp; link IDs</h3>
-                <p class="hint">Replay name is written into the official CoH header (visible in-game). Steam IDs and player-ID overrides are stored in an <code>FKSTMETA</code> trailer. Reset removes only that trailer (not header renames).</p>
+                <p class="hint">Replay name is written into the official CoH header (visible in-game). Steam IDs / player-ID overrides go in an <code>FKSTMETA</code> trailer — CoH and Replay Manager <strong>cannot</strong> read <code>.edited.rec</code> files. Use <strong>Reset</strong> to download a trailer-free copy (also works if you re-open an edited file). Absolute workshop map paths from another PC are rewritten to your local Documents folder so CoH can find the <code>.sga</code>.</p>
                 <p id="ambiguityHint" class="hint"></p>
                 <div class="replay-name-row">
                     <label for="replayNameInput">Replay name</label>
                     <input type="text" id="replayNameInput" placeholder="Replay name" autocomplete="off">
                 </div>
+                <div class="replay-name-row">
+                    <label for="localDocumentsInput">Local Documents</label>
+                    <input type="text" id="localDocumentsInput" placeholder="C:\Users\You\Documents" autocomplete="off" spellcheck="false">
+                </div>
                 <div id="steamIdRows"></div>
                 <div class="steam-actions">
                     <button type="button" id="applySteamIdsBtn">Apply &amp; Download .rec</button>
-                    <button type="button" id="resetMetadataBtn" class="secondary" disabled title="Remove FKSTMETA trailer">Reset custom metadata &amp; Download .rec</button>
+                    <button type="button" id="resetMetadataBtn" class="secondary" disabled title="Restore the exact bytes from when you opened the file">Reset to original &amp; Download .rec</button>
                 </div>
             </div>
         </div>

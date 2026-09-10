@@ -7,6 +7,7 @@ import {
     embedReplayMetadata,
     extractReplayMetadata,
     hasReplayMetadata,
+    hasReplayMetadataTrailer,
     resetReplayMetadata,
     stripReplayMetadata,
 } from "../src/replay-metadata";
@@ -100,6 +101,47 @@ describe("replay metadata trailer", () => {
         const replay = parseReplay(reset);
         expect(replay.players.every((p) => p.steamId === undefined)).toBe(true);
         expect(replay.actions.length).toBeGreaterThan(500);
+    });
+
+    it("strips a framed trailer even when JSON is corrupt", () => {
+        const original = readFixture(mainFixture);
+        const good = embedPlayerSteamIds(original, { FCMpex: "1" });
+        // Corrupt the JSON payload but keep footer lengths/magic.
+        const broken = good.slice();
+        const view = new DataView(
+            broken.buffer,
+            broken.byteOffset,
+            broken.byteLength,
+        );
+        const jsonLength = view.getUint32(broken.length - 16, true);
+        const jsonStart = broken.length - 16 - jsonLength;
+        broken[jsonStart] = 0x7b; // {
+        broken[jsonStart + 1] = 0x00; // NUL — invalid JSON
+
+        expect(hasReplayMetadata(broken)).toBe(false);
+        expect(hasReplayMetadataTrailer(broken)).toBe(true);
+
+        const stripped = stripReplayMetadata(broken);
+        expect(stripped).toEqual(original);
+
+        const reset = resetReplayMetadata(broken);
+        expect(reset).toEqual(original);
+        expect(parseReplay(reset).actions.length).toBeGreaterThan(500);
+    });
+
+    it("setReplayName + embed + reset body equals renamed body only", async () => {
+        const { setReplayName } = await import("../src/set-replay-name");
+        const original = readFixture(mainFixture);
+        const renamed = setReplayName(original, "Custom title");
+        const embedded = embedPlayerSteamIds(renamed, {
+            FCMpex: "76561198000000001",
+        });
+        const reset = resetReplayMetadata(embedded);
+        expect(reset).toEqual(renamed);
+        expect(hasReplayMetadata(reset)).toBe(false);
+        // Pristine restore (playground behavior) must use the upload copy:
+        const pristine = original.slice();
+        expect(pristine).toEqual(original);
     });
 
     it("applies embedded steam IDs during parseReplay", () => {

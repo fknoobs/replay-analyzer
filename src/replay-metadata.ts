@@ -80,6 +80,9 @@ const normalizeMetadata = (
 /**
  * If a FKSTMETA trailer is present, returns the official body and parsed metadata.
  * Otherwise returns the full buffer as body with null metadata.
+ *
+ * When the footer magic + lengths are valid but JSON is corrupt, still strips the
+ * trailer so callers can recover a CoH-readable body.
  */
 export const extractReplayMetadata = (
     input: ArrayBuffer | Uint8Array,
@@ -104,34 +107,55 @@ export const extractReplayMetadata = (
         return { body: bytes, metadata: null };
     }
 
+    const body = bytes.subarray(0, jsonStart);
+
     try {
         const jsonText = textDecoder.decode(
             bytes.subarray(jsonStart, jsonStart + jsonLength),
         );
         const parsed = JSON.parse(jsonText) as Partial<ReplayMetadata>;
         return {
-            body: bytes.subarray(0, jsonStart),
+            body,
             metadata: normalizeMetadata(parsed),
         };
     } catch {
-        return { body: bytes, metadata: null };
+        // Valid footer framing but bad JSON — still strip so CoH can read the body.
+        return { body, metadata: null };
     }
 };
+
+/** True when the buffer ends with a FKSTMETA magic footer (even if JSON is corrupt). */
+export const hasReplayMetadataTrailer = (
+    input: ArrayBuffer | Uint8Array,
+): boolean => {
+    const bytes =
+        input instanceof Uint8Array ? input : new Uint8Array(input);
+    if (bytes.length < TRAILER_FOOTER_SIZE || !endsWithMagic(bytes)) {
+        return false;
+    }
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const version = view.getUint32(bytes.length - 8 - 4, true);
+    const jsonLength = view.getUint32(bytes.length - 8 - 8, true);
+    if (version !== TRAILER_VERSION) return false;
+    const jsonStart = bytes.length - TRAILER_FOOTER_SIZE - jsonLength;
+    return jsonLength >= 2 && jsonStart >= 0;
+};
+
+/** True when the buffer ends with a valid FKSTMETA trailer with parseable metadata. */
+export const hasReplayMetadata = (input: ArrayBuffer | Uint8Array): boolean =>
+    extractReplayMetadata(input).metadata !== null;
 
 /** Strips any existing FKSTMETA trailer; returns the official replay body (may be a view). */
 export const stripReplayMetadata = (
     input: ArrayBuffer | Uint8Array,
 ): Uint8Array => extractReplayMetadata(input).body;
 
-/** True when the buffer ends with a valid FKSTMETA trailer. */
-export const hasReplayMetadata = (input: ArrayBuffer | Uint8Array): boolean =>
-    extractReplayMetadata(input).metadata !== null;
-
 /**
- * Removes custom FKSTMETA metadata and returns a detached copy of the original
- * CoH1 replay bytes (suitable for saving as a `.rec`).
+ * Removes custom FKSTMETA metadata and returns a detached copy of the official
+ * CoH1 replay body (suitable for saving as a `.rec` for the game / Replay Manager).
  *
- * Does not undo official header edits such as `setReplayName`.
+ * Note: this does not undo prior `setReplayName` edits on the body. Callers that
+ * need a full restore should keep the pristine upload bytes separately.
  */
 export const resetReplayMetadata = (
     input: ArrayBuffer | Uint8Array,

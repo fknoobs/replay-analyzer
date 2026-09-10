@@ -1,12 +1,15 @@
 import {
     embedPlayerIds,
     embedPlayerSteamIds,
+    findMapArchivePaths,
     getUnresolvedPlayerIds,
-    hasReplayMetadata,
+    hasReplayMetadataTrailer,
     parseHeader,
     parseReplay,
-    resetReplayMetadata,
+    playerCpm,
+    rewriteLocalMapArchivePaths,
     setReplayName,
+    stripReplayMetadata,
     type ReplayData,
 } from "./index";
 
@@ -18,6 +21,9 @@ const steamIdRows = document.getElementById("steamIdRows") as HTMLDivElement;
 const replayNameInput = document.getElementById(
     "replayNameInput",
 ) as HTMLInputElement;
+const localDocumentsInput = document.getElementById(
+    "localDocumentsInput",
+) as HTMLInputElement;
 const applySteamIdsBtn = document.getElementById(
     "applySteamIdsBtn",
 ) as HTMLButtonElement;
@@ -28,12 +34,85 @@ const ambiguityHint = document.getElementById(
     "ambiguityHint",
 ) as HTMLParagraphElement;
 
+const LOCAL_DOCUMENTS_KEY = "cohLocalDocuments";
+
+function loadLocalDocumentsSetting(): string {
+    try {
+        return localStorage.getItem(LOCAL_DOCUMENTS_KEY)?.trim() || "";
+    } catch {
+        return "";
+    }
+}
+
+function saveLocalDocumentsSetting(value: string) {
+    try {
+        if (value.trim()) localStorage.setItem(LOCAL_DOCUMENTS_KEY, value.trim());
+    } catch {
+        /* ignore quota / private mode */
+    }
+}
+
+function getLocalDocuments(): string | undefined {
+    const fromInput = localDocumentsInput.value.trim();
+    if (fromInput) return fromInput;
+    const stored = loadLocalDocumentsSetting();
+    return stored || undefined;
+}
+
+/** Strip FKSTMETA and rewrite foreign workshop map paths for local CoH. */
+function buildCohBody(upload: Uint8Array): {
+    body: Uint8Array;
+    pathRewrites: { from: string; to: string }[];
+} {
+    const stripped = stripReplayMetadata(upload);
+    const localDocuments = getLocalDocuments();
+    if (!localDocuments) {
+        return { body: stripped.slice(), pathRewrites: [] };
+    }
+    const { bytes, rewritten } = rewriteLocalMapArchivePaths(stripped, {
+        localDocuments,
+    });
+    return { body: bytes, pathRewrites: rewritten };
+}
+
+localDocumentsInput.value = loadLocalDocumentsSetting();
+localDocumentsInput.addEventListener("change", () => {
+    saveLocalDocumentsSetting(localDocumentsInput.value);
+    // Rebuild CoH body if a file is already loaded
+    if (uploadedFileBytes) {
+        const { body, pathRewrites } = buildCohBody(uploadedFileBytes);
+        cohBodyBytes = body;
+        currentFileBytes = hasReplayMetadataTrailer(uploadedFileBytes)
+            ? uploadedFileBytes.slice()
+            : body.slice();
+        const note =
+            pathRewrites.length > 0
+                ? `Rewrote ${pathRewrites.length} map path(s) for local CoH.`
+                : "Local Documents updated (no foreign map paths found).";
+        statusDiv.textContent = note;
+        updateResetButtonState();
+    }
+});
+
 /** Last parsed replay; used so Steam IDs can be applied without re-parsing. */
 let currentReplay: ReplayData | null = null;
-/** Original file bytes (may already include a metadata trailer). */
+/**
+ * Exact bytes from the file picker (may already include FKSTMETA if re-opening
+ * an edited download).
+ */
+let uploadedFileBytes: Uint8Array | null = null;
+/**
+ * CoH / Replay Manager compatible body: upload with any FKSTMETA trailer
+ * stripped and foreign workshop paths rewritten to Local Documents.
+ * Apply starts from this; Reset restores this.
+ */
+let cohBodyBytes: Uint8Array | null = null;
+/** Working copy (may include FKSTMETA and/or a rewritten replayName). */
 let currentFileBytes: Uint8Array | null = null;
 let currentFileName = "replay.rec";
 let currentMode: "full" | "header" = "full";
+/** Official header replayName on the CoH body (for dirty checks). */
+let baselineReplayName = "";
 
 fileInput.addEventListener("change", async (e) => {
     const file = (e.target as HTMLInputElement).files?.[0];
@@ -43,17 +122,27 @@ fileInput.addEventListener("change", async (e) => {
     outputDiv.innerHTML = "";
     hideSteamIdsPanel();
     currentReplay = null;
+    uploadedFileBytes = null;
+    cohBodyBytes = null;
     currentFileBytes = null;
     currentFileName = file.name;
+    baselineReplayName = "";
 
     try {
         const arrayBuffer = await file.arrayBuffer();
-        currentFileBytes = new Uint8Array(arrayBuffer);
+        uploadedFileBytes = new Uint8Array(arrayBuffer).slice();
+        const { body, pathRewrites } = buildCohBody(uploadedFileBytes);
+        cohBodyBytes = body;
+        currentFileBytes = uploadedFileBytes.slice();
         currentMode = (
             document.querySelector(
                 'input[name="mode"]:checked',
             ) as HTMLInputElement
         ).value as "full" | "header";
+
+        const foreignPaths = findMapArchivePaths(uploadedFileBytes);
+        const needsLocalDocs =
+            foreignPaths.length > 0 && !getLocalDocuments();
 
         statusDiv.textContent = `Parsing ${file.name} (${currentMode} mode)...`;
 
@@ -63,9 +152,27 @@ fileInput.addEventListener("change", async (e) => {
 
             try {
                 currentReplay = parseCurrentFile();
+                // Baseline name from the CoH body (ignores trailer-only edits)
+                baselineReplayName = parseHeader(cohBodyBytes!).replayName;
 
                 const endTime = performance.now();
-                statusDiv.textContent = `Parsed in ${(endTime - startTime).toFixed(2)}ms`;
+                const notes: string[] = [];
+                if (hasReplayMetadataTrailer(uploadedFileBytes!)) {
+                    notes.push(
+                        "upload had FKSTMETA — Reset exports trailer-free body",
+                    );
+                }
+                if (pathRewrites.length > 0) {
+                    notes.push(
+                        `rewrote ${pathRewrites.length} map archive path(s) → local Documents`,
+                    );
+                } else if (needsLocalDocs) {
+                    notes.push(
+                        "foreign workshop path found — set Local Documents (e.g. C:\\Users\\You\\Documents) then Reset",
+                    );
+                }
+                const trailerNote = notes.length ? ` (${notes.join("; ")})` : "";
+                statusDiv.textContent = `Parsed in ${(endTime - startTime).toFixed(2)}ms${trailerNote}`;
 
                 renderSteamIdInputs(currentReplay);
                 updateResetButtonState();
@@ -82,7 +189,7 @@ fileInput.addEventListener("change", async (e) => {
 });
 
 applySteamIdsBtn.addEventListener("click", () => {
-    if (!currentReplay || !currentFileBytes) return;
+    if (!currentReplay || !currentFileBytes || !cohBodyBytes) return;
 
     const steamIdsByName: Record<string, string> = {};
     const playerIdsByName: Record<string, number> = {};
@@ -128,8 +235,15 @@ applySteamIdsBtn.addEventListener("click", () => {
     }
 
     try {
-        // Rewrite official header replayName, then (re)embed metadata trailer
-        let next = setReplayName(currentFileBytes, replayNameInput.value);
+        saveLocalDocumentsSetting(localDocumentsInput.value);
+        // Always start from trailer-free CoH body so we never stack trailers
+        // or rewrite on top of a previous edited download.
+        let next: Uint8Array = cohBodyBytes.slice();
+        const desiredName = replayNameInput.value;
+        if (desiredName !== baselineReplayName) {
+            next = setReplayName(next, desiredName);
+        }
+
         next = embedPlayerSteamIds(next, steamIdsByName);
         next = embedPlayerIds(next, playerIdsByName);
         currentFileBytes = next;
@@ -142,7 +256,7 @@ applySteamIdsBtn.addEventListener("click", () => {
         const linkedIds = currentReplay.players.filter(
             (p) => p.id !== undefined && p.id !== 0,
         ).length;
-        statusDiv.textContent = `Wrote replay name "${currentReplay.replayName}", Steam IDs ${linkedSteam}/${currentReplay.players.length}, player IDs ${linkedIds}/${currentReplay.players.length}`;
+        statusDiv.textContent = `Wrote "${currentReplay.replayName}", Steam ${linkedSteam}/${currentReplay.players.length}, IDs ${linkedIds}/${currentReplay.players.length}. Note: .edited.rec has FKSTMETA — CoH needs Reset export.`;
 
         renderSteamIdInputs(currentReplay);
         updateResetButtonState();
@@ -155,20 +269,23 @@ applySteamIdsBtn.addEventListener("click", () => {
 });
 
 resetMetadataBtn.addEventListener("click", () => {
-    if (!currentFileBytes) return;
+    if (!cohBodyBytes || !uploadedFileBytes) return;
 
     try {
-        if (!hasReplayMetadata(currentFileBytes)) {
-            statusDiv.textContent = "No custom FKSTMETA trailer to remove";
-            return;
-        }
-
-        const reset = resetReplayMetadata(currentFileBytes);
+        saveLocalDocumentsSetting(localDocumentsInput.value);
+        // Rebuild in case Local Documents changed since load
+        const { body, pathRewrites } = buildCohBody(uploadedFileBytes);
+        cohBodyBytes = body;
+        const reset = cohBodyBytes.slice();
         currentFileBytes = reset;
         currentReplay = parseCurrentFile();
+        baselineReplayName = currentReplay.replayName;
 
-        statusDiv.textContent =
-            "Removed FKSTMETA trailer (Steam / player IDs); downloaded original replay body";
+        const pathNote =
+            pathRewrites.length > 0
+                ? `; rewrote ${pathRewrites.length} map path(s) to local Documents`
+                : "";
+        statusDiv.textContent = `Exported CoH / Replay Manager compatible body (no FKSTMETA trailer${pathNote})`;
 
         renderSteamIdInputs(currentReplay);
         updateResetButtonState();
@@ -191,8 +308,23 @@ function parseCurrentFile(): ReplayData {
 }
 
 function updateResetButtonState() {
-    resetMetadataBtn.disabled =
-        !currentFileBytes || !hasReplayMetadata(currentFileBytes);
+    if (!cohBodyBytes || !currentFileBytes) {
+        resetMetadataBtn.disabled = true;
+        return;
+    }
+    // Dirty when working copy still has a trailer or differs from CoH body.
+    const dirty =
+        hasReplayMetadataTrailer(currentFileBytes) ||
+        !bytesEqual(currentFileBytes, cohBodyBytes);
+    resetMetadataBtn.disabled = !dirty;
+}
+
+function bytesEqual(a: Uint8Array, b: Uint8Array): boolean {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) return false;
+    }
+    return true;
 }
 
 function downloadRecFile(
@@ -201,6 +333,7 @@ function downloadRecFile(
     suffix: string,
 ) {
     const base = originalName.replace(/\.rec$/i, "") || "replay";
+    // Copy into a standalone ArrayBuffer so Blob never sees a shared/offset view.
     const copy = new Uint8Array(bytes.byteLength);
     copy.set(bytes);
     const blob = new Blob([copy], { type: "application/octet-stream" });
@@ -260,6 +393,15 @@ function renderSteamIdInputs(replay: ReplayData) {
         factionEl.className = "faction";
         factionEl.textContent = player.faction;
 
+        const cpmEl = document.createElement("span");
+        cpmEl.className = "cpm";
+        cpmEl.title = "Commands per minute (C2A-style)";
+        if (currentMode === "header") {
+            cpmEl.textContent = "CPM —";
+        } else {
+            cpmEl.textContent = `CPM ${playerCpm(replay, player.id)}`;
+        }
+
         const idSelect = document.createElement("select");
         idSelect.dataset.playerName = player.name;
         idSelect.title = "Action player ID (MPN + 1000)";
@@ -298,7 +440,7 @@ function renderSteamIdInputs(replay: ReplayData) {
         input.value = player.steamId ?? "";
         input.autocomplete = "off";
 
-        row.append(nameEl, factionEl, idSelect, input);
+        row.append(nameEl, factionEl, cpmEl, idSelect, input);
         steamIdRows.appendChild(row);
     }
 
@@ -340,6 +482,7 @@ function displayResult(data: ReplayData) {
     const unresolved = getUnresolvedPlayerIds(data);
     const displayPlayers = data.players.map((player) => ({
         ...player,
+        cpm: currentMode === "header" ? null : playerCpm(data, player.id),
         actions: data.actions.filter((action) => action.playerID === player.id),
     }));
     const dataForJson = {
