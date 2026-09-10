@@ -4,7 +4,7 @@
  */
 import fs from "fs";
 import path from "path";
-import { parseReplay } from "../src/replay-parser";
+import { formatDuration, parseReplay } from "../src/index";
 
 const roots = [process.cwd(), path.join(process.cwd(), "fixtures")];
 const files = roots.flatMap((dir) => {
@@ -29,19 +29,20 @@ for (const file of unique) {
     const replay = parseReplay(new Uint8Array(buf));
     const ms = (performance.now() - start).toFixed(1);
     const status =
-        replay.errors.length > 0
-            ? `ERRORS=${replay.errors.length}`
-            : replay.dataParsed
+        replay.meta.warnings.length > 0
+            ? `WARN=${replay.meta.warnings.length}`
+            : replay.meta.dataOk
               ? "OK"
-              : replay.headerParsed
+              : replay.meta.headerOk
                 ? "HEADER_ONLY"
                 : "INCOMPLETE";
-    if (replay.errors.length > 0) failed++;
+    if (replay.meta.warnings.length > 0) failed++;
     console.log(
-        `${status.padEnd(12)} ${ms.padStart(7)}ms  players=${replay.players.length} actions=${replay.actions.length}  ${path.basename(file)}`,
+        `${status.padEnd(12)} ${ms.padStart(7)}ms  players=${replay.players.length} actions=${replay.actions.length} duration=${formatDuration(replay.durationSeconds)}  ${path.basename(file)}`,
     );
-    if (replay.errors.length) {
-        for (const e of replay.errors.slice(0, 3)) console.log(`    - ${e}`);
+    if (replay.meta.warnings.length) {
+        for (const e of replay.meta.warnings.slice(0, 3))
+            console.log(`    - ${e}`);
     }
 }
 

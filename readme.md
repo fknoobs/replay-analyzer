@@ -1,143 +1,353 @@
-# Company of Heroes 1 Replay Parser (`@fknoobs/replay-parser`)
+# Company of Heroes 1 Replay Parser (`@fknoobs/replay-parser`) v2
 
-A lightweight, type-safe TypeScript parser for Company of Heroes 1 (CoH1) `.rec` files.
+A lightweight, type-safe TypeScript library for reading and lightly editing Company of Heroes 1 (CoH1) `.rec` files.
 
-Designed to run in modern environments (browser, Tauri, Electron, Node.js) with **no runtime dependencies**. Input is `ArrayBuffer` / `Uint8Array` so file access can stay in the host app (drag-and-drop, Tauri FS, `fs.readFileSync`, etc.).
+- **No runtime dependencies** — works in Node.js, browsers, Tauri, Electron
+- **Input is bytes** — pass `ArrayBuffer` / `Uint8Array`; file I/O stays in the host app
+- **Soft-fail parsing** — never throws to callers; issues land in `replay.meta.warnings`
+- **Optional FKSTMETA trailer** — store Steam IDs / player-ID overrides without breaking CoH playback of the body
 
-## Features
+Package version: **2.0.0** (breaking rewrite of the v1 flat `ReplayData` API).
 
-- **Header parsing** — game version, map details, mod info, match settings, wall-clock date
-- **Players** — names, factions, inferred in-game IDs, doctrines when present
-- **Chat log** — messages with timestamps and sender info
-- **Action stream** — ticks/commands (orders, construction, abilities)
-- **Steam ID metadata** — optional name → Steam ID linking, persistable as an `FKSTMETA` trailer on the `.rec`
-- **Player ID overrides** — persist ambiguous name → action playerID fixes in the same trailer; Replay Manager `0xBADC0DE` ladder blobs are applied automatically when present
-- **Rename replays** — rewrite the official header `replayName` (visible in CoH) while preserving any `FKSTMETA` trailer
-- **No external deps** — does not require `cohra_helper` or external definition files
+---
 
-## Install / build
+## Table of contents
+
+1. [Install & build](#install--build)
+2. [Quick start](#quick-start)
+3. [Parse options](#parse-options)
+4. [Data model](#data-model)
+5. [Parsing pipeline](#parsing-pipeline)
+6. [Player ID linking](#player-id-linking)
+7. [CPM (commands per minute)](#cpm-commands-per-minute)
+8. [FKSTMETA metadata trailer](#fkstmeta-metadata-trailer)
+9. [Rename replay](#rename-replay)
+10. [Local map archive paths](#local-map-archive-paths)
+11. [Dates](#dates)
+12. [BinaryReader](#binaryreader)
+13. [API reference](#api-reference)
+14. [Migrating from v1](#migrating-from-v1)
+15. [Development](#development)
+16. [Credits](#credits)
+
+---
+
+## Install & build
 
 ```bash
 pnpm install   # or npm install
-pnpm build     # or npm run build
+pnpm build     # tsc → dist/
 ```
 
-Package entry: `dist/index.js` (ESM). Public API is re-exported from `src/index.ts`.
+| Field | Value |
+| --- | --- |
+| Entry | `dist/index.js` (ESM) |
+| Types | `dist/index.d.ts` |
+| Exports | `"."` → types + import |
 
-## Basic usage
+```ts
+import {
+  parseReplay,
+  parseHeader,
+  formatDuration,
+  playerCpm,
+  // …
+} from "@fknoobs/replay-parser";
+```
+
+---
+
+## Quick start
 
 ```typescript
 import { readFileSync } from "node:fs";
-import { parseReplay, parseHeader } from "@fknoobs/replay-parser";
+import {
+  formatDuration,
+  formatTickTimestamp,
+  parseHeader,
+  parseReplay,
+  playerCpm,
+  playerNameById,
+} from "@fknoobs/replay-parser";
 
 const bytes = new Uint8Array(readFileSync("./replays/my_replay.rec"));
 
-// Full parse (header + ticks/actions/chat)
+// Full parse: header + chat + actions + player-ID linking
 const replay = parseReplay(bytes);
 
-console.log(replay.mapName);
-console.log(replay.players.map((p) => `${p.name} (${p.faction})`).join(", "));
-console.log(replay.durationReadable);
+console.log(replay.header.mapName);
+console.log(replay.header.replayName);
+console.log(formatDuration(replay.durationSeconds));
 
-// Header only (faster; no actions/messages)
-const header = parseHeader(bytes);
+for (const p of replay.players) {
+  console.log(
+    p.name,
+    p.faction,
+    p.id,
+    p.doctrineName,
+    playerCpm(replay, p.id),
+  );
+}
+
+for (const msg of replay.chat.slice(0, 5)) {
+  console.log(
+    formatTickTimestamp(msg.tick),
+    msg.sender,
+    msg.content,
+  );
+}
+
+// Resolve a display name for an action without storing it on every Action
+const a = replay.actions[0];
+if (a) {
+  console.log(playerNameById(replay.players, a.playerId), a.command?.name);
+}
+
+// Header only — skips the tick/action stream (much faster for lobby metadata)
+const headerOnly = parseHeader(bytes);
+console.log(headerOnly.meta.headerOk, headerOnly.players.length);
 ```
 
-In the browser / Tauri, pass a `Uint8Array` from `file.arrayBuffer()` the same way.
+In the browser / Tauri, pass `new Uint8Array(await file.arrayBuffer())` the same way.
 
-## Output (`ReplayData`)
+---
 
-| Field | Notes |
-| --- | --- |
-| `version`, `gameType` | From the file header |
-| `gameDate` | Local wall-clock `YYYY-MM-DDTHH:mm:ss` (no timezone). Covers Gregorian Windows locales worldwide (DMY/MDY/YMD, CJK meridiems, Thai Buddhist years, etc.). Hijri/Persian calendars stay as the raw string; `3/6`+AM/PM can still be US vs AU ambiguous |
-| `mapName`, `mapFileName`, `mapDescription`, `mapWidth`, `mapHeight` | Map info |
-| `modName`, `matchType`, `replayName` | Match / lobby metadata |
-| `highResources`, `randomStart`, `vpCount`, `vpGame` | Match settings |
-| `playerCount`, `duration`, `durationReadable` | Summary (`HH:MM:SS`) |
-| `players` | See `Player` below |
-| `messages` | Chat entries |
-| `actions` | Command stream |
-| `headerParsed`, `dataParsed`, `errors` | Parse status |
+## Parse options
 
-### CPM (`playerCpm`)
-
-Aligned with Replay Manager’s `C2A.EXE` backend:
+```ts
+type ParseOptions = {
+  /** Parse tick / action / chat stream. Default: `true` for `parseReplay`. */
+  actions?: boolean;
+  /**
+   * Attach `action.command` labels (type / name / description) from the
+   * built-in definition tables. Default: `true`.
+   * Set `false` for a cheaper parse when you only need raw IDs + positions.
+   */
+  enrichCommands?: boolean;
+};
+```
 
 ```typescript
-import { parseReplay, playerCpm, playerCpmLabel } from "@fknoobs/replay-parser";
+// Skip command name tables (still decodes packets + positions)
+parseReplay(bytes, { enrichCommands: false });
 
-const replay = parseReplay(bytes);
-for (const p of replay.players) {
-  console.log(p.name, playerCpm(replay, p.id)); // number
-  // playerCpmLabel(replay, p.id) → "99"
-}
+// Header fields + players from DATAINFO, but no ticks/chat/actions
+parseReplay(bytes, { actions: false });
+
+// Dedicated header path (same as actions: false for the stream, plus no tick demux)
+parseHeader(bytes);
 ```
 
-- Counts unique `(tick, commandID, objectID)` (collapses multi-entity spam on one tick)
-- Stops at the first `AI_TAKEOVER`; divisor is minutes until that tick (else full duration)
-- Excludes aura / non-input `UNIT_COMMAND`s (`Maintain Command Range`, `Set Up Truck`, …)
-- Does **not** count the takeover packet itself (early dropout → CPM `0`)
+Errors during parse are caught and pushed to `replay.meta.warnings`. The library does **not** call `console.error`.
+
+---
+
+## Data model
+
+### `Replay`
+
+```ts
+type Replay = {
+  header: ReplayHeader;
+  players: Player[];
+  chat: ChatMessage[];
+  actions: Action[];
+  /** Present when a Replay Manager `0xBADC0DE` blob was in the matchname field. */
+  ladder?: RelicLadderPlayer[];
+  /** Match length in seconds (engine ticks ÷ 8). */
+  durationSeconds: number;
+  meta: ReplayMeta;
+};
+```
+
+### `ReplayHeader`
+
+| Field | Meaning |
+| --- | --- |
+| `version` | Replay format version (`u32`) |
+| `gameType` | 8-byte ASCII game type |
+| `gameDate` | Local wall-clock `YYYY-MM-DDTHH:mm:ss` (no `Z`) |
+| `modName` | Mod folder / name from DATASDSC |
+| `mapName` / `mapFileName` / `mapDescription` | Map display + file identity |
+| `mapWidth` / `mapHeight` | Map size |
+| `matchType` | Lobby match name (`"automatch"`, …). Empty when a BADCOE blob replaced it |
+| `highResources` | High resources setting |
+| `randomStart` | Random start positions |
+| `vpCount` | Victory point total (derived from encoded VP index) |
+| `vpGame` | VP-game flag |
+| `replayName` | Official name shown in CoH / Replay Manager |
 
 ### `Player`
 
+| Field | Meaning |
+| --- | --- |
+| `name` | Lobby / DATAINFO name |
+| `faction` | e.g. `allies`, `axis`, `allies_commonwealth`, `axis_panzer_elite` |
+| `id?` | In-game action player ID (`1000`–`1007`) when linked |
+| `slot` | Lobby order index (0-based) |
+| `doctrine?` / `doctrineName?` | From doctrinal actions when `id` is known |
+| `dataInfo1?` | ≈ host seat marker (not the action ID) |
+| `dataInfo2?` | Team side in observed replays |
+| `steamId?` | From BADCOE blob and/or FKSTMETA / `applyPlayerSteamIds` |
+
+### `Action` (lean)
+
+Actions no longer store per-packet `playerName` or `timestamp` strings (v1 did). Use helpers instead.
+
+| Field | Meaning |
+| --- | --- |
+| `tick` | Engine tick (8 Hz) |
+| `playerId` | Issuing player (`1000`–`1007`) |
+| `commandId` / `objectId` | Packet command + subtype |
+| `offset` | Absolute byte offset in the stripped replay body |
+| `packetLength` | Raw packet size |
+| `position?` | `{ x, y, z }` when the command family carries coords |
+| `command?` | `{ type, name, description }` when `enrichCommands` is on |
+
+Helpers:
+
+- `formatTickTimestamp(tick)` → `"HH:MM:SS"`
+- `formatDuration(seconds)` → `"HH:MM:SS"`
+- `playerNameById(players, playerId)` → name or `undefined`
+
+### `ChatMessage`
+
+| Field | Meaning |
+| --- | --- |
+| `tick` | Tick when the message was recorded |
+| `sender` | Player name or `"System"` |
+| `playerId` | Sender’s action ID (0 for system) |
+| `content` | Message text |
+| `recipient` | Recipient / channel code |
+
+### `ReplayMeta`
+
+| Field | Meaning |
+| --- | --- |
+| `headerOk` | Fixed header + Relic Chunky regions parsed |
+| `dataOk` | Tick/chat stream demux completed |
+| `warnings` | Soft-fail messages (truncated files, unexpected layout, …) |
+
+### Doctrines
+
 ```ts
-{
-  name: string;
-  faction: string;
-  id?: number;           // inferred in-game command ID (not Steam / Relic)
-  slot: number;
-  doctrine?: number;
-  doctrineName?: string;
-  dataInfo1?: number;    // 0 ≈ host seat; not the action playerID
-  dataInfo2?: number;    // team side in observed replays
-  steamId?: string;      // optional; from metadata or applyPlayerSteamIds
-}
+import { DOCTRINES, getDoctrineName } from "@fknoobs/replay-parser";
+
+getDoctrineName(9); // "Armor"
 ```
 
-**Player ID linking:** DATAINFO has names/factions but not the action-stream playerID (`1000`…). The parser links in this order:
+---
 
-1. Replay Manager `0xBADC0DE` matchname blob (`mpn` → `1000 + mpn`, plus Steam IDs) when present
-2. Chat (name ↔ playerID)
-3. Fixed start: `1000 + lobby slot`
-4. Unique faction residuals (exactly one unassigned player + ID)
+## Parsing pipeline
 
-It does **not** guess by lobby order for same-faction teammates on random start. Ambiguous players stay without `id`/`doctrine`. Inspect leftovers with `getUnresolvedPlayerIds(replay)`, then correct with `applyPlayerIds` and/or persist via `embedPlayerIds`.
+```
+input bytes
+  → strip FKSTMETA trailer (if present)
+  → BinaryReader over CoH body
+  → fixed preamble (version, gameType, date) + seek(76)
+  → Relic Chunky × 2
+       DATASDSC → map / mod
+       DATABASE → settings, replayName, matchType | BADCOE ladder
+       DATAINFO → players
+  → [parseReplay] tick/chat demux → Action[] / ChatMessage[]
+  → player-ID linking + doctrine attach
+  → optional command refine (faction variants)
+  → apply FKSTMETA steamIds / playerIds
+```
 
-The CoH1 header does **not** contain Steam IDs (unless a BADCOE blob or FKSTMETA trailer supplies them).
+Duration: last meaningful tick index ÷ 8 seconds (fallback: tick-packet count ÷ 8).
 
-## Steam ID & player ID metadata
+---
 
-### In memory
+## Player ID linking
+
+DATAINFO has names/factions but **not** the action-stream player ID. The parser links conservatively:
+
+1. **BADCOE ladder blob** (`0x0BADC0DE`) — lobby index → `mpn` → `id = 1000 + mpn`, plus Steam IDs
+2. **Chat** — sender name ↔ `playerId`
+3. **Fixed start** — `id = 1000 + lobby slot` when the slot scheme fits
+4. **Unique faction residual** — exactly one unassigned player and one unclaimed ID for that faction/side
+
+It does **not** assign same-faction teammates by sorted lobby order on random start (that historically swapped Armor/Infantry doctrines).
+
+### Inspect ambiguity
 
 ```typescript
-import {
-  parseReplay,
-  applyPlayerSteamIds,
-  applyPlayerIds,
-  getUnresolvedPlayerIds,
-} from "@fknoobs/replay-parser";
-
-const replay = parseReplay(bytes);
+import { getUnresolvedPlayerIds, applyPlayerIds, embedPlayerIds } from "@fknoobs/replay-parser";
 
 const unresolved = getUnresolvedPlayerIds(replay);
-// unresolved.unassignedPlayers / unresolved.unclaimedIds (with doctrine hints)
+// unresolved.unassignedPlayers — header players still without id
+// unresolved.unclaimedIds — leftover 1000–1007 IDs with faction/doctrine hints
 
 applyPlayerIds(replay, {
   "EGY | GAZA": 1003,
   CamoFILMs: 1002,
 });
 
-applyPlayerSteamIds(replay, {
-  Alice: "76561198000000001",
-  Bob: "76561198000000002",
+const persisted = embedPlayerIds(bytes, {
+  "EGY | GAZA": 1003,
+  CamoFILMs: 1002,
 });
-// Matching is trim + case-insensitive; mutates replay.players in place
 ```
 
-### Persist in the `.rec` file
+Matching for `applyPlayerIds` / `applyPlayerSteamIds` is **trim + case-insensitive**.
 
-Steam IDs and player-ID overrides can be stored in an **`FKSTMETA` trailer** appended after the official replay bytes. The game tick stream never sees it: the parser strips the trailer before reading.
+---
+
+## CPM (commands per minute)
+
+Aligned with Replay Manager’s `C2A.EXE` backend:
+
+```typescript
+import { playerCpm, playerCpmLabel, countCpmCommands } from "@fknoobs/replay-parser";
+
+playerCpm(replay, player.id);       // number, rounded
+playerCpmLabel(replay, player.id);  // "99"
+```
+
+Rules:
+
+- Count unique `(tick, commandId, objectId)` among eligible actions (collapses multi-entity spam on one tick)
+- Stop at the first `AI_TAKEOVER` for that player; divisor is minutes until that tick (else full `durationSeconds`)
+- Exclude aura / non-input `UNIT_COMMAND`s (`Maintain Command Range`, `Set Up Truck`, …) — see `CPM_EXCLUDED_UNIT_COMMAND_IDS`
+- The takeover packet itself does **not** count (early dropout → CPM `0`)
+
+Lower-level helpers: `isAiTakeoverAction`, `isCpmExcludedAction`, `actionsUntilAiTakeover`, `cpmEligibleActions`, `cpmDurationMinutes`.
+
+AI takeover is detected via `command.type === "AI_TAKEOVER"` **or** raw `commandId === 0x6a && objectId === 0x4` (works even with `enrichCommands: false`).
+
+---
+
+## FKSTMETA metadata trailer
+
+Optional trailer **after** the official CoH1 body. The game never sees it: parsers strip it first.
+
+```
+[CoH replay body]
+[JSON UTF-8 payload]
+[u32 LE jsonByteLength]
+[u32 LE version = 1]
+[8 ASCII "FKSTMETA"]
+```
+
+Payload shape:
+
+```ts
+type ReplayMetadata = {
+  steamIdsByName: Record<string, string>;
+  playerIdsByName: Record<string, number>;
+};
+```
+
+| Function | Behavior |
+| --- | --- |
+| `extractReplayMetadata(input)` | `{ body, metadata }` — body is CoH-readable |
+| `hasReplayMetadata(input)` | Valid trailer with parseable JSON |
+| `hasReplayMetadataTrailer(input)` | Valid framing (even if JSON is corrupt) |
+| `stripReplayMetadata(input)` | Body only (may be a view) |
+| `resetReplayMetadata(input)` | Detached copy of body (does **not** undo `setReplayName`) |
+| `embedReplayMetadata(input, meta)` | Replace trailer; returns new buffer |
+| `embedPlayerSteamIds` / `embedPlayerIds` | Patch one map; preserve the other |
 
 ```typescript
 import {
@@ -145,6 +355,7 @@ import {
   embedPlayerIds,
   extractReplayMetadata,
   parseReplay,
+  resetReplayMetadata,
 } from "@fknoobs/replay-parser";
 import { writeFileSync } from "node:fs";
 
@@ -152,67 +363,202 @@ let withMeta = embedPlayerSteamIds(bytes, {
   Alice: "76561198000000001",
   Bob: "76561198000000002",
 });
-withMeta = embedPlayerIds(withMeta, {
-  Alice: 1000,
-  Bob: 1001,
-});
-writeFileSync("./replays/my_replay.with-meta.rec", withMeta);
+withMeta = embedPlayerIds(withMeta, { Alice: 1000, Bob: 1001 });
+writeFileSync("./out.with-meta.rec", withMeta);
 
-// Later: parseReplay / parseHeader auto-apply steamId + player id onto matching players
-const replay = parseReplay(withMeta);
-console.log(replay.players.map((p) => [p.name, p.id, p.steamId]));
-
-// Or inspect the trailer without a full parse
+const replay = parseReplay(withMeta); // auto-applies trailer maps
 const { body, metadata } = extractReplayMetadata(withMeta);
+
+// CoH / Replay Manager export (trailer removed)
+writeFileSync("./out.reset.rec", resetReplayMetadata(withMeta));
 ```
 
-`embedPlayerSteamIds` / `embedPlayerIds` each preserve the other map when replacing the trailer. Re-embedding replaces any existing trailer (it does not stack).
+**Important:** CoH and Replay Manager cannot read files that still have an FKSTMETA trailer. Use `resetReplayMetadata` or `prepareForLocalCoh` before handing bytes to the game.
 
-### Reset to original replay bytes
+---
 
-`resetReplayMetadata` removes the `FKSTMETA` trailer and returns a detached copy of the official CoH1 body. It does **not** undo header edits from `setReplayName`.
+## Rename replay
 
-```typescript
-import {
-  hasReplayMetadata,
-  resetReplayMetadata,
-  parseReplay,
-} from "@fknoobs/replay-parser";
-import { writeFileSync } from "node:fs";
-
-if (hasReplayMetadata(bytes)) {
-  const original = resetReplayMetadata(bytes);
-  writeFileSync("./replays/my_replay.reset.rec", original);
-
-  const replay = parseReplay(original);
-  // players have no steamId / ID overrides from trailer
-}
-```
-
-## Rename replay (`replayName`)
-
-`setReplayName` rewrites the length-prefixed UTF-16 `replayName` inside the CoH1 `DATABASE` header chunk (ancestor Relic Chunky lengths are updated). Any existing `FKSTMETA` trailer is preserved.
+`setReplayName` rewrites the length-prefixed UTF-16LE `replayName` inside the `DATABASE` header chunk and updates ancestor Relic Chunky length fields. Any existing FKSTMETA trailer is preserved.
 
 ```typescript
 import { parseHeader, setReplayName } from "@fknoobs/replay-parser";
 import { writeFileSync } from "node:fs";
 
 const renamed = setReplayName(bytes, "My custom replay title");
-writeFileSync("./replays/my_replay.renamed.rec", renamed);
-
-console.log(parseHeader(renamed).replayName);
-// → "My custom replay title"
+writeFileSync("./out.renamed.rec", renamed);
+console.log(parseHeader(renamed).header.replayName);
 ```
+
+Throws if the DATABASE chunk / string cannot be located (corrupt or unsupported header).
+
+---
+
+## Local map archive paths
+
+Workshop / custom maps often embed an absolute Windows `.sga` / `.sgb` path under `\My Games\Company of Heroes…` inside DATASDSC. Replays recorded on another PC fail to find the archive locally.
+
+| Function | Behavior |
+| --- | --- |
+| `defaultLocalDocumentsRoot()` | `%USERPROFILE%\Documents` / `$HOME/Documents`, or `undefined` in browsers |
+| `toLocalMapArchivePath(foreign, docs)` | Rewrite keeping the `\My Games\…` suffix |
+| `findMapArchivePaths(input)` | List embedded absolute archive paths |
+| `rewriteLocalMapArchivePaths(input, opts)` | Rewrite in place; preserve FKSTMETA |
+| `prepareForLocalCoh(input, opts)` | Strip FKSTMETA **and** rewrite paths |
+
+```typescript
+import { prepareForLocalCoh, findMapArchivePaths } from "@fknoobs/replay-parser";
+
+console.log(findMapArchivePaths(bytes));
+
+const { bytes: localReady, rewritten } = prepareForLocalCoh(bytes, {
+  localDocuments: "C:\\Users\\You\\Documents",
+});
+// Hand `localReady` to CoH / Replay Manager
+```
+
+---
+
+## Dates
+
+Replay headers store the recorder’s Windows short date + time (`g`), which varies by culture.
+
+`parseReplayDate(raw)` returns timezone-naive `YYYY-MM-DDTHH:mm:ss` for Gregorian Windows locales (DMY/MDY/YMD, CJK meridiems, Thai Buddhist years, …). Hijri/Persian calendars fall back to the raw string. Ambiguous `3/6` + AM/PM can still be US vs AU.
+
+Used automatically during header parse; export it if you need to normalize dates yourself.
+
+---
+
+## BinaryReader
+
+Low-level little-endian reader used internally and exported for advanced tooling:
+
+```typescript
+import { BinaryReader } from "@fknoobs/replay-parser";
+
+const r = new BinaryReader(bytes);
+r.readUInt32();
+r.readLengthPrefixedUnicodeStr();
+```
+
+Views are bound to a tight `Uint8Array` (views into pooled buffers are copied). Out-of-bounds reads throw `RangeError` — the high-level parsers catch these into `meta.warnings`.
+
+---
+
+## API reference
+
+### Parsing
+
+| Export | Description |
+| --- | --- |
+| `parseReplay(input, options?)` | Full parse → `Replay` |
+| `parseHeader(input)` | Header (+ BADCOE / FKSTMETA) only |
+| `ParseOptions` | `actions?`, `enrichCommands?` |
+
+### Types & helpers
+
+| Export | Description |
+| --- | --- |
+| `Replay`, `ReplayHeader`, `ReplayMeta`, `Player`, `Action`, `ChatMessage`, `Command`, `Vec3`, `RelicLadderPlayer` | Public model |
+| `createEmptyReplay` / `createEmptyHeader` | Empty shells for tests / manual builds |
+| `DOCTRINES` / `getDoctrineName` | Doctrine ID → name |
+| `formatDuration` / `formatTickTimestamp` / `playerNameById` | Display helpers |
+| `BinaryReader` | LE binary cursor |
+| `parseReplayDate` | Locale date string → ISO local |
+
+### Players
+
+| Export | Description |
+| --- | --- |
+| `applyPlayerIds` | Name → action ID overrides (mutates replay) |
+| `applyPlayerSteamIds` | Name → Steam ID (mutates replay) |
+| `getUnresolvedPlayerIds` | Ambiguous leftover players / IDs |
+| `UnclaimedPlayerId`, `UnresolvedPlayerIds` | Ambiguity result types |
+
+### Analytics
+
+| Export | Description |
+| --- | --- |
+| `playerCpm` / `playerCpmLabel` | C2A-aligned CPM |
+| `countCpmCommands`, `cpmEligibleActions`, `actionsUntilAiTakeover`, `cpmDurationMinutes` | Building blocks |
+| `isAiTakeoverAction`, `isCpmExcludedAction` | Filters |
+| `CPM_EXCLUDED_UNIT_COMMAND_IDS` | Aura / spam object IDs |
+| `CpmAction` | Minimal action shape for CPM helpers |
+
+### Metadata
+
+| Export | Description |
+| --- | --- |
+| `extractReplayMetadata`, `embedReplayMetadata` | Read / write trailer |
+| `embedPlayerSteamIds`, `embedPlayerIds` | Partial trailer updates |
+| `stripReplayMetadata`, `resetReplayMetadata` | Remove trailer |
+| `hasReplayMetadata`, `hasReplayMetadataTrailer` | Presence checks |
+| `ReplayMetadata`, `ExtractedReplay` | Trailer types |
+
+### Mutators
+
+| Export | Description |
+| --- | --- |
+| `setReplayName` | Rewrite official `replayName` |
+| `findMapArchivePaths` | List embedded `.sga` / `.sgb` paths |
+| `rewriteLocalMapArchivePaths` | Rewrite paths; keep trailer |
+| `prepareForLocalCoh` | Strip trailer + rewrite paths |
+| `toLocalMapArchivePath`, `defaultLocalDocumentsRoot` | Path helpers |
+| `RewriteLocalMapPathOptions` / `Result`, `PrepareForLocalCoh*` | Option/result types |
+
+---
+
+## Migrating from v1
+
+| v1 | v2 |
+| --- | --- |
+| Flat `ReplayData` fields (`mapName`, `matchType`, …) | Nested `replay.header.*` |
+| `duration` / `durationReadable` | `durationSeconds` + `formatDuration()` |
+| `messages` | `chat` |
+| `errors` / `headerParsed` / `dataParsed` | `meta.warnings` / `meta.headerOk` / `meta.dataOk` |
+| `action.playerID` / `commandID` / `objectID` | `playerId` / `commandId` / `objectId` |
+| `action.absoluteOffset` | `action.offset` |
+| `action.playerName` / `timestamp` | `playerNameById` / `formatTickTimestamp` |
+| `relicLadderPlayers` | `ladder` |
+| `playerCount` | `players.length` |
+| `includeHexData` | Removed; use `actions` / `enrichCommands` |
+| `ReplayStream` | `BinaryReader` |
+| Soft-fail + `console.error` | Soft-fail only (`meta.warnings`) |
+
+There is **no** compatibility shim. Bump consumers to `@fknoobs/replay-parser@2`.
+
+---
 
 ## Development
 
 ```bash
-pnpm dev      # Vite playground (upload .rec, edit name / Steam / player IDs, download .rec)
+pnpm dev      # Vite playground (upload .rec, edit name / Steam / IDs, download)
 pnpm test     # Vitest unit tests
-pnpm smoke    # Parse every *.rec in the project root + fixtures/
+pnpm smoke    # Parse every *.rec in project root + fixtures/
 pnpm build    # tsc → dist/
 ```
 
+Source layout:
+
+```
+src/
+  parse.ts, types.ts, index.ts
+  binary/     BinaryReader
+  chunky/     shared Relic Chunky walk + splice
+  header/     DATASDSC / DATABASE / DATAINFO / BADCOE
+  ticks/      tick/chat demux
+  actions/    packet decode, definitions, refine
+  players/    ID linking, overrides, ambiguity
+  metadata/   FKSTMETA
+  mutate/     rename + map-path rewrite
+  analytics/  CPM
+  dates/      parseReplayDate
+playground/   Vite UI (not shipped in dist/)
+fixtures/     regression .rec files
+```
+
+---
+
 ## Credits
 
-Based on research and logic from the Company of Heroes community (GameReplays.org) and original work by Sander Dijkstra. Rewritten and modernized for the current era.
+Based on research and logic from the Company of Heroes community (GameReplays.org) and original work by Sander Dijkstra. Rewritten for v2 as a modular, typed library with lean action data and shared header edit primitives.

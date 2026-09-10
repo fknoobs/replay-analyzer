@@ -1,8 +1,18 @@
 {
     "name": "@fknoobs/replay-parser",
-    "version": "1.11.0",
+    "version": "2.0.0",
     "type": "module",
-    "main": "dist/index.js",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "build": "tsc",
         "prepare": "npm run build",
@@ -13,7 +23,7 @@
     "keywords": [],
     "author": "",
     "license": "ISC",
-    "description": "",
+    "description": "Company of Heroes 1 replay parser",
     "devDependencies": {
         "@types/node": "^25.9.5",
         "ts-node": "^10.9.2",
