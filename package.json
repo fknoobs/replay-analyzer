@@ -1,37 +1,36 @@
 {
-    "name": "@fknoobs/replay-parser",
-    "version": "2.0.0",
-    "type": "module",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-        ".": {
-            "types": "./dist/index.d.ts",
-            "import": "./dist/index.js"
-        }
-    },
-    "files": [
-        "dist"
-    ],
-    "scripts": {
-        "build": "tsc",
-        "prepare": "npm run build",
-        "dev": "vite",
-        "build:site": "vite build",
-        "preview:site": "vite preview",
-        "test": "vitest run",
-        "smoke": "tsx scripts/smoke-all-rec.ts"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "description": "Company of Heroes 1 replay parser",
-    "devDependencies": {
-        "@types/node": "^25.9.5",
-        "ts-node": "^10.9.2",
-        "tsx": "^4.23.13",
-        "typescript": "^5.9.3",
-        "vite": "^7.3.6",
-        "vitest": "^4.1.11"
+  "name": "@fknoobs/replay-parser",
+  "version": "2.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "vite",
+    "build:site": "vite build",
+    "preview:site": "vite preview",
+    "test": "vitest run",
+    "smoke": "tsx scripts/smoke-all-rec.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Company of Heroes 1 replay parser",
+  "devDependencies": {
+    "@types/node": "^25.9.5",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.6",
+    "vitest": "^4.1.11"
+  }
 }
