@@ -8,6 +8,7 @@ commands.txt
 
 # Production builds
 build/
+site/
 
 # TypeScript
 *.tsbuildinfo

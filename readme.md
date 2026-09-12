@@ -536,7 +536,10 @@ pnpm dev      # Vite playground (upload .rec, edit name / Steam / IDs, download)
 pnpm test     # Vitest unit tests
 pnpm smoke    # Parse every *.rec in project root + fixtures/
 pnpm build    # tsc → dist/
+pnpm build:site  # Vite playground → site/ (set GITHUB_PAGES=true for Pages base path)
 ```
+
+Playground on GitHub Pages: https://fknoobs.github.io/replay-analyzer/
 
 Source layout:
 

@@ -17,6 +17,8 @@
         "build": "tsc",
         "prepare": "npm run build",
         "dev": "vite",
+        "build:site": "vite build",
+        "preview:site": "vite preview",
         "test": "vitest run",
         "smoke": "tsx scripts/smoke-all-rec.ts"
     },
